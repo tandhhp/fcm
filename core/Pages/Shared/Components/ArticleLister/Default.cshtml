@@ -1,0 +1,37 @@
+﻿@using Waffle.Extensions;
+@using Waffle.Models.Components
+@model ArticleLister
+
+@{
+    IEnumerable<ListGroupItem> GetItems()
+    {
+        var items = new List<ListGroupItem>();
+        if (Model.Articles == null)
+        {
+            return items;
+        }
+        foreach (var item in Model.Articles.Data)
+        {
+            items.Add(new ListGroupItem
+                    {
+                        Link = new Link
+                        {
+                            Name = item.Name,
+                            Href = item.GetUrl()
+                        }
+                    });
+        }
+        return items;
+    }
+}
+
+@await Html.PartialAsync("/Pages/Shared/Components/ListGroup/Default.cshtml", new ListGroup
+                {
+                    Name = Model.Name,
+                    Items = GetItems()
+                })
+
+@if (Model.Articles != null)
+{
+    @Html.DisplayFor(x => Model.Articles.Pagination)
+}

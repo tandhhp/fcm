@@ -1,0 +1,13 @@
+﻿@using Waffle.Models.Components;
+@model Css
+
+@if (Model.Type == CssType.Critical)
+{
+    <style>
+        @Html.Raw(Model.Value)
+    </style>
+} 
+else
+{
+    <link rel="stylesheet" href="@Model.Url" asp-append-version="true" />
+}

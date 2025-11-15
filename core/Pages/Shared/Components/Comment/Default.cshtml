@@ -1,0 +1,81 @@
+﻿@using Waffle.Entities;
+@using Waffle.Extensions;
+@model Waffle.Models.Components.CommentComponent
+
+<div class="comment mb-4" id="@Model.Id">
+    <div class="title">Bình luận</div>
+    @if (Model.IsAuthenticated)
+    {
+        <div class="comment-message mb-2">
+            <div class="form-item">
+                <textarea class="form-control" id="js-comment-message"></textarea>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="addComment()">
+                <i class="fa-regular fa-paper-plane me-1"></i>
+                <span>Gửi bình luận</span>
+            </button>
+        </div>
+        <div class="comment-list">
+            @foreach (var comment in Model.Comments.Data)
+            {
+                if (comment.UserId != User.GetId() && comment.Status == CommentStatus.Draft)
+                {
+                    continue;
+                }
+                <div class="shadow mb-2 @(comment.Status == CommentStatus.Draft ? "opacity-50" : string.Empty)">
+                    <div class="px-2 py-1 bg-gray-100 flex justify-between">
+                        <div>
+                            <i class="fas fa-user me-1"></i>
+                            <span class="me-1 font-bold">@comment.UserName</span>
+                            @if (comment.Status == CommentStatus.Draft)
+                            {
+                                <span class="px-1 bg-red-500 text-white rounded text-sm">Chờ duyệt</span>
+                            }
+                        </div>
+                        <div class="text-sm text-muted">
+                            <i class="fas fa-calendar me-1"></i>
+                            <span>@comment.CreatedDate.ToLongDateString()</span>
+                        </div>
+                    </div>
+                    <div class="p-2">
+                        @comment.Content
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="px-2 text-center">
+            Để lại bình luận <a href="/users/login?returnUrl=@Model.CurrentUrl">
+                <localize key="login" />
+            </a> / <a href="/users/register">Đăng ký</a>
+        </div>
+    }
+</div>
+<script>
+    function addComment() {
+
+        const data = {
+            catalogId: '@Model.CatalogId',
+            message: document.querySelector('#js-comment-message').value
+        };
+
+        if (!data.message) {
+            Site.toast('Vui lòng nhập nội dung!');
+            return;
+        }
+
+        fetch('/api/comment/add', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data),
+        }).then(response => response.json().then(result => {
+            if (result.succeeded) {
+                window.location.reload();
+            }
+        }))
+    }
+</script>

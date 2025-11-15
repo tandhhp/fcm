@@ -1,0 +1,11 @@
+﻿@page
+@model Waffle.Pages.Products.List.IndexModel
+
+<main class="container">
+    @Html.DisplayFor(x => x.SearchTerm)
+
+    @foreach (var component in Model.Components)
+    {
+        @await Component.InvokeAsync(component.Name, component.Id)
+    }
+</main>

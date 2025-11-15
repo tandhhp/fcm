@@ -1,0 +1,82 @@
+﻿@page
+@model Waffle.Pages.Users.RegisterModel
+
+<main class="container">
+    <div class="d-flex justify-content-center align-items-center">
+        <div class="col-md-6">
+            <div class="mb-4">
+                <div class="mb-4">
+                    @if (Model.Result != null)
+                    {
+                        @if (!Model.Result.Succeeded)
+                        {
+                            <ul class="text-red-500">
+                                @foreach (var item in Model.Result.Errors)
+                                {
+                                    <li>@item.Description</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <div class="text-green-500">
+                                Đăng ký thành công, vui lòng kiểm tra hộp thư đến và xác nhận địa chỉ email!
+                            </div>
+                        }
+                    }
+                </div>
+                <div class="title">Đăng ký</div>
+                <form method="post">
+                    <div class="form-item">
+                        <div class="form-label">
+                            Tên đăng nhập
+                            <font color="red">*</font>
+                        </div>
+                        <input class="form-control" type="text" required name="userName" />
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-item">
+                                <div class="form-label">Email</div>
+                                <input class="form-control" type="email" required name="email" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-item">
+                                <div class="form-label">Số điện thoại</div>
+                                <input class="form-control" type="text" required name="phoneNumber" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <div class="form-label">
+                            <localize key="password" />
+                            <font color="red">*</font>
+                        </div>
+                        <input class="form-control" type="password" required name="Password" />
+                    </div>
+                    <div class="form-item">
+                        <div class="form-label">
+                            <localize key="confirmPassword" />
+                            <font color="red">*</font>
+                        </div>
+                        <input class="form-control" type="password" required name="ConfirmPassword" />
+                    </div>
+                    <div class="form-item">
+                        <label>
+                            <input type="checkbox" required name="IsAccept" />
+                            <span>Đồng ý điều khoản sử dụng</span>
+                        </label>
+                    </div>
+                    <div class="form-item">
+                        <button type="submit" class="btn btn-primary">Đăng ký</button>
+                        <button type="reset" class="btn">Reset</button>
+                    </div>
+                </form>
+            </div>
+            <div class="mb-4 text-right">
+                Bạn đã có tài khoản? <a href="/users/login">Đăng nhập</a>
+            </div>
+        </div>
+    </div>
+</main>

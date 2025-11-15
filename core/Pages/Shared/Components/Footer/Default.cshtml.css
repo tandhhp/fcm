@@ -1,0 +1,9 @@
+﻿.footer {
+    background: #00BCD4 url(https://nuras.com.vn/imgs/web/bg-footer.png) 100% 0 no-repeat;
+    color: white;
+}
+
+    .footer a {
+        border-bottom: 1px;
+        border-color: transparent;
+    }

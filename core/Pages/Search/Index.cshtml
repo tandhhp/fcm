@@ -1,0 +1,50 @@
+﻿@page
+@using Waffle.Core.Constants;
+@using Waffle.Core.Helpers;
+@using Waffle.Models.Components
+@using Waffle.Models.Components.Specifications
+@using Waffle.Models.Components.Lister
+@model Waffle.Pages.Search.IndexModel
+
+<main class="container">
+    @await Component.InvokeAsync(nameof(Breadcrumb))
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="mb-2 flex items-center justify-between">
+                <form class="mb-2" action="/search/index" method="get">
+                    <div class="border rounded-full flex bg-white">
+                        <input type="search" name="searchTerm" placeholder="Tìm kiếm..." class="flex-grow px-4 rounded-full" value="@Model.FilterOptions.SearchTerm" autocomplete="off">
+                        <button type="submit" class="py-2 px-3">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                </form>
+                <div class="dropdown">
+                    <button class="py-2 fw-medium" data-bs-toggle="dropdown" aria-expanded="false" id="drp-sort">
+                        <i class="fas fa-sort-amount-up"></i> Sắp xếp
+                    </button>
+                    <div class="dropdown-menu bg-white shadow dropdown-menu-end shadow-lg rounded" aria-labelledby="drp-sort">
+                        <a class="py-2 px-4 flex items-center hover:bg-gray-100 w-full rounded-b" href="/search?searchTerm=@Model.FilterOptions.SearchTerm&orderBy=VIEW&amp;sortBy=ASCENDING&amp;current=1">Lượt xem</a>
+                        <a class="py-2 px-4 flex items-center hover:bg-gray-100 w-full rounded-b" href="/search?searchTerm=@Model.FilterOptions.SearchTerm&orderBy=MODIFIED&amp;sortBy=ASCENDING&amp;current=1">Thời gian</a>
+                    </div>
+                </div>
+            </div>
+            <div class="title">@Model.Articles.Total kết quả tìm kiếm cho: @Model.FilterOptions.SearchTerm</div>
+            @if (Model.Articles.HasData)
+            {
+                <partial name="~/Pages/Articles/_List.cshtml" model="Model.Articles.Data" />
+
+                @Html.DisplayFor(x => Model.Articles.Pagination)
+            }
+            else
+            {
+                @await Html.PartialAsync(PartialViewName.Empty, new ErrorViewModel{ RequestId = Guid.Empty.ToString() })
+            }
+
+        </div>
+        <div class="col-md-4">
+            @await Component.InvokeAsync(nameof(ArticleSpotlight))
+        </div>
+    </div>
+</main>

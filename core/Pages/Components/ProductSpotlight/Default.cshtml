@@ -1,0 +1,47 @@
+﻿@using System.Globalization;
+@using Waffle.Extensions;
+@using Waffle.Models.Components
+@model ProductSpotlight
+
+<div class="mb-4 product-spotlight">
+    <div class="title">@Model.Title</div>
+    <div class="bg-white">
+        <div class="row">
+            @foreach (var item in Model.Products)
+            {
+                <div class="@Model.ItemPerRow">
+                    <a href="@item.Url">
+                        <div class="card-image bg-dark relative">
+                            <img src="@item.Thumbnail" alt="@item.Name" class="object-cover product-thumbnail" loading="lazy" />
+                            @if (item.Price != null && item.SalePrice != null)
+                            {
+                                <span class="badge bg-danger position-absolute top-0 end-0">
+                                    <span>GIẢM</span>
+                                    @(100 - Math.Round((item.SalePrice / item.Price ?? 0) * 100))%
+                                </span>
+                            }
+                        </div>
+                    </a>
+                    <div class="py-2">
+                        <div class="mb-1 d-md-flex justify-content-between">
+                            <div>
+                                <span class="text-danger fw-medium">@item.SalePrice.ToMoney()</span>
+                                <s class="text-muted text-sm">@item.Price.ToMoney()</s>
+                            </div>
+                            <div class="text-warning text-xs text-right">
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                        </div>
+                        <a href="@item.Url" class="line-clampin">
+                            @item.Name
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

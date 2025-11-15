@@ -1,0 +1,16 @@
+﻿@using Waffle.Models.Components.Specifications
+@model VideoPlayer
+
+<div class="video-player mb-4">
+    <div class="title">Video</div>
+    <div>
+        @if (Model.Format == VideoPlayerFormat.YouTube)
+        {
+            <iframe class="w-full iframe-height" src="https://www.youtube.com/embed/@Model.EmbedId" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        }
+        else
+        {
+            <div hidden>Video player format not supported</div>
+        }
+    </div>
+</div>

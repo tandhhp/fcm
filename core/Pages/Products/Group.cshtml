@@ -1,0 +1,45 @@
+﻿@page "/shop/group/{groupId}"
+@using Waffle.Models.Components
+@using Waffle.Models.Components.Specifications
+@model Waffle.Pages.Products.GroupModel
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="mb-2 flex justify-end">
+                <form method="get">
+                    <div class="rounded-full bg-gray-100">
+                        <input type="search" class="px-4 py-2 rounded-full bg-gray-100" placeholder="Nhập từ khóa" name="searchTerm" />
+                        <button type="submit">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="title">Danh mục (@Model.Data.TotalCount)</div>
+            <div class="mb-2">
+                <div class="grid grid-cols-4 gap-4 mb-4">
+                    @foreach (var item in Model.Data.LinkList)
+                    {
+                        <div class="bg-white">
+                            <div class="card-image">
+                                <img src="@item.Image" alt="@item.LinkName" class="object-cover" loading="lazy" />
+                            </div>
+                            <div class="p-2">
+                                <a href="@item.Link" class="line-clampin">
+                                    @item.LinkName
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <partial name="~/Pages/Shared/Components/Pagination/Token.cshtml" model="Model.Pagination" />
+        </div>
+        <div class="col-md-4">
+            @await Component.InvokeAsync(nameof(ArticleSpotlight))
+            @await Component.InvokeAsync(nameof(Tag))
+            @await Component.InvokeAsync(nameof(Waffle.ExternalAPI.Models.GoogleAggregate.Trend))
+        </div>
+    </div>
+</div>

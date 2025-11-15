@@ -1,0 +1,80 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@using Waffle.Core.Helpers;
+@using Waffle.Entities;
+@using Waffle.Extensions;
+@model ApplicationUser
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    Layout = null;
+    var avatar = $"https://www.gravatar.com/avatar/{EncryptHelper.MD5Create(Model.Email)}?s=520";
+    var isCurrentUser = Model.Id == User.GetId();
+
+    static string HidePhoneNumber(string? phoneNumber, int startIndex, int length)
+    {
+        if (string.IsNullOrEmpty(phoneNumber) || startIndex < 0 || startIndex >= phoneNumber.Length || length <= 0)
+        {
+            return "-";
+        }
+
+        // Ensure not to go out of bounds
+        int endIndex = Math.Min(startIndex + length, phoneNumber.Length);
+
+        // Replace characters with asterisks
+        string hiddenPart = new string('*', endIndex - startIndex);
+
+        // Construct the hidden phone number
+        string hiddenPhoneNumber = phoneNumber.Substring(0, startIndex) + hiddenPart + phoneNumber.Substring(endIndex);
+
+        return hiddenPhoneNumber;
+    }
+}
+
+<aside class="col-md-3 mb-4">
+    <div class="card mb-2 shadow">
+        <div class="flex justify-center mb-4 relative">
+            <img src="@Model.Avatar" loading="lazy" alt="Avatar" class="rounded-full object-cover h-52" width="200" height="200" />
+        </div>
+        <div class="text-xl font-bold mb-3 text-center">@Model.Name</div>
+        <div class="mb-4 text-center text-muted">
+            @Model.UserName
+        </div>
+    </div>
+    <div class="bg-white shadow">
+        <div class="px-4 py-2 border-bottom flex justify-between">
+            <div>
+                <i class="fas fa-phone me-1"></i>Số điện thoại:
+            </div>
+            <div class="text-muted text-right">
+                <a href="tel:@Model.PhoneNumber">@HidePhoneNumber(Model.PhoneNumber, 3, 7)</a>
+            </div>
+        </div>
+        <div class="px-4 py-2 border-bottom flex justify-between">
+            <div>
+                <i class="fas fa-globe me-1"></i>Ngày sinh:
+            </div>
+            <div class="text-muted text-right">@Model.DateOfBirth?.ToString("dd/MM/yyyy")</div>
+        </div>
+        <div class="px-4 py-2 border-bottom flex justify-between">
+            <div>
+                <i class="fa-solid fa-location-dot me-1"></i>Địa chỉ:
+            </div>
+            <div class="text-muted text-right">@Model.Address</div>
+        </div>
+        @if (isCurrentUser)
+        {
+            <div class="px-4 py-2 border-bottom flex justify-center">
+                <a href="/users/changepassword">
+                    <i class="fa-solid fa-lock me-1"></i>
+                    <span>Đổi mật khẩu</span>
+                </a>
+            </div>
+            <div class="px-4 py-2 border-bottom flex justify-center">
+                <a href="/users/logout" class="text-red-500">
+                    <i class="fa-solid fa-right-from-bracket me-1"></i>
+                    <span>Đăng xuất</span>
+                </a>
+            </div>
+        }
+    </div>
+</aside>

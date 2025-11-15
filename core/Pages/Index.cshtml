@@ -1,0 +1,327 @@
+﻿@page
+@using Waffle.Models.Components
+@model Waffle.Pages.IndexModel
+
+<link href="https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<main class="home">
+
+    <div class="relative">
+        <div class="swiper heroSwiper">
+            <div class="swiper-wrapper">
+                @foreach (var item in Model.HeroSlides)
+                {
+                    <div class="swiper-slide bg-green-200 bg-cover bg-center">
+                        <div class="flex justify-center absolute top-0 inset-x-0 md:py-10 py-2 z-50">
+                            <div class="py-2 px-4 rounded-lg">
+                                <a href="/">
+                                    <img src="https://nuras.com.vn/imgs/web/logo-white-full.png" class="w-32 md:w-40" />
+                                </a>
+                            </div>
+                            <a href="https://me.nuras.com.vn" class="shadow absolute md:left-20 left-2 top-5 z-10 border-2 btn-login font-medium cursor-pointer hover:bg-cyan-400 hover:text-white text-white">
+                                <i class="fa-solid fa-user me-1 text-sm"></i>
+                                <span>Đăng nhập</span>
+                            </a>
+                        </div>
+                        @if (item.IsVideo)
+                        {
+                            <video autoplay
+                                   loop
+                                   muted
+                                   playsinline
+                                   class="absolute w-auto min-w-full min-h-full max-w-none swiper-video">
+                                <source src="@item.Image"
+                                        type="video/mp4" />
+                                Your browser does not support the video tag.
+                            </video>
+                        }
+                        else
+                        {
+                            <img src="@item.Image" alt="@item.Title" loading="lazy" class="w-full swiper-img">
+                        }
+                        <div class="swiper-hero__overlay">
+                            <div class="swiper-hero__overlay-wrapper" data-aos="fade-right">
+                                <div class="swiper-hero__overlay--title philosopher animate__animated animate__fadeInUp animate__delay-1s">
+                                    @Html.Raw(item.Title)
+                                </div>
+                                <div class="swiper-hero__overlay--description animate__animated animate__fadeInUp animate__delay-1s">
+                                    @item.Description
+                                </div>
+                                @if (item.Type == HeroType.Tour)
+                                {
+                                    <div class="swiper-hero__overlay--cta animate__animated animate__fadeIn animate__delay-1s">
+                                        <button class="btn btn-primary btn-cta drop-shadow-md" onclick="showVoucher('@item.Voucher', 'tour')">Voucher 3 ngày 2 đêm Phú Quốc</button>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="swiper-hero__overlay--cta animate__animated animate__fadeIn animate__delay-1s">
+                                        <button class="btn btn-primary btn-cta drop-shadow-md" onclick="showVoucher('@item.Voucher', 'healthcare')">Voucher xét nghiệm miễn phí</button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+
+    <div class="feature">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card" data-aos="fade-up" data-aos-delay="50" data-aos-duration="2000">
+                        <img src="https://www.cio.com/wp-content/uploads/2023/07/healthcare_technology_medical_data_by_metamorworks_gettyimages-1127069581_2400x1600-100837041-orig-1.jpg?quality=50&strip=all" class="card-img-top" alt="IMG">
+                        <div class="card-body">
+                            <h5 class="card-title philosopher">Giá trị cốt lõi</h5>
+                            <p class="card-text">
+                                Luôn đặt lợi ích và sức khỏe của khách hàng lên hàng đầu, mang đến trải nghiệm dịch vụ tốt nhất. Lòng yêu thương, sự tôn trọng, trân quý từng khách hàng, tạo dựng mối quan hệ gắn bó, tin cậy.
+                            </p>
+                            <div class="text-center wrapper-cta">
+                                <button type="button" class="btn-cta" data-bs-toggle="modal" data-bs-target="#voucherForm">TÌM HIỂU THÊM</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card" data-aos="fade-up" data-aos-delay="300" data-aos-duration="2000">
+                        <img src="https://nuras.com.vn/imgs/homes/su-menh.jpg" class="card-img-top" alt="IMG">
+                        <div class="card-body">
+                            <h5 class="card-title philosopher">Sứ mệnh</h5>
+                            <p class="card-text">
+                                Xây dựng thói quen chăm sóc sức khỏe chủ động cho người Việt bằng những ứng dụng công nghệ y học tiên tiến vào đời sống với mục đích giúp người trưởng thành luôn khỏe mạnh, trẻ trung để tận hưởng cuộc sống hạnh phúc hơn.
+                            </p>
+                            <div class="text-center wrapper-cta">
+                                <button type="button" class="btn-cta" data-bs-toggle="modal" data-bs-target="#voucherForm">TÌM HIỂU THÊM</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card" data-aos="fade-up" data-aos-delay="600" data-aos-duration="2000">
+                        <img src="https://nuras.com.vn/imgs/homes/te-bao-goc-2.jpg" class="card-img-top" alt="IMG">
+                        <div class="card-body">
+                            <h5 class="card-title philosopher">Tầm nhìn</h5>
+                            <p class="card-text">
+                                Đến năm 2030, hình thành thói quen chăm sóc sức khỏe chủ động, dưỡng sinh cho hơn 1 triệu người Việt trưởng thành và trở thành công ty tiên phong hàng đầu về dịch vụ chăm sóc sức khoẻ tại thị trường Châu Á.
+                            </p>
+                            <div class="text-center wrapper-cta">
+                                <button type="button" class="btn-cta" data-bs-toggle="modal" data-bs-target="#voucherForm">TÌM HIỂU THÊM</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-slate-200 testimonial relative">
+        <div class="testimonial-before"></div>
+        <div class="container">
+            <div class="py-10 md:py-20">
+                <div data-aos="fade-up" data-aos-duration="1500"
+                     class="philosopher testimonial-title" style="letter-spacing: .12em">
+                    Trải nghiệm của khách hàng
+                </div>
+                <div class=" md:w-[1000px] mx-auto" data-aos="zoom-in" data-aos-duration="1500">
+                    <div class="swiper testimonialSwiper">
+                        <div class="swiper-wrapper">
+                            @foreach (var item in TestimonialDemoData.Data.Items)
+                            {
+                                <div class="swiper-slide h-full">
+                                    <div class="border-cyan-500 rounded h-full bg-white xs:p-4 md:py-10">
+                                        <div class="flex flex-col items-center justify-center px-2 px-md-0 pt-2">
+                                            <img src="@item.Avatar" class="md:w-32 md:h-32 w-32 h-32 rounded-full mb-2 testimonial-avatar object-cover" loading="lazy" />
+                                            <div class="text-yellow-300 flex gap-2">
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                            </div>
+                                            <div class="py-2 text-center testimonial-quote text-slate-800">
+                                                <i class="fa-solid fa-quote-left text-slate-700"></i>
+                                                @Html.Raw(item.Message)
+                                                <i class="fa-solid fa-quote-right text-slate-700"></i>
+                                            </div>
+                                            <div class="border-b border-cyan-800 w-64 mb-2"></div>
+                                            <div class="font-bold text-lg mb-4">@item.Name</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="testimonial-after"></div>
+    </div>
+
+    <div class="article">
+        <div class="container">
+            <div class="text-center">
+                <div data-aos="fade-up" data-aos-duration="1500"
+                     class="philosopher article-heading" style="letter-spacing: .12em">
+                    Tin tức mới nhất
+                </div>
+            </div>
+            <div class="row">
+                @foreach (var item in Model.Articles)
+                {
+                    <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-duration="1500">
+                        <div class="relative max-w-full overflow-hidden bg-cover bg-no-repeat">
+                            <img src="@item.Thumbnail" alt="@Html.Raw(item.Name)" class="h-52 w-full object-cover transition duration-300 ease-in-out hover:scale-110" />
+                        </div>
+                        <div class="article-title line-clamp-2">
+                            <a href="@item.NormalizedName">@Html.Raw(item.Name)</a>
+                        </div>
+                        <div class="article-date">
+                            <span>
+                                <i class="fa-solid fa-calendar"></i>
+                                @item.CreatedDate.ToString("dd/MM/yyyy")
+                            </span>
+                            <span>
+                                <i class="fa-solid fa-eye"></i>
+                                @item.ViewCount.ToString("N0")
+                            </span>
+                        </div>
+                        <div class="article-des line-clamp-3">
+                            @Html.Raw(item.Description)
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @foreach (var item in Model.Components)
+    {
+        @await Component.InvokeAsync(item.Name, item.Id)
+    }
+</main>
+
+<div class="modal fade" tabindex="-1" id="voucherModal">
+    <div class="modal-dialog voucher-modal modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="relative py-3 sm:max-w-xl sm:mx-auto">
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan-700 to-sky-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl">
+                </div>
+                <div class="text-white relative px-4 py-8 bg-cyan-400 shadow-lg sm:rounded-3xl sm:p-20">
+
+                    <div class="text-center pb-6">
+
+                        <div class="flex justify-center mb-4">
+                            <img src="https://nuras.com.vn/imgs/web/logo-white-full.png" class="w-32 md:w-40" />
+                        </div>
+
+                        <p class="text-white">
+                            Vui lòng điền đầy đủ thông tin dưới đây để nhận voucher xét nghiệm miễn phí, kỳ nghỉ dưỡng sinh độc bản
+                        </p>
+                    </div>
+
+                    <form>
+
+                        <input class="border border-white mb-4 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                               type="text" placeholder="Họ và tên" name="name">
+
+                        <input class="border border-white mb-4 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                               type="email" placeholder="Email" name="email">
+
+                        <input class="border border-white mb-4 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                               type="text" placeholder="Số điện thoại" name="phoneNumber">
+
+                        <div class="flex justify-between">
+                            <button class="border border-white hover:bg-white text-slate-50 hover:text-cyan-500 font-bold py-2 px-4 rounded"
+                                    type="submit">
+                                Gửi ➤
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="voucherForm" tabindex="-1" aria-labelledby="voucherForm" aria-hidden="true">
+    <div class="modal-dialog voucher-modal modal-dialog-centered">
+        <div class="modal-content">
+            <img src="https://nuras.com.vn/imgs/vouchers/voucher-tour.png" alt="Voucher" loading="lazy" class="w-full h-full" id="voucher-img" />
+            <div class="p-4 bg-white border-t">
+                <div class="font-bold text-lg mb-1 text-dark">Nhận voucher miễn phí từ chúng tôi</div>
+                <div class="mb-2 text-muted">Chào bạn. Hãy để lại thông tin dưới đây. Chúng tôi sẽ liên hệ cho bạn trong thời gian sớm nhất.</div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <input class="form-control" placeholder="Họ và tên" id="form-name" onchange="onNameChange()" />
+                        <span class="text-danger text-sm hidden" id="msg-name">Vui lòng nhập họ và tên</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <input class="form-control" placeholder="Số điện thoại" id="form-phone" onchange="onPhoneChange()" />
+                        <span class="text-danger text-sm hidden" id="msg-phone">Vui lòng nhập số điện thoại</span>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <input class="form-control" placeholder="Email" id="form-email" />
+                    </div>
+                    <div class="flex justify-end">
+                        <button class="btn btn-primary" type="button" onclick="submitForm()">Nhận voucher miễn phí</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="thankModal" data-bs-toggle="modal" aria-labelledby="thankModal" aria-hidden="true">
+    <div class="modal-dialog voucher-modal modal-dialog-centered">
+        <div class="modal-content">
+            <img src="https://pantado.edu.vn/storage/media/thanks_1636595533.png" alt="Voucher" loading="lazy" class="w-full h-full" />
+            <div class="p-4 bg-white border-t">
+                <div class="font-bold text-lg mb-1 text-dark">Lời cảm ơn</div>
+                <div class="mb-2 text-muted">Cám ơn bạn đã liên hệ với chúng tôi. Chúng tôi sẽ liên hệ cho bạn trong thời gian sớm nhất.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="voucherType" />
+<input type="hidden" id="achievementId" value="@Model.AchievementId" />
+
+@section scripts {
+    <script>
+        new Swiper(".heroSwiper", {
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+                renderBullet: function (index, className) {
+                    return '<span class="' + className + ' bg-cyan-500">' + "</span>";
+                }
+            },
+            speed: 900,
+            loop: true,
+            autoplay: {
+                delay: 20000
+            }
+        });
+        new Swiper(".testimonialSwiper", {
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+                renderBullet: function (index, className) {
+                    return '<span class="' + className + ' bg-cyan-500">' + "</span>";
+                }
+            },
+            loop: true,
+            autoplay: {
+                delay: 5000
+            }
+        });
+    </script>
+}

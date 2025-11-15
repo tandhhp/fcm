@@ -1,0 +1,99 @@
+﻿@using Waffle.Entities
+@using Waffle.Models.Components
+@model Swiper
+
+<div class="wf-swiper">
+    <div class="title">
+        @Model.Title
+        <div class="extra">
+            <a href="/album" class="text-dark">
+                <i class="fa-solid fa-angles-right"></i>
+            </a>
+        </div>
+    </div>
+    <div class="swiper js-swiper-@Model.Mode">
+        <div class="swiper-wrapper">
+            @if (Model.Items.Any())
+            {
+                @foreach (var item in Model.Items)
+                {
+                    <div class="swiper-slide">
+                        <div class="swiper-album">
+                            <img src="@item.Image" alt="@item.Title" loading="lazy" class="w-full" />
+                            <div class="swiper-album__overlay">
+                                <div class="swiper-album__overlay--title">
+                                    <a href="@item.Url">
+                                        @item.Title
+                                    </a>
+                                </div>
+                                <div class="swiper-album__overlay--delimiter"></div>
+                                <div class="swiper-album__overlay--description">
+                                    @item.Description
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+    </div>
+</div>
+<script>
+    window.onload = () => {
+        var wfSwipper = (function () {
+            function defaultMode() {
+                if (!document.querySelector('.js-swiper-default')) return;
+                new Swiper(".js-swiper-default", {
+                    slidesPerView: 'auto',
+                    loop: true,
+                    autoplay: {
+                        delay: 2500
+                    },
+                    pagination: {
+                        el: ".swiper-pagination",
+                        clickable: true
+                    },
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                    }
+                });
+            }
+
+            function sponsorMode() {
+                if (!document.querySelector('.js-swiper-sponsor')) return;
+                console.log('js-swiper-sponsor')
+                new Swiper(".js-swiper-sponsor", {
+                    spaceBetween: 30,
+                    loop: true,
+                    autoplay: true,
+                    breakpoints: {
+                        0: {
+                            slidesPerView: 2,
+                        },
+                        768: {
+                            slidesPerView: 6
+                        },
+                        1024: {
+                            slidesPerView: 8
+                        }
+                    }
+                });
+            }
+
+            var init = () => {
+                defaultMode();
+                sponsorMode();
+            }
+
+            return {
+                init: init
+            }
+        })();
+        console.log(wfSwipper)
+        wfSwipper.init();
+    }
+</script>

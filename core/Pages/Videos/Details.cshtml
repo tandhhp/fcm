@@ -1,0 +1,57 @@
+﻿@page "/video/{normalizedName}"
+@using Waffle.Core.Constants;
+@using Waffle.Entities;
+@using Waffle.Extensions;
+@using Waffle.Models.Components
+@using Waffle.Models.Components.Specifications
+@model Waffle.Pages.Videos.DetailsModel
+
+<main class="wf-video">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 mb-4">
+                @await Component.InvokeAsync(nameof(Breadcrumb))
+
+                <h1 class="title">@Model.PageData.Name</h1>
+
+                <div class="post-body mb-4">
+                    @foreach (var item in Model.Components)
+                    {
+                        @await Component.InvokeAsync(item.Name, item.Id)
+                    }
+
+                    @if (Model.HasTag)
+                    {
+                        <div class="wf-delimiter"></div>
+                        <div class="mb-4">
+                            <i class="fas fa-tag me-2"></i>
+                            @foreach (var item in Model.Tags)
+                            {
+                                <a href="@item.GetUrl()" class="tag-item">@item.Name</a>
+                            }
+                        </div>
+                    }
+                    <div class="bg-gray-100 px-4 py-2 flex justify-between items-center text-muted text-sm">
+                        <div class="flex gap-4">
+                            <span>
+                                <i class="fas fa-eye me-1"></i>
+                                <span>@Model.PageData.ViewCount.ToNumber()</span>
+                            </span>
+                            <span>|</span>
+                            <span>
+                                <i class="fas fa-calendar me-1"></i>
+                                <span>@Model.PageData.ModifiedDate</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                @await Component.InvokeAsync(nameof(Comment))
+            </div>
+            <div class="col-md-4">
+                @await Component.InvokeAsync(nameof(ArticleSpotlight))
+                @await Component.InvokeAsync(nameof(Tag))
+                @await Component.InvokeAsync(nameof(ProductSpotlight))
+            </div>
+        </div>
+    </div>
+</main>

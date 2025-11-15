@@ -1,0 +1,28 @@
+﻿@using Waffle.Extensions;
+@using Waffle.Models.Components
+@model ArticleSpotlight
+
+<div class="mb-4 article-spotlight">
+    <div class="title">
+        @Model.Title
+    </div>
+    <div class="bg-white">
+        @foreach (var item in Model.Articles)
+        {
+            <div class="flex mt-1 gap-2">
+                <a href="@item.GetUrl()" class="bg-dark">
+                    <img class="thumbnail object-cover" loading="lazy" width="80" height="64" src="@item.Thumbnail" alt="@Html.Raw(item.Name)">
+                </a>
+                <div>
+                    <div class="mb-1 fw-medium">
+                        <a href="@item.GetUrl()">@Html.Raw(item.Name)</a>
+                    </div>
+                    <div class="text-muted text-sm flex">
+                        <div class="me-2"><i class="fa fa-calendar me-2"></i>@item.ModifiedDate</div>
+                        <div><i class="fas fa-eye me-2"></i>@item.ViewCount.ToNumber()</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

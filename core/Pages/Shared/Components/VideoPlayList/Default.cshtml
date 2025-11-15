@@ -1,0 +1,35 @@
+﻿@using Waffle.Models.Components.Lister
+@model VideoPlayList
+
+<div class="mb-4 video-playlist @Model.ClassName">
+    <div class="title">
+        <div><i class="fas fa-video me-1"></i>@Model.Title</div>
+    </div>
+    <div class="grid md:grid-cols-4 gap-4">
+        @foreach (var item in Model.PlaylistItems)
+        {
+            <div class="playlist-item">
+                <div class="bg-gray-900 relative">
+                    <a href="@item.Url" class="thumbnail">
+                        <img src="@item.Thumbnail" alt="@item.Name" class="w-full object-cover" />
+                    </a>
+                </div>
+                <div class="py-2">
+                    <div class="fw-medium mb-2 line-clampin">
+                        <a href="@item.Url">@item.Name</a>
+                    </div>
+                    <div class="text-sm text-muted flex gap-2">
+                        <div>
+                            <i class="fas fa-calendar me-1"></i>
+                            <span>@item.Date</span>
+                        </div>
+                        <div>
+                            <i class="fas fa-eye me-1"></i>
+                            <span>@item.ViewCount</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

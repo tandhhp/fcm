@@ -1,0 +1,16 @@
+﻿@model Waffle.Models.ErrorViewModel
+@{
+    Layout = null;
+}
+
+@if (Model != null && Model.ShowRequestId)
+{
+    <div class="text-center p-4" data-traceIdentifier="@Model.RequestId">
+        <img src="/imgs/search-engines-amico.svg" alt="No data" width="150" height="150" />
+        <div class="text-muted">
+            <small>
+                <i>Không có dữ liệu</i>
+            </small>
+        </div>
+    </div>
+}

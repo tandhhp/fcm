@@ -1,0 +1,17 @@
+﻿@{
+    // Find the full list of object types in https://ogp.me/
+}
+<meta property="og:title" content="@ViewData["Title"]" />
+<meta property="og:description" content="@ViewData["Description"]" />
+@if (!string.IsNullOrEmpty(ViewData["Type"]?.ToString()))
+{
+    <meta property="og:type" content="@ViewData["Type"]" />
+}
+@if (!string.IsNullOrEmpty(ViewData["Image"]?.ToString()))
+{
+    <meta property="og:image" content="@ViewData["Image"]" />
+}
+@if (!string.IsNullOrEmpty(ViewData["Url"]?.ToString()))
+{
+    <meta property="og:url" content="@ViewData["Url"]" />
+}

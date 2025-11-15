@@ -1,0 +1,29 @@
+input {
+    outline: none;
+    color: #333;
+}
+
+.form-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .cdx-input {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    box-shadow: none;
+    border-color: #d9d9d9;
+}
+
+.cdx-button {
+    background-color: #1677ff;
+    color: white;
+    height: 32px;
+    padding: 4px 15px;
+}
+
+.cdx-button:hover {
+    background-color: #1677ff;
+    opacity: 0.75;
+}

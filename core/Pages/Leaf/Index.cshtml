@@ -1,0 +1,28 @@
+﻿@page
+@using Waffle.Models.Components
+@using Waffle.Models.Components.Specifications
+@model Waffle.Pages.Leaf.IndexModel
+
+<main class="container">
+    <div class="title">Danh sách trang</div>
+    <div class="md:flex gap-4">
+        <div class="col-md-8">
+            @if (Model.Catalogs.Data != null)
+            {
+                <div class="mb-4">
+                    @foreach (var item in Model.Catalogs.Data)
+                    {
+                        <div class="py-2 border-b hover:bg-gray-100">
+                            <a href="/page/@item.NormalizedName">@item.Name</a>
+                        </div>
+                    }
+                </div>
+                @Html.DisplayFor(x => x.Catalogs.Pagination)
+            }
+        </div>
+        <div class="col-md-4">
+            @await Component.InvokeAsync(nameof(ArticleSpotlight))
+            @await Component.InvokeAsync(nameof(Tag))
+        </div>
+    </div>
+</main>

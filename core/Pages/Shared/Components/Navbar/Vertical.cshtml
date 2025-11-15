@@ -1,0 +1,34 @@
+﻿@using Waffle.Models.Components
+@model Navbar
+
+<nav class="shadow mb-4 navbar-collapse bg-white">
+    <ul class="navbar-nav">
+        @foreach(var navItem in Model.NavItems)
+        {
+            if (!navItem.Links.Any())
+            {
+                continue;
+            }
+            if (navItem.HasSubItem)
+            {
+                
+            }
+            else
+            {
+                <li class="navbar-item">
+                    <a class="navbar-link" href="@navItem.Links.First().Href">
+                        <div>
+                            <i class="fab fa-staylinked me-2"></i>
+                            @navItem.Links.First().Name
+                        </div>
+                    </a>
+                </li>
+            }
+        }
+    </ul>
+    <div class="navbar-footer">
+        <button type="button" class="py-3 px-4 navbar-toggler" aria-label="Navigation bars">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</nav>

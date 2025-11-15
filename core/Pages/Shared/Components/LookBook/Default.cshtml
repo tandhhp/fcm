@@ -1,0 +1,30 @@
+﻿@using Waffle.Models.Components
+@{
+    var images = ViewBag.Images as IAsyncEnumerable<Image>;
+}
+@if (images != null)
+{
+    <div class="masonry">
+        @await foreach (var image in images)
+        {
+            <div class="break-inside p-4 my-2 bg-gray-100 rounded">
+                <div class="card wf-card">
+                    <img src="@image.Src" alt="@image.Alt" />
+                    <div class="card-img-overlay">
+                        <h5 class="card-title">@image.Alt</h5>
+                        <p class="card-text">@image.Description</p>
+                    </div>
+                    <div class="wf-card-action">
+                        <button class="btn-action" type="button">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <a class="btn-action" href="@image.Src" target="_blank">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+<script src="~/js/lookbook.js"></script>

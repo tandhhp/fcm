@@ -1,0 +1,66 @@
+﻿.masonry {
+    column-count: 1;
+    column-gap: 1.5em;
+}
+
+.break-inside {
+    break-inside: avoid;
+}
+
+.masonry img {
+    max-width: 100%;
+}
+.card {
+    position: relative;
+}
+.card-img-overlay {
+    background-image: linear-gradient(to bottom,rgba(0,0,0,0.8),transparent);
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    right: 0;
+    bottom: 0;
+    transition: opacity .3s ease-in-out;
+    padding: 1rem;
+}
+
+.card-img-overlay:hover {
+    opacity: 1;
+}
+
+.card-title, .wf-card .card-text {
+    color: white;
+    text-shadow: 0 0 2px rgb(0 0 0 / 50%);
+}
+
+.wf-card-action {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 0.5rem;
+    display: flex;
+}
+
+.btn-action {
+    background-color: var(--gray-800);
+    color: white;
+    height: 2rem;
+    width: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: .5rem;
+    border: 1px solid white;
+}
+
+.btn-action:hover {
+    background-color: var(--primary);
+}
+
+@media screen and (min-width: 640px) {
+    .masonry {
+        column-count: 3;
+        column-gap: 1.5em;
+    }
+}

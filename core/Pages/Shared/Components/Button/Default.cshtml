@@ -1,0 +1,9 @@
+﻿@model Waffle.Models.Components.Button
+
+<button type="@Model.Type">
+    @if (Model.HasIcon)
+    {
+        <i class="@Model.Icon me-2"></i>
+    }
+    <span>@Model.Text</span>
+</button>

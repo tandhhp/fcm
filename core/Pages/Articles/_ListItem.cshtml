@@ -1,0 +1,54 @@
+﻿@using Waffle.Entities
+@using Waffle.Core.Helpers
+@using Waffle.Extensions;
+@model Catalog
+@{
+    var domain = Context.Request.Host;
+    var url = Model.GetUrl();
+}
+
+<div class="wf-article-item shadow">
+    <a href="@url" class="bg-dark">
+        <img src="@Model.Thumbnail" class="thumbnail object-cover" alt="@Html.Raw(Model.Name)" height="220" loading="lazy" />
+    </a>
+    <div class="wf-article-item__body">
+        <a href="@url" class="fw-medium">@Html.Raw(Model.Name)</a>
+        <div class="line-clampin">
+            @Html.Raw(Model.Description)
+        </div>
+    </div>
+    <div class="card-footer">
+        <div>
+            <small class="me-2">
+                <i class="fas fa-clock"></i>
+                @Model.ModifiedDate
+            </small>
+            <small>
+                <i class="fa fa-eye"></i> @(Model.ViewCount.ToNumber())
+            </small>
+        </div>
+        <div class="dropdown">
+            <button type="button" class="btn-share" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Share"><i class="fa fa-share-alt"></i></button>
+            <ul class="dropdown-menu p-0 border-0 shadow">
+                <li>
+                    <a class="dropdown-item" data-title="Twitter" href="https://twitter.com/share?url=@($"https://{domain}{url}")" rel="nofollow" target="_blank">
+                        <i class="fab fa-twitter"></i>
+                        <span>Twitter</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" data-title="Facebook" href="https://www.facebook.com/sharer.php?u=@($"https://{domain}{url}")" rel="nofollow" target="_blank">
+                        <i class="fab fa-facebook"></i>
+                        <span>Facebook</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" data-title="Pinterest" href="https://pinterest.com/pin/create/button/?url=@($"https://{domain}{url}")" rel="nofollow" target="_blank">
+                        <i class="fab fa-pinterest"></i>
+                        <span>Pinterest</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

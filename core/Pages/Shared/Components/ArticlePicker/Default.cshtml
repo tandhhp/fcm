@@ -1,0 +1,37 @@
+﻿@using Waffle.Extensions;
+@using Waffle.Models.Components
+@model ArticlePicker
+
+<div class="article-picker mb-4">
+    <div class="title">
+        <div>@Model.Title</div>
+        <a href="/tag/@Waffle.Core.Helpers.SeoHelper.ToSeoFriendly(Model.Title)" class="text-body" aria-label="View More">
+            <i class="fa-solid fa-angles-right"></i>
+        </a>
+    </div>
+    <div class="bg-white shadow rounded">
+        @for (var i = 0; i < Model.Articles.Count; i++)
+        {
+            if (i == 0)
+            {
+                <div>
+                    <img src="@Model.Articles[i].Thumbnail" alt="@Model.Articles[i].Name" loading="lazy" class="w-full object-cover" height="250" />
+                    <div class="px-2 py-1">
+                        <div class="mb-1 fw-medium text-truncate"><a href="@Model.Articles[i].GetUrl()">@Html.Raw(Model.Articles[i].Name)</a></div>
+                        <div class="text-muted line-clampin">
+                            @Model.Articles[i].Description
+                        </div>
+                    </div>
+                </div>
+                continue;
+            }
+            <div class="border-top px-2 py-1">
+                <div class="mb-1 fw-medium text-truncate"><a href="@Model.Articles[i].GetUrl()">@Html.Raw(Model.Articles[i].Name)</a></div>
+                <div class="text-muted text-sm flex">
+                    <div class="me-2"><i class="fa fa-calendar me-2"></i>@Model.Articles[i].ModifiedDate</div>
+                    <div><i class="fas fa-eye me-2"></i>@Model.Articles[i].ViewCount.ToNumber()</div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

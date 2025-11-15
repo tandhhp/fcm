@@ -1,0 +1,59 @@
+﻿@using Waffle.Models.Components;
+@model FacebookAlbum
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css" integrity="sha256-PZLhE6wwMbg4AB3d35ZdBF9HD/dI/y4RazA3iRDurss=" crossorigin="anonymous" />
+@if (Model.Photos != null && Model.Photos != null)
+{
+    <div class="container">
+        <div class="masonry before:box-inherit after:box-inherit">
+            @foreach (var item in Model.Photos)
+            {
+                <figure class="bg-gray-100 rounded" itemscope itemtype="https://schema.org/ImageObject">
+                    <div class="shadow h-100">
+                        <a href="@item.Src" class="bg-gray-900 image-popup">
+                            <img src="@item.Src" class="object-cover cursor-zoom-in w-100" alt="image" itemprop="contentUrl">
+                        </a>
+                        <div class="p-2 flex justify-between items-center bg-white">
+                            <div class="flex gap-2">
+                                <a href="@item.Src" title="download"><i class="fas fa-download text-blue-600"></i></a>
+                                <div data-bs-toggle="tooltip" data-bs-title="@item.Name" itemprop="name">
+                                    @item.Name
+                                </div>
+                            </div>
+                            <i class="far fa-heart text-red-600 cursor-pointer"></i>
+                        </div>
+                    </div>
+                    <span itemprop="creator" itemtype="https://schema.org/Person" itemscope>
+                        <meta itemprop="name" content="tanbanroi" />
+                    </span>
+                </figure>
+            }
+        </div>
+        <div class="mb-4">
+            <a href="?before=@Model.Before" class="btn btn-sm btn-primary">Trang trước</a>
+            <a href="?after=@Model.After" class="btn btn-sm btn-primary">Trang sau</a>
+        </div>
+    </div>
+}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js" integrity="sha256-P93G0oq6PBPWTP1IR8Mz/0jHHUpaWL0aBJTKauisG7Q=" crossorigin="anonymous"></script>
+<script>
+    $(".image-popup").magnificPopup({
+        type: "image", closeOnContentClick: !1, closeBtnInside: !1, mainClass: "mfp-with-zoom mfp-img-mobile",
+        image: { verticalFit: !0, titleSrc: function (e) { return e.el.attr("title") } }, gallery: { enabled: !0 }, zoom: {
+            enabled: !0, duration: 300,
+            opener: function (e) { return e.find("img") }
+        }
+    }), $(".filter-menu .filter-menu-item").click(function () {
+        $(".filter-menu .filter-menu-item").removeClass("active"), $(this).addClass("active")
+    }), $(function () {
+        var e = ""; $(".filter-menu-item").click(function () {
+            e = $(this).attr("data-rel"),
+                $(".filterable-content").fadeTo(100, 0), $(".filterable-content .filter-item").not("." + e).fadeOut().removeClass(""),
+                setTimeout(function () { $("." + e).fadeIn().addClass(""), $(".filterable-content").fadeTo(300, 1) }, 300)
+        })
+    });
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>

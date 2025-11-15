@@ -1,0 +1,29 @@
+﻿@using Waffle.Extensions;
+@using Waffle.Models.Components
+@model ShopeeProduct
+
+@if (Model.Products != null)
+{
+    <div class="mb-4 product-spotlight">
+        <div class="title">@Model.Title</div>
+        <div class="bg-white">
+            <div class="row">
+                @foreach (var item in Model.Products)
+                {
+                    <div class="col-6 col-md-3">
+                        <div class="card-image bg-dark">
+                            <a href="@(item.NormalizedName)">
+                                <img src="@item.Thumbnail" alt="@item.Name" class="object-cover product-thumbnail" loading="lazy" />
+                            </a>
+                        </div>
+                        <div class="py-2">
+                            <a href="@(item.NormalizedName)" class="line-clampin">
+                                @item.Name
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

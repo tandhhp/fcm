@@ -1,0 +1,78 @@
+﻿@page
+@model Waffle.Pages.Users.Login.IndexModel
+@{
+    var loginUri = $"{Request.Scheme}://{Request.Host.Value}/api/user/google-signin";
+}
+<main class="login">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <div class="mb-4">
+                    <div class="title">Đăng nhập</div>
+                    <div class="bg-white">
+                        @if (Model.SignInResult != null && !Model.SignInResult.Succeeded)
+                        {
+                            <div class="text-red-500 mb-4">
+                                Đăng nhập thất bại
+                            </div>
+                        }
+                        <form method="post">
+                            <div class="form-item">
+                                <div class="form-label">
+                                    <localize key="userName" />
+                                </div>
+                                <input type="text" class="form-control" name="UserName" placeholder="Email" required />
+                            </div>
+                            <div class="form-item">
+                                <div class="form-label">
+                                    <localize key="password" />
+                                </div>
+                                <input type="password" class="form-control" name="Password" required placeholder="Password" />
+                            </div>
+                            <div class="form-item">
+                                <label>
+                                    <input type="checkbox" />
+                                    <localize key="rememberMe" />
+                                </label>
+                            </div>
+                            <div class="form-item">
+                                <button class="btn btn-primary" type="submit">
+                                    <localize key="login" />
+                                </button>
+                                <button class="btn" type="reset">
+                                    <localize key="reset" />
+                                </button>
+                            </div>
+                            <div class="form-item">
+                                <div class="text-right">
+                                    <a href="/User/ForgotPassword">
+                                        <localize key="forgotPassword" />
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="text-center mb-4">
+                    Hoặc đăng nhập bằng
+                </div>
+                <div class="flex gap-4 mb-4 justify-center items-center">
+                    <a href="#" class="border flex justify-center items-center rounded-full hover:bg-gray-100 text-dark" style="height: 40px; width: 40px">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <div class="g_id_signin"
+                         data-type="icon"
+                         data-shape="circle"
+                         data-theme="outline"
+                         data-text="signin_with"
+                         data-size="large">
+                    </div>
+
+                </div>
+                <div class="text-center mb-4">
+                    Bạn chưa có tài khoản? <a href="/users/register">Đăng ký</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

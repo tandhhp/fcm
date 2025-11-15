@@ -1,0 +1,42 @@
+﻿@model Waffle.Models.Components.Pagination
+
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-end">
+        @if (Model.HasPrevPage)
+        {
+            <li class="page-item">
+                <a class="page-link" href="?current=@(Model.Current - 1)">
+                    <i class="fa-solid fa-angle-left"></i>
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <span class="page-link">
+                    <i class="fa-solid fa-angle-left"></i>
+                </span>
+            </li>
+        }
+        
+        @* <li class="page-item"><a class="page-link" href="#">@(Model.Current)</a></li>
+        <li class="page-item"><a class="page-link" href="#">@(Model.Current + 1)</a></li>
+        <li class="page-item"><a class="page-link" href="#">@(Model.Current + 2)</a></li> *@
+        @if (Model.HasNextPage)
+        {
+            <li class="page-item">
+                <a class="page-link" href="?current=@(Model.Current + 1)">
+                    <i class="fa-solid fa-angle-right"></i>
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <span class="page-link">
+                    <i class="fa-solid fa-angle-right"></i>
+                </span>
+            </li>
+        }
+    </ul>
+</nav>

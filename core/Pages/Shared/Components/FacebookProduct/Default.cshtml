@@ -1,0 +1,37 @@
+﻿@using Waffle.ExternalAPI.Models
+@model FacebookListResult<FacebookProduct>
+
+<div class="title">Sản phẩm mới</div>
+<div class="mb-4 md:grid grid-cols-4 gap-4">
+    @if (Model.Data != null)
+    {
+        @foreach (var item in Model.Data)
+        {
+            <div class="bg-white shadow">
+                <div class="bg-gray-900">
+                    <a href="@item.Url">
+                        <img src="@item.ImageUrl" alt="@item.Name" class="thumbnail-img" />
+                    </a>
+                </div>
+                <div class="p-2">
+                    <div class="mb-2">
+                        <a href="@item.Url">@item.Name</a>
+                    </div>
+                    <div class="flex justify-end gap-2 text-sm">
+                        @if (!string.IsNullOrEmpty(item.SalePrice))
+                        {
+                            <div class="text-muted">
+                                <s>@item.Price</s>
+                            </div>
+                            <div class="text-red-500">@item.SalePrice</div>
+                        }
+                        else
+                        {
+                            <div class="text-red-500">@item.Price</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

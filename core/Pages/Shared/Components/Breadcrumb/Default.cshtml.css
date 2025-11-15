@@ -1,0 +1,36 @@
+.breadcrumb {
+    list-style: none;
+    background-color: #eee;
+    margin-bottom: 1rem;
+}
+
+    .breadcrumb i {
+        font-size: .875rem;
+    }
+
+.breadcrumb-item:last-child a {
+    pointer-events: none;
+}
+
+.breadcrumb ol {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+.breadcrumb ol li:last-child {
+    font-weight: 500;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    --bs-breadcrumb-divider: '';
+}
+
+@media screen and (min-width: 768px) {
+    .breadcrumb ol li:last-child {
+        font-size: 1.5rem;
+        font-weight: 500;
+    }
+}

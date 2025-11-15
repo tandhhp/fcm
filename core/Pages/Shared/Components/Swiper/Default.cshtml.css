@@ -1,0 +1,62 @@
+﻿.swiper {
+    margin-bottom: 1rem;
+}
+
+.swiper-slide img {
+    height: 300px;
+    object-fit: cover;
+}
+
+.swiper-album {
+    position: relative;
+}
+
+.swiper-album__overlay {
+    background-image: linear-gradient(to top,rgba(0,0,0,0.75),transparent);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: opacity .3s ease-in-out;
+    padding: 1rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.swiper-album__overlay--title a {
+    color: white;
+    font-size: 1.125rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.swiper-album__overlay--delimiter {
+    height: 1px;
+    background-color: #eee;
+    width: 10rem;
+}
+
+.swiper-album__overlay--description {
+    color: #BBB;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+}
+
+@media screen and (min-width: 768px) {
+    .swiper-slide img {
+        height: 400px;
+    }
+
+    .swiper-album__overlay--title a {
+        font-size: 1.5rem;
+    }
+
+    .swiper-album__overlay--description {
+        font-size: 1rem;
+    }
+}

@@ -1,0 +1,45 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Waffle.Models.Settings
+@using Waffle.Entities
+@model Header
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark md:py-3" aria-label="Offcanvas navbar large" style="background-color: var(--primary) !important">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <img src="https://nuras.com.vn/imgs/web/logo-white-full.png" alt="Logo" class="d-inline-block align-text-top w-40">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar2" aria-controls="offcanvasNavbar2" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasNavbar2" aria-labelledby="offcanvasNavbar2Label">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasNavbar2Label">Nura's</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                    @* <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">
+                            <i class="fa-brands fa-instagram text-xl"></i>
+                            <span class="d-md-none ms-1">Instagram</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">
+                            <i class="fa-brands fa-facebook text-xl"></i>
+                            <span class="d-md-none ms-1">Facebook</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/search">
+                            <i class="fa-solid fa-magnifying-glass text-xl"></i>
+                            <span class="d-md-none ms-1">Tìm kiếm</span>
+                        </a>
+                    </li> *@
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>

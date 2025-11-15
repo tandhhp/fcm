@@ -1,0 +1,104 @@
+﻿@page "/tag/{normalizedName}"
+@using Waffle.Extensions;
+@using Waffle.Models.Components
+@using Waffle.Models.Components.Specifications
+@model Waffle.Pages.Tag.DetailsModel
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+
+            @await Component.InvokeAsync(nameof(Breadcrumb))
+
+            @Html.DisplayFor(x => x.SearchTerm)
+
+            @if (Model.Articles != null)
+            {
+                <div class="title flex justify-between mb-0">
+                    <h1 class="text-base">
+                        @Model.PageData.Name
+                        <span class="font-normal">(@Model.Articles.Total)</span>
+                    </h1>
+                </div>
+                <div class="bg-gray-100 px-2 py-1 mb-2 flex justify-between text-sm text-muted">
+                    <div>Lượt xem: @Model.PageData.ViewCount.ToNumber()</div>
+                    <div>
+                        <i class="fas fa-calendar me-1"></i>
+                        <span>@Model.PageData.ModifiedDate</span>
+                    </div>
+                </div>
+                <partial name="~/Pages/Articles/_List.cshtml" model="Model.Articles.Data" />
+                @Html.DisplayFor(x => Model.Articles.Pagination)
+            }
+            
+            @if (Model.Products.Any())
+            {
+                @await Html.PartialAsync("~/Pages/Shared/Components/Feed/Product.cshtml", new Feed {
+                    Name = "Sản phẩm",
+                    Products = Model.Products
+                })
+            }
+
+            @await Component.InvokeAsync("ShopeeSpotlight")
+
+            @if (Model.Albums.Data != null && Model.Albums.HasData)
+            {
+                <div class="title flex justify-between">
+                    <div>Albums</div>
+                    <div class="font-normal">
+                        <span>@Model.Albums.Total</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-4 gap-4 mb-4">
+                    @foreach (var item in Model.Albums.Data)
+                    {
+                        <div class="card bg-white shadow rounded">
+                            <div class="p-2">
+                                <a href="/album/@item.NormalizedName">
+                                    @item.Name
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (Model.Locations.Data != null && Model.Locations.HasData)
+            {
+                <div class="title flex justify-between">
+                    <div>Cafe - Địa điểm Check-in</div>
+                    <div class="font-normal">
+                        <span>@Model.Locations.Total</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md-grid-cols-4 gap-4 mb-4">
+                    @foreach (var item in Model.Locations.Data)
+                    {
+                        <div class="bg-white shadow rounded">
+                            <div class="card-image bg-dark">
+                                <img src="@item.Thumbnail" alt="@item.Name" class="object-cover w-100 product-thumbnail" loading="lazy" />
+                            </div>
+                            <div class="p-2">
+                                <a href="@item.GetUrl()">
+                                    @item.Name
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (Model.Videos.HasData)
+            {
+                @await Html.PartialAsync("~/Pages/Shared/Components/VideoPlaylist/Default.cshtml", Model.Videos)
+            }
+
+        </div>
+        <div class="col-md-4">
+            @await Component.InvokeAsync(nameof(ArticleSpotlight))
+            @await Component.InvokeAsync(nameof(Tag))
+            @await Component.InvokeAsync(nameof(ProductSpotlight))
+            @await Component.InvokeAsync(nameof(Waffle.ExternalAPI.Models.GoogleAggregate.Trend))
+        </div>
+    </div>
+</div>

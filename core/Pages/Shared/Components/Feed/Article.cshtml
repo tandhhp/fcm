@@ -1,0 +1,18 @@
+﻿@using Waffle.Models.Components
+@model Feed
+
+<div class="wf-feed mb-4">
+    <div class="title flex justify-between items-center">
+        <div><i class="fas fa-blog me-2"></i>@Model.Name</div>
+        <a href="/articles"><i class="fas fa-angle-double-right"></i></a>
+    </div>
+
+    <div class="row">
+        @foreach (var article in Model.Articles)
+        {
+           <div class="col-md-6 col-lg-4 mb-2">
+                <partial name="~/Pages/Articles/_ListItem.cshtml" model="article" />
+           </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,27 @@
+﻿@page
+@using Waffle.Entities
+@using Waffle.Models.Components;
+@model Waffle.Pages.Products.Cart.IndexModel
+@{
+    ViewData["Title"] = "Giỏ hàng";
+    ViewData["Description"] = "Thông tin các sản phẩm trong giỏ hàng";
+}
+
+<main class="container">
+    @await Component.InvokeAsync(nameof(Breadcrumb))
+    <div class="row">
+        <div class="col-md-8 mb-4">
+            <div class="title">Giỏ hàng</div>
+            <div id="js-products"></div>
+        </div>
+        <div class="col-md-4">
+            @await Component.InvokeAsync(nameof(ProductSpotlight))
+        </div>
+    </div>
+</main>
+@section scripts {
+    <script src="~/js/products/cart.js" asp-append-version="true"></script>
+    <script>
+        Cart.init();
+    </script>
+}

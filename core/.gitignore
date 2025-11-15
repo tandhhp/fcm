@@ -1,0 +1,21 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Data/Migrations
+/obj
+/bin/Debug/net6.0
+/Waffle.csproj.user
+/.vs
+/wwwroot/imgs
+/wwwroot/files
+*.map
+*.js
+/bin/Release/net6.0
+.vscode
+/.config
+/ClientApp/node_modules
+/ClientApp/package-lock.json
+/appsettings.Development.json
+/wwwroot/backup
+/wwwroot/sitemap.xml

@@ -1,0 +1,44 @@
+﻿@page "/users/{id}"
+@using Waffle.Extensions;
+@model Waffle.Pages.Users.IndexModel
+
+<main class="container py-4">
+    <div class="row">
+        <partial name="_Leftbar" model="Model.ApplicationUser" />
+        <div class="col-md-9 mb-4">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Thành tựu của tôi</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="activity-tab1" data-bs-toggle="tab" data-bs-target="#activity-tab-pane1" type="button" role="tab" aria-controls="home-tab-pane1" aria-selected="true">Hoạt động của tôi</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="activity-tab-pane" role="tabpanel" aria-labelledby="activity-tab" tabindex="0">
+                    <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-4">
+                        @foreach (var item in Model.Achievements)
+                        {
+                            <div class="p-4">
+                                <img src="@item.Icon" alt="@item.Name" class="w-32 h-32 object-cover mb-2" />
+                                <div class="text-sm text-center">@item.Name</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="tab-content" id="myTabContent1">
+                <div class="tab-pane" id="activity-tab-pane1" role="tabpanel" aria-labelledby="activity-tab1" tabindex="0">
+                    <div class="py-4">
+                        <ul class="list-group">
+                            @foreach (var item in Model.Forms)
+                            {
+                                <li class="list-group-item">@item.Name</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

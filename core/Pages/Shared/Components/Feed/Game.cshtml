@@ -1,0 +1,22 @@
+﻿@using Waffle.Models.Components
+@model Feed
+
+<div class="wf-feed">
+    <div class="title flex justify-between items-center">
+        <div><i class="fas fa-blog me-2"></i>@Model.Name</div>
+        <a href="/games"><i class="fas fa-angle-double-right"></i></a>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4">
+        @foreach (var article in Model.Articles)
+        {
+            <partial name="~/Pages/Articles/_ListItem.cshtml" model="article" />
+        }
+    </div>
+
+    <a href="/game">
+        <div style="border: 1px dashed #d1d1d1;" class="p-1 flex justify-center mb-4 bg-white">
+            <localize key="viewMore" />
+        </div>
+    </a>
+</div>

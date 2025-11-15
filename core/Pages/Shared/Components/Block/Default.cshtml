@@ -1,0 +1,113 @@
+﻿@using Waffle.Models.Components
+@model BlockEditor
+
+@foreach (var item in Model.Blocks)
+{
+    switch (item.Type)
+    {
+        case BlockEditorType.PARAGRAPH:
+            <p id="@item.Id">
+                @Html.Raw(item.Data.Text)
+            </p>
+            break;
+        case BlockEditorType.HEADER:
+            if (item.Data.Level == 1)
+            {
+                <h1 class="wf-h1">@item.Data.Text</h1>
+            }
+            else if (item.Data.Level == 2)
+            {
+                <h2 class="wf-h2">@item.Data.Text</h2>
+            }
+            else if (item.Data.Level == 3)
+            {
+                <h3 class="wf-h3">@item.Data.Text</h3>
+            }
+            break;
+        case BlockEditorType.DELIMITER:
+            <div class="wf-delimiter"></div>
+            break;
+        case BlockEditorType.RAW:
+            @Html.Raw(item.Data.Html)
+            break;
+        case BlockEditorType.LINK_TOOL:
+            <div class="wf-link-tool">
+                <div class="wf-link-tool__image">
+                    <img src="@item.Data.Meta.Image.Url" loading="lazy" alt="@item.Data.Meta.Title" width="100" height="100" class="object-cover" />
+                </div>
+                <div class="wf-link-tool__content">
+                    <div class="mb-2">
+                        <a href="@item.Data.Link">
+                            <b>@item.Data.Meta.Title</b>
+                        </a>
+                    </div>
+                    <div class="text-muted text-sm">
+                        @item.Data.Meta.Description
+                    </div>
+                </div>
+            </div>
+            break;
+        case BlockEditorType.CODE:
+            <div class="wf-code">
+                @item.Data.Code
+            </div>
+            break;
+        case BlockEditorType.QUOTE:
+            <blockquote class="quote">
+                @Html.Raw(item.Data.Text)
+            </blockquote>
+            break;
+        case BlockEditorType.LIST:
+            @if (item.Data.Items != null)
+            {
+                @if (item.Data.Style.Equals("ordered"))
+                {
+                    <ol class="wf-list">
+                        @foreach (var li in item.Data.Items)
+                        {
+                            <li class="wf-list__item">@li</li>
+                        }
+                    </ol>
+                }
+                else
+                {
+                    <ul class="wf-list">
+                        @foreach (var li in item.Data.Items)
+                        {
+                            <li class="wf-list__item">@li</li>
+                        }
+                    </ul>
+                }
+            }
+            break;
+        case BlockEditorType.SIMPLE_IMAGE:
+            <div class="simple-image">
+                <div class="@(item.Data.WithBackground ? "simple-image__picture simple-image__picture--with-background" : "simple-image__picture")">
+                    <img src="@item.Data.Url" alt="@(string.IsNullOrEmpty(item.Data.Caption) ? "IMG" : item.Data.Caption)" loading="lazy" />
+                </div>
+                <div class="simple-image__caption">
+                    @item.Data.Caption
+                </div>
+            </div>
+            break;
+        case BlockEditorType.YOUTUBE:
+            <div class="video-player mb-4">
+            <iframe class="w-full h-full" src="@item.Data.Url" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+            break;
+        case BlockEditorType.BLOGGER:
+            @await Component.InvokeAsync(nameof(Blogger), item.Data.Blogger)
+            break;
+        case BlockEditorType.EMBED:
+            <div class="video-player mb-4">
+                @if (item.Data.Service == "youtube")
+                {
+                    <iframe class="w-full h-full" src="@item.Data.Embed" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                }
+                <div class="caption">
+                    @item.Data.Caption
+                </div>
+            </div>
+            break;
+    }
+}

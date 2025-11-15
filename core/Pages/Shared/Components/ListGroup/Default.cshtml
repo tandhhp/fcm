@@ -1,0 +1,25 @@
+﻿@using Waffle.Core.Constants;
+@model Waffle.Models.Components.ListGroup
+
+<div class="mb-4 list-group">
+    <div class="title">@Model.Name</div>
+    @foreach (var item in Model.Items)
+    {
+        <div class="py-2 hover:bg-gray-100 bg-white border-bottom flex justify-between">
+            <div>
+                <i class="@item.Icon"></i>
+                <partial name="@PartialViewName.Link" model="item.Link" />
+                @if (item.HasSuffix)
+                {
+                    @Html.Raw(item.Suffix)
+                }
+            </div>
+            @if (Model.HasBadge)
+            {
+                <span class="badge text-white bg-gray-900 rounded flex justify-center items-center">
+                    @item.Badge
+                </span>
+            }
+        </div>
+    }
+</div>

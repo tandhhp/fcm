@@ -1,0 +1,16 @@
+﻿<div class="pagination">
+    @if (Model.HasPrevPage)
+    {
+        <a href="@Model.PrevPageUrl" class="btn btn-primary py-1">
+            <i class="fas fa-angles-left"></i>
+            <localize key="prevPage" />
+        </a>
+    }
+    @if (Model.HasNextPage)
+    {
+        <a href="@Model.NextPageUrl" class="btn btn-primary py-1">
+            <localize key="nextPage" />
+            <i class="fas fa-angles-right"></i>
+        </a>
+    }
+</div>

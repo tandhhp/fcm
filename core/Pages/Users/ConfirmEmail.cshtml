@@ -1,0 +1,22 @@
+﻿@page
+@model Waffle.Pages.Users.ConfirmEmailModel
+
+<div class="container">
+    <div class="mb-4 card p-4 shadow">
+        @if (Model.Result.Succeeded)
+        {
+            <div>
+                Thank you for confirming your email.
+            </div>
+        }
+        else
+        {
+            <ul class="text-red-500">
+                @foreach (var item in Model.Result.Errors)
+                {
+                    <li>@item.Description</li>
+                }
+            </ul>
+        }
+    </div>
+</div>

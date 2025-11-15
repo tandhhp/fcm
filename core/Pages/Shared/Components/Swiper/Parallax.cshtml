@@ -1,0 +1,23 @@
+﻿@using Waffle.Entities
+@using Waffle.Models.Components
+@model Swiper
+
+<div class="swiper js-swiper-@Model.Mode" data-slidesPerView="@Model.SlidesPerView">
+    <div class="swiper-wrapper">
+        @if (Model.Items.Any())
+        {
+            @foreach (var item in Model.Items)
+            {
+                <div class="swiper-slide">
+                    <div class="text" data-swiper-parallax="-300" data-swiper-parallax-duration="600">
+                        <div class="h-24 flex items-center justify-center">
+                            <a href="@item.Url" aria-label="@item.Title" rel="nofollow" target="_blank">
+                                <img src="@item.Image" alt="@item.Title" class="w-full" loading="lazy" />
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

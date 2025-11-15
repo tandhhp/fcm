@@ -1,0 +1,43 @@
+﻿@using Waffle.Core.Constants;
+@using Waffle.Extensions;
+@using Waffle.ExternalAPI.Models;
+@using Waffle.Models.Components;
+@model LandingPageLinkList
+
+@if (Model != null && Model.LinkList.Any())
+{
+    <div class="mb-4 shopee-spotlight">
+        <div class="title">
+            <span>Shopee</span>
+            <a href="/Products/Shopee?searchTerm=@Model.KeyWord" class="text-sm">Xem thêm <i class="fas fa-angle-double-right"></i></a>
+        </div>
+        <div class="row">
+            <div class="row g-2">
+                @foreach (var item in Model.LinkList)
+                {
+                    <div class="col-md-3 col-6">
+                        <a href="@item.Link" rel="nofollow" target="_blank" title="@item.LinkName">
+                            <div class="card-image bg-dark relative">
+                                <img src="@item.Image" alt="@item.LinkName" class="object-cover product-thumbnail" loading="lazy" />
+                            </div>
+                        </a>
+                        <div class="py-2">
+                            <div class="mb-1 d-flex justify-between">
+                                <div class="text-warning text-xs">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                            </div>
+                            <a href="@item.Link" class="line-clampin" rel="nofollow" target="_blank">
+                                @item.LinkName
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

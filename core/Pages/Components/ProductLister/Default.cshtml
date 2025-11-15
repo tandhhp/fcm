@@ -1,0 +1,50 @@
+﻿@using Waffle.Core.Constants;
+@using Waffle.Extensions;
+@using Waffle.Models.Components;
+@model ProductLister
+
+<div class="mb-4 product-lister">
+    <div class="title">@Model.Title</div>
+    <div class="row">
+        @if (Model.Products != null)
+        {
+            @foreach (var item in Model.Products.Data)
+            {
+                <div class="@Model.ItemPerRow">
+                    <a href="@item.Url">
+                        <div class="card-image bg-dark relative">
+                            <img src="@item.Thumbnail" alt="@item.Name" class="object-cover product-thumbnail" loading="lazy" />
+                            @if (item.Price != null && item.SalePrice != null)
+                            {
+                                <span class="badge bg-danger position-absolute top-0 end-0">
+                                    <span>GIẢM</span>
+                                    @item.Discount %
+                                </span>
+                            }
+                        </div>
+                    </a>
+                    <div class="py-2">
+                        <div class="mb-1 d-flex justify-between">
+                            <div>
+                                <span class="text-danger fw-medium">@item.SalePrice.ToMoney()</span>
+                                <s class="text-muted text-sm">@item.Price.ToMoney()</s>
+                            </div>
+                            <div class="text-warning text-xs">
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                        </div>
+                        <a href="@item.Url" class="line-clampin">
+                            @item.Name
+                        </a>
+                    </div>
+                </div>
+            }
+
+            @Html.DisplayFor(x => Model.Products.Pagination)
+        }
+    </div>
+</div>

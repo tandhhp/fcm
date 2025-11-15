@@ -1,0 +1,358 @@
+﻿.swiper-hero__overlay {
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0.75), transparent);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: opacity .3s ease-in-out;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.testimonial-before {
+    background-image: url(https://nuras.com.vn/imgs/web/bg3.jpg);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.testimonialSwiper {
+    border: 1px solid var(--primary);
+    border-radius: 1rem;
+    background-color: white;
+}
+
+.testimonial-avatar {
+    border: 1px solid var(--primary);
+}
+
+.testimonial-quote {
+    position: relative;
+    padding: 30px;
+    max-width: 630px;
+}
+
+    .testimonial-quote .fa-quote-left {
+        position: absolute;
+        left: 0;
+        top: 0;
+        font-size: 1.5rem;
+    }
+
+    .testimonial-quote .fa-quote-right {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        font-size: 1.5rem;
+    }
+
+.testimonial-title {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3rem;
+    letter-spacing: 0.12rem;
+    font-size: 1.5rem;
+    color: white;
+    text-shadow: 2px 2px #000;
+}
+
+.swiper-hero__overlay-wrapper {
+    position: absolute;
+    left: 5%;
+    top: 35%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-right: 1rem;
+}
+
+.swiper-video {
+    max-height: 30rem;
+}
+
+.swiper-hero__overlay--title {
+    color: white;
+    font-size: 2rem;
+    max-width: 700px;
+    text-shadow: 2px 2px #000;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.swiper-hero__overlay--description {
+    color: white;
+    max-width: 800px;
+    font-size: 0.875rem;
+    text-shadow: 2px 2px #000;
+    margin-bottom: 1rem;
+}
+
+.swiper-hero__overlay--cta .btn-cta {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    border-color: var(--primary);
+    background-color: transparent;
+    color: var(--primary);
+    border-width: 2px;
+    letter-spacing: 0.2rem;
+    text-transform: uppercase;
+}
+
+    .swiper-hero__overlay--cta .btn-cta:hover {
+        opacity: 0.9;
+        background-color: var(--primary);
+        color: white;
+    }
+
+.voucher-modal {
+    color: white;
+}
+
+    .voucher-modal .modal-content {
+        --bs-modal-bg: transparent;
+        --bs-modal-border-radius: 0;
+    }
+
+.voucher-modal__btn-action {
+    border: 1px solid #eee;
+    border-radius: 1rem;
+    padding: 0.5rem 2rem;
+    color: white;
+    font-weight: 500;
+    min-width: 180px;
+    text-align: center;
+}
+
+    .voucher-modal__btn-action:hover {
+        background-color: var(--bs-btn-hover-bg);
+    }
+
+.feature {
+    padding: 2rem 0;
+}
+
+    .feature .card {
+        position: relative;
+        height: 100%;
+    }
+
+    .feature .card-title {
+        padding: 0 1rem;
+        text-align: center;
+        letter-spacing: 0.12rem;
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .feature .card-text {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .feature .card:before {
+        content: '';
+        border: 1px solid #dee2e6;
+        position: absolute;
+        top: .5rem;
+        left: .5rem;
+        bottom: 1.5rem;
+        right: .5rem;
+    }
+
+    .feature .card-img-top {
+        border-radius: 0;
+        margin-bottom: 1rem;
+    }
+
+    .feature .wrapper-cta {
+        position: absolute;
+        bottom: 0.25rem;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        left: 0;
+    }
+
+    .feature .btn-cta {
+        letter-spacing: 0.5rem;
+        background-color: var(--primary);
+        padding: 0.5rem 2rem;
+        transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        font-size: 0.75rem;
+        color: white;
+        bottom: 1rem;
+        left: 40%;
+        border: 1px solid var(--primary);
+        border-radius: 0.25rem;
+    }
+
+        .feature .btn-cta:hover {
+            background-color: white;
+            color: var(--primary);
+        }
+
+.btn-login {
+    padding: 0.25rem 1rem;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+}
+
+.btn-login:hover {
+    border-color: var(--primary);
+}
+
+.heroSwiper .swiper-slide {
+    height: 30rem;
+}
+
+.heroSwiper .swiper-img {
+    height: 30rem;
+    object-fit: cover;
+}
+
+.article {
+    padding: 1rem 0;
+}
+
+    .article .thumb {
+        background: black;
+    }
+
+        .article .thumb img {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+            .article .thumb img:hover {
+                opacity: 0.5;
+                transition: all ease-in-out 0.5s;
+            }
+
+    .article .article-title {
+        font-weight: 500;
+        padding: 0.4rem 0;
+        font-size: 1.25rem;
+    }
+
+        .article .article-title a:hover {
+            color: var(--primary);
+        }
+
+    .article .article-date {
+        display: flex;
+        gap: 0.5rem;
+        color: var(--bs-gray);
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .article .article-des {
+        color: var(--bs-gray);
+    }
+
+    .article .article-heading {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+.card-img-top {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+}
+
+@media screen and (min-width: 768px) {
+
+    .card-img-top {
+        height: 260px;
+        width: 100%;
+        object-fit: cover;
+    }
+
+    .article {
+        padding: 6rem 0;
+    }
+
+        .article .article-title {
+            min-height: 70px;
+        }
+
+        .article .article-heading {
+            margin-bottom: 2.5rem;
+            font-size: 2.5rem;
+        }
+
+        .article .thumb img {
+            height: 250px;
+        }
+
+    .testimonial-title {
+        font-size: 2.5rem;
+    }
+
+    .btn-login {
+        padding: 0.25rem 2rem;
+        font-size: 1rem;
+    }
+
+    .swiper-hero__overlay--title {
+        font-size: 4rem;
+    }
+
+    .swiper-hero__overlay--description {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .swiper-hero__overlay-wrapper {
+        gap: 1rem;
+    }
+
+    .swiper-hero__overlay--cta .btn-cta {
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-size: 0.85rem;
+        letter-spacing: 0.25rem;
+    }
+
+    .feature {
+        padding: 6rem;
+    }
+
+        .feature .card:before {
+            content: '';
+            border: 1px solid #dee2e6;
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            bottom: 1.5rem;
+            right: 1.5rem;
+        }
+
+        .feature .btn-cta {
+            padding: 0.75rem 3.5rem;
+        }
+
+    .heroSwiper .swiper-slide {
+        height: 100vh;
+    }
+
+    .heroSwiper .swiper-img {
+        height: 100vh;
+    }
+
+    .swiper-video {
+        max-height: none;
+    }
+}

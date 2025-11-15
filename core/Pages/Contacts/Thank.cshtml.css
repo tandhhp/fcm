@@ -1,0 +1,19 @@
+﻿.icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.thank-title {
+    font-size: 2rem;
+    padding: 0.5rem;
+    font-weight: 500;
+}
+
+.thank-sub-title {
+    font-size: 2rem;
+}
+
+.wrapper {
+    padding: 1rem;
+    margin-bottom: 1rem;
+}

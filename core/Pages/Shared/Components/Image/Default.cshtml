@@ -1,0 +1,15 @@
+﻿@using Waffle.Models.Components
+@model Image
+
+<div class="@Model.Wrapper">
+    @if (Model.HasLink)
+    {
+        <a href="@Model.Link.Href" aria-label="@Model.Link.Name" target="@Model.Link.Target">
+            <img src="@Model.Src" alt="@Model.Alt" class="w-100" loading="lazy" />
+        </a>
+    }
+    else
+    {
+        <img src="@Model.Src" alt="@Model.Alt" class="w-100" loading="lazy" />
+    }
+</div>

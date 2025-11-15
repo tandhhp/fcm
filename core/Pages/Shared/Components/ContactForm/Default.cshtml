@@ -1,0 +1,67 @@
+﻿@model Waffle.Models.Components.ContactForm
+
+<link href="https://cdn.jsdelivr.net/gh/Eonasdan/tempus-dominus@master/dist/css/tempus-dominus.css" rel="stylesheet" crossorigin="anonymous">
+
+<div class="card shadow rounded p-4 bg-white">
+    <div class="card-body">
+        <form action="/api/contact/submit-form" method="post">
+            <input type="hidden" value="@Model.Id" name="WorkId" />
+            <div class="mb-3">
+                <label class="form-label">@Model.Labels.Name</label>
+                <input class="form-control" type="text" name="name" required />
+            </div>
+            <div class="row">
+                <div class="wf-col mb-3">
+                    <label class="form-label">@Model.Labels.Email</label>
+                    <input class="form-control" type="email" name="email" />
+                </div>
+                <div class="wf-col mb-3">
+                    <label class="form-label">@Model.Labels.PhoneNumber</label>
+                    <input class="form-control" type="tel" name="phoneNumber" required />
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@Model.Labels.Address</label>
+                <input class="form-control" type="text" name="address" />
+            </div>
+            <div class="row">
+                <div class="wf-col mb-3">
+                    <label class="form-label">@Model.Labels.Category</label>
+                    <select class="form-control" name="Category">
+                        @foreach (var item in Model.Categories)
+                        {
+                            <option value="@item.Value">@item.Label</option>
+                        }
+                    </select>
+                </div>
+                <div class="wf-col mb-3">
+                    <label class="form-label">@Model.Labels.Appointment</label>
+                    <input type="text" class="form-control" id="datetimepicker" name="appointment">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@Model.Labels.Note</label>
+                <textarea class="form-control" name="note"></textarea>
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-primary bg-primary" type="submit">
+                    <i class="far fa-paper-plane me-2"></i>
+                    <span>@Model.Labels.Submit</span>
+                </button>
+            </div>
+            <div class="mb-2 text-muted">
+                <small>We do not share any of your information without your consent</small>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.6/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/Eonasdan/tempus-dominus@master/dist/js/tempus-dominus.js" crossorigin="anonymous"></script>
+<script>
+    new tempusDominus.TempusDominus(document.getElementById('datetimepicker'), {
+        restrictions: {
+            daysOfWeekDisabled: [1, 2, 3, 4, 5, 6]
+        },
+    });
+</script>

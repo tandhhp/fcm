@@ -1,0 +1,13 @@
+﻿@page
+@using Waffle.Models.Components;
+@model Waffle.Pages.Products.Checkout.FinishModel
+
+<main class="container">
+
+    @await Component.InvokeAsync(nameof(Breadcrumb))
+
+    @foreach (var item in Model.Components)
+    {
+        @await Component.InvokeAsync(item.Name, item.Id)
+    }
+</main>

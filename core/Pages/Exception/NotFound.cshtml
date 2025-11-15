@@ -1,0 +1,54 @@
+﻿@page
+@model Waffle.Pages.Exception.NotFoundModel
+@{
+    ViewData["Title"] = "Không tìm thấy trang";
+}
+
+<main class="container">
+    <div class="flex flex items-center justify-center gap-4">
+        <div class="svg-wrapper">
+            <svg class="message-icon" viewBox="0 0 205 230" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_e)">
+                    <path d="M166.381 11.6288C126.705 9.86893 91.934 4.3661 8.79785 11.6288C22.1183 91.8883 20.2883 136.833 8.79785 220.027C45.257 205.504 97.6644 209.834 189.593 220.027C195.134 154.578 199.762 118.984 189.593 44.8471L166.381 11.6288Z" fill="white" stroke="#99A4AE"></path>
+                    <g filter="url(#filter1_d)">
+                        <path d="M190.059 45.9008C191.906 43.6985 173.874 8.40358 165.551 11.4206C165.551 11.4206 169.864 23.6871 166.476 37.2809C183.551 34.0426 188.211 48.1032 190.059 45.9008Z" fill="#F5F5F5"></path>
+                        <path d="M166.209 11.8225C166.203 11.8042 166.197 11.7865 166.192 11.7691C166.946 11.6534 167.825 11.8552 168.831 12.3875C170.052 13.0339 171.391 14.1332 172.79 15.5753C175.585 18.4565 178.54 22.6191 181.19 26.9668C183.839 31.3106 186.169 35.8149 187.72 39.3642C188.496 41.1407 189.072 42.6654 189.396 43.8049C189.558 44.3767 189.652 44.8329 189.681 45.1663C189.695 45.3332 189.691 45.4523 189.68 45.5311C189.674 45.5665 189.668 45.5867 189.665 45.5961C189.643 45.6199 189.629 45.6299 189.623 45.6334C189.618 45.6366 189.617 45.6363 189.616 45.6364C189.612 45.637 189.562 45.6415 189.442 45.5821C189.187 45.4556 188.84 45.1576 188.351 44.6718C188.139 44.4604 187.906 44.2207 187.653 43.9595C186.788 43.0673 185.681 41.9252 184.294 40.8118C180.779 37.9887 175.418 35.2994 167.139 36.6575C168.659 30.0523 168.417 23.8135 167.78 19.1794C167.45 16.7746 167.012 14.7975 166.657 13.4197C166.479 12.7306 166.322 12.1911 166.209 11.8225Z" stroke="#99A4AE"></path>
+                    </g>
+                    <ellipse cx="57.8124" cy="102.794" rx="8.32318" ry="9.48207" fill="#99A4AE"></ellipse>
+                    <ellipse cx="146.593" cy="102.794" rx="8.32318" ry="9.48207" fill="#99A4AE"></ellipse>
+                    <path d="M91.9619 141.01L112.906 132.366" stroke="#99A4AE" stroke-width="2"></path>
+                </g>
+                <defs>
+                    <filter id="filter0_e" x="0.185059" y="0.473145" width="203.922" height="229.336" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"></feColorMatrix>
+                        <feOffset dy="1"></feOffset>
+                        <feGaussianBlur stdDeviation="4"></feGaussianBlur>
+                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"></feColorMatrix>
+                        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"></feBlend>
+                        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"></feBlend>
+                    </filter>
+                    <filter id="filter1_d" x="162.551" y="9.23779" width="30.6394" height="40.8984" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"></feColorMatrix>
+                        <feOffset dy="1"></feOffset>
+                        <feGaussianBlur stdDeviation="1.5"></feGaussianBlur>
+                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"></feColorMatrix>
+                        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"></feBlend>
+                        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"></feBlend>
+                    </filter>
+                </defs>
+            </svg>
+        </div>
+        <div>
+            <h1 class="error-code">404</h1>
+            <div class="text-muted mb-4">Sorry, the page you visited does not exist.</div>
+            <div class="mb-4">
+                <a href="/" class="inline-block font-bold action">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    <span>Go back</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</main>

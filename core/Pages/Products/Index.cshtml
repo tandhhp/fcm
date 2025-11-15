@@ -1,0 +1,53 @@
+﻿@page
+@using Waffle.Models.Components
+@using Waffle.Models.Components.Specifications
+@model Waffle.Pages.Products.IndexModel
+
+<main class="container">
+    <div class="row">
+        <div class="col-md-8">
+
+            <div class="title">Danh mục</div>
+            <div class="bg-white rounded mb-4 flex gap-2 flex-wrap">
+                @foreach (var group in Model.BaseInfoAndLinks.LandingPageBaseInfo.GroupList)
+                {
+                    <a href="/shop/group/@group.GroupId" class="px-4 py-1 rounded bg-gray-100 rounded">@group.GroupName</a>
+                }
+            </div>
+
+            <div class="mb-2">
+                <div class="title">Bộ sưu tập (@Model.BaseInfoAndLinks.LandingPageLinkList.TotalCount)</div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    @foreach (var item in Model.BaseInfoAndLinks.LandingPageLinkList.LinkList)
+                    {
+                        <div class="bg-white">
+                            <a href="@item.Link">
+                                <div class="card-image bg-dark">
+                                    <img src="@item.Image" alt="@item.LinkName" class="object-cover product-thumbnail" loading="lazy" />
+                                </div>
+                            </a>
+                            <div class="py-2">
+                                <a href="@item.Link" class="line-clampin">
+                                    @item.LinkName
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <partial name="~/Pages/Shared/Components/Pagination/Token.cshtml" model="Model.Pagination" />
+
+            @foreach (var item in Model.Components)
+            {
+                @await Component.InvokeAsync(item.Name, item.Id)
+            }
+
+        </div>
+        <div class="col-md-4">
+            @await Component.InvokeAsync(nameof(ProductSpotlight))
+            @await Component.InvokeAsync(nameof(ArticleSpotlight))
+            @await Component.InvokeAsync(nameof(Tag))
+        </div>
+    </div>
+</main>

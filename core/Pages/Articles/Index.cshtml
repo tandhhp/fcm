@@ -1,0 +1,43 @@
+﻿@page
+@using Waffle.Models.Components
+@using Waffle.Models.Components.Specifications
+@model Waffle.Pages.Articles.IndexModel
+
+<main class="container pt-4">
+    <div class="row">
+        <div class="col-md-8">
+
+            <div class="mb-2 flex justify-between items-center">
+                <form class="mb-2" method="get">
+                    <div class="border rounded-full flex bg-white">
+                        <input type="search" name="searchTerm" placeholder="Tìm kiếm..." class="flex-grow px-4 rounded-full" autocomplete="off">
+                        <button type="submit" class="py-2 px-3">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                </form>
+                <div class="dropdown">
+                    <button class="py-2 fw-medium" data-bs-toggle="dropdown" aria-expanded="false" id="drp-sort">
+                        <i class="fas fa-sort-amount-up"></i> Sắp xếp
+                    </button>
+                    <div class="dropdown-menu bg-white shadow dropdown-menu-end shadow-lg rounded" aria-labelledby="drp-sort" style="">
+                        <a class="py-2 px-4 flex items-center hover:bg-gray-100 w-full rounded-b" href="?searchTerm=@Model.SearchTerm&orderby=VIEW">Lượt xem</a>
+                        <a class="py-2 px-4 flex items-center hover:bg-gray-100 w-full rounded-b" href="?searchTerm=@Model.SearchTerm&orderby=DATE">Thời gian</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="title">@ViewData["Title"]</div>
+            @if (Model.Articles != null)
+            {
+                <partial name="_List.cshtml" model="Model.Articles.Data" />
+
+                @Html.DisplayFor(x => Model.Articles.Pagination)
+            }
+        </div>
+        <div class="col-md-4">
+            @await Component.InvokeAsync(nameof(ArticleSpotlight))
+            @await Component.InvokeAsync(nameof(Tag))
+        </div>
+    </div>
+</main>

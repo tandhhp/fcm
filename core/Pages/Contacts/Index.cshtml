@@ -1,0 +1,72 @@
+﻿@page
+@using Waffle.Entities
+@using Waffle.Models.Components
+@model Waffle.Pages.Contacts.IndexModel<ApplicationUser>
+
+<div class="container">
+
+    @await Component.InvokeAsync(nameof(Breadcrumb))
+
+    <div class="row">
+        <div class="col-md-8 mb-4">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15676.476918463875!2d106.6547622!3d10.8021793!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317529379ab2ff91%3A0x19aca450ba4fd5b!2sRepublic%20Apartment%20Saigon%20Airport!5e0!3m2!1svi!2s!4v1727513993017!5m2!1svi!2s" class="w-full" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card shadow rounded p-4 bg-white">
+                <div class="card-body">
+                    @if (!Model.IdentityResult.Succeeded)
+                    {
+                        <div class="alert">
+                            <div class="alert-title">Error: Something Wrong Here!</div>
+                            <ul>
+                                @foreach (var item in Model.IdentityResult.Errors)
+                                {
+                                    <li>@item.Description</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                    <form method="post">
+                        <div class="text-lg font-bold mb-2">Để lại thông tin liên hệ</div>
+                        <div class="mb-2">
+                            <label class="form-label">
+                                Họ và tên
+                            </label>
+                            <input class="form-control" type="text" name="name" id="contact-input-name" required />
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input class="form-control" type="email" name="email" id="contact-input-email" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Số điện thoại
+                                </label>
+                                <input class="form-control" type="tel" name="phoneNumber" id="contact-input-phoneNumber" required />
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">
+                                Ghi chú
+                            </label>
+                            <textarea class="form-control" name="note" id="contact-input-note"></textarea>
+                        </div>
+                        <div class="mb-2">
+                            <button class="btn btn-primary" type="submit" id="contact-btn-submit">
+                                <i class="far fa-paper-plane me-2"></i>
+                                <localize key="submit" />
+                            </button>
+                            <button class="btn btn-secondary" type="reset">
+                                <localize key="reset" />
+                            </button>
+                        </div>
+                        <div class="mb-2 text-muted">
+                            <small>We do not share any of your information without your consent</small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

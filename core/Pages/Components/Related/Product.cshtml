@@ -1,0 +1,10 @@
+﻿@using Waffle.Entities
+@using Waffle.Extensions;
+@using Waffle.Models.Components;
+@using Waffle.Models.ViewModels.Products;
+@model IEnumerable<ProductListItem>
+
+@await Html.PartialAsync("~/Pages/Shared/Components/Feed/Product.cshtml", new Feed {
+    Name = "Sản phẩm liên Quan",
+    Products = Model
+})

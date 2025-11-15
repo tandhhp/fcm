@@ -1,0 +1,22 @@
+﻿@page
+@using Waffle.Models.Components
+@using Waffle.Models.Components.Lister
+@using Waffle.Models.Components.Specifications
+@model Waffle.Pages.Videos.IndexModel
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            @await Html.PartialAsync("/Pages/Shared/Components/VideoPlaylist/Default.cshtml", new VideoPlayList {
+                Title = "Video mới",
+                PlaylistItems = Model.PlaylistItems
+            })
+
+            @Html.DisplayFor(x => Model.Pagination)
+        </div>
+        <div class="col-md-4">
+            @await Component.InvokeAsync(nameof(ArticleSpotlight))
+            @await Component.InvokeAsync(nameof(Tag))
+        </div>
+    </div>
+</div>

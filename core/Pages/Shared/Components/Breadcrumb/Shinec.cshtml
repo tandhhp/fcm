@@ -1,0 +1,30 @@
+﻿@using Waffle.Models.Components
+@model IEnumerable<Breadcrumb>
+
+<header class="garland-page-header mb-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-wrap">
+                    <ul class="page-title-elements page-title-center pull-center">
+                        <h1 class="page-title">Shinec Gia Lai</h1>
+                        <div class="breadcrumbs-wrap">
+                        <li class="breadcrumb-wrap">
+                            <ul id="breadcrumb" class="breadcrumb nav">
+                                    @foreach (var item in Model)
+                                    {
+                                    <li class="breadcrumb-item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                                        <a href="@item.Url" itemprop="item">
+                                            <span itemprop="name">@item.Name</span>
+                                        </a>
+                                        <meta itemprop="position" content="@item.Position" />
+                                    </li>
+                                    }
+                            </ul>
+                        </li>
+                </div>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,68 @@
+﻿@using System.Globalization;
+@using Waffle.Core.Constants;
+@using Waffle.Models.Params.Products;
+@using Waffle.Extensions;
+@model IEnumerable<CartItem>
+@{
+    Layout = null;
+}
+
+@if (Model.Any())
+{
+    <div class="cart-items mb-4">
+        @foreach (var item in Model)
+        {
+            if (item.Catalog == null)
+            {
+                continue;
+            }
+            <div class="cart-item mb-2">
+                <div class="row">
+                    <div style="max-width: 150px">
+                        <img src="@item.Catalog.Thumbnail" alt="@item.Catalog.Name" loading="lazy" class="w-100" />
+                    </div>
+                    <div class="col">
+                        <div class="d-flex gap-4 align-items-center">
+                            <div class="col">
+                                <div class="fw-medium mb-2">
+                                    <a href="@item.Catalog.GetUrl()">@item.Catalog.Name</a>
+                                </div>
+                                <div class="fw-medium mb-2">Số lượng</div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm border btn-light px-2 js-minusQuantity" type="button" data-productId="@item.Catalog.Id" @(item.Quantity < 2 ? "disabled" : "")>
+                                        <i class="fa-solid fa-minus"></i>
+                                    </button>
+                                    <div class="input-wrap" style="width: 40px">
+                                        <input type="text" value="@item.Quantity" class="form-control form-control-sm text-center">
+                                    </div>
+                                    <button class="btn btn-sm border btn-light px-2 js-plusQuantity" type="button" data-productId="@item.Catalog.Id">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-sm btn-outline-danger px-2 js-remove" data-productId="@item.Catalog.Id">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="text-right mb-4">
+        <span>Tổng tiền:</span>
+    </div>
+
+    <div class="text-right">
+        <a href="/products/checkout" class="btn btn-primary @(Model.Any() ? "" : "disabled")">
+            <i class="fas fa-cart-shopping me-1"></i>
+            <span>Thanh toán</span>
+        </a>
+    </div>
+}
+else
+{
+    await Html.PartialAsync(PartialViewName.Empty, new ErrorViewModel { RequestId = Guid.Empty.ToString() });
+}

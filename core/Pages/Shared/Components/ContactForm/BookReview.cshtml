@@ -1,0 +1,40 @@
+﻿@model Waffle.Models.Components.ContactForm
+
+<div class="card bg-white">
+    <div class="card-body">
+        <form action="/api/contact/submit-form" method="post">
+            <input type="hidden" value="@Model.Id" name="WorkId" />
+            <div class="mb-3">
+                <label class="form-label">@Model.Labels.Name</label>
+                <input class="form-control" type="text" name="name" required />
+            </div>
+            <div class="row">
+                <div class="wf-col mb-3">
+                    <label class="form-label">@Model.Labels.Email</label>
+                    <input class="form-control" type="email" name="email" />
+                </div>
+                <div class="wf-col mb-3">
+                    <label class="form-label">@Model.Labels.PhoneNumber</label>
+                    <input class="form-control" type="tel" name="phoneNumber" required />
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@Model.Labels.Address</label>
+                <input class="form-control" type="text" name="address" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@Model.Labels.Note</label>
+                <textarea class="form-control" name="note"></textarea>
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-primary bg-primary" type="submit">
+                    <i class="far fa-paper-plane me-2"></i>
+                    <span>@Model.Labels.Submit</span>
+                </button>
+            </div>
+            <div class="mb-2 text-muted">
+                <small>We do not share any of your information without your consent</small>
+            </div>
+        </form>
+    </div>
+</div>

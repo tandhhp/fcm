@@ -1,0 +1,17 @@
+﻿@page "/leaf/{normalizedName}"
+@using Waffle.Models.Components
+@model Waffle.Pages.Leaf.DetailsModel
+
+@await Component.InvokeAsync(nameof(Breadcrumb))
+
+<main class="container">
+
+    @if (Model.Components != null)
+    {
+        @foreach (var item in Model.Components)
+        {
+            @await Component.InvokeAsync(item.Name, item.Id)
+        }
+    }
+
+</main>

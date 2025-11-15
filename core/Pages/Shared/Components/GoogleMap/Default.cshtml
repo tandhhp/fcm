@@ -1,0 +1,24 @@
+﻿@using Waffle.Models.Components
+@model GoogleMap
+
+<div class="contact-map relative">
+    <iframe src="@Model.Src" height="@Model.Height" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="w-full"></iframe>
+    <div class="rounded shadow map-description bg-white absolute p-4">
+        <div class="md:grid gap-4 grid-cols-2">
+            <div>
+                <div class="mb-2 fw-medium uppercase">
+                    <localize key="address" />
+                </div>
+                <div>
+                    @Model.Address
+                </div>
+            </div>
+            <div>
+                <div class="mb-2 fw-medium">EMAIL</div>
+                <div>
+                    <a href="mailto:@Model.Email">@Model.Email</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

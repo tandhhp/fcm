@@ -1,0 +1,88 @@
+﻿@using Waffle.Models.Settings
+@model Footer
+
+<footer class="footer p-4 border-t text-slate-800">
+    <div class="container md:pt-4">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="mb-3">
+                    <img src="https://nuras.com.vn/imgs/web/logo-white-full.png" alt="LOGO" class="w-40" />
+                </div>
+            </div>
+            <div class="col-md-10">
+                <div class="row">
+                    <div class="col-md-2 mb-2">
+                        <div class="font-bold text-xl mb-2">
+                            Về chúng tôi
+                        </div>
+                        <ul>
+                            @* <li>
+                                <a href="/leaf/chung-toi" class="text-gray-50 hover:text-white"><i class="fa-solid fa-caret-right"></i> Giới thiệu</a>
+                            </li> *@
+                            <li>
+                                <a href="/articles" class="text-gray-50 hover:text-white"><i class="fa-solid fa-caret-right"></i> Tin tức</a>
+                            </li>
+                            <li>
+                                <a href="/contacts" class="text-gray-50 hover:text-white"><i class="fa-solid fa-caret-right"></i> Liên hệ</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-5 mb-2">
+
+                        <div class="font-bold text-xl mb-2">
+                            Thông tin liên hệ
+                        </div>
+                        <ul>
+                            <li>
+                                <i class="fa-solid fa-location-dot"></i> Hồ Chí Minh: Tầng 2, Tầng 5 và Tầng 6, Tòa nhà Republic, Số 18E, đường Cộng Hòa, Phường Tân Sơn Nhất
+                            </li>
+                            <li>
+                                <i class="fa-solid fa-location-dot"></i> Hà Nội: Tầng 13, Số 49 Hai Bà Trưng, Phường Cửa Nam
+                            </li>
+                            <li>
+                                <i class="fa-solid fa-phone-volume"></i> Hotline: 099.661.5028 | 090.901.3386
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="font-bold text-xl mb-2">
+                            Thông tin công ty
+                        </div>
+                        <div class="flex justify-center items-center flex-col text-sm md:text-base">
+                            <div class="mb-2 text-white">
+                                <div class="mb-2">
+                                    <div class="mb-1"><span class="medium">Tên công ty</span>: Công ty Cổ phần Dịch vụ Công Nghệ Cao An Lạc Khang</div>
+                                    <div><span class="medium">Mã số thuế</span>: 0318388190</div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <h3 class="font-medium">Tìm NURA'S trên:</h3>
+                                    <div class="flex gap-4 mb-2">
+                                        <a href="https://www.facebook.com/nurasvn" target="_blank" class="hover:opacity-100 transition duartion-700 text-gray-50 icon hover:text-blue-500">
+                                            <i class="fa-brands fa-facebook-f text-xl"></i>
+                                        </a>
+                                        <a href="#" class="hover:opacity-100 transition duartion-700 text-gray-50 icon hover:text-pink-500">
+                                            <i class="fa-brands fa-instagram text-xl"></i>
+                                        </a>
+                                        <a href="https://www.tiktok.com/@@nuras.vn" class="hover:opacity-100 transition duartion-700 text-gray-50 icon hover:text-purple-500">
+                                            <i class="fa-brands fa-tiktok text-xl"></i>
+                                        </a>
+                                        <a href="https://www.youtube.com/@@nurasvn" target="_blank" class="hover:opacity-100 transition duartion-700 text-gray-50 icon hover:text-red-500">
+                                            <i class="fa-brands fa-youtube text-xl"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<div class="bg-cyan-700">
+    <div class="container">
+        <div class="flex justify-between items-center text-white">
+            <div class="px-1 py-2 text-white">© @DateTime.Now.Year NURA'S. Bản quyền thuộc về Công Ty Cổ phần dịch vụ Công nghệ cao An Lạc Khang</div>
+        </div>
+    </div>
+</div>
