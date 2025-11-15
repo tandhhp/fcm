@@ -215,7 +215,6 @@ public class ToolController : BaseController
                         ToById = to?.Id,
                         SalesId = sales?.Id,
                         KeyInId = keyInUser?.Id,
-                        IdentityNumber = identityNumber,
                         PhoneNumber = phoneNumber
                     };
 
@@ -241,9 +240,6 @@ public class ToolController : BaseController
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                throw ex;
-                errorCount++;
-                continue;
             }
         }
 
@@ -257,4 +253,35 @@ public class ToolController : BaseController
             Message = $"Successfully imported {importedCount} records. {errorCount} errors."
         });
     }
+
+    [HttpPost("fixed"), AllowAnonymous]
+    public async Task<IActionResult> FixedAsync([FromBody] List<FixedImport> args)
+    {
+        try
+        {
+            var invoices = await _context.Invoices.ToListAsync();
+            foreach (var item in args)
+            {
+                if (string.IsNullOrEmpty(item.InvoiceNumber) || item.ClosedDate == null) continue;
+                var invoice = invoices.FirstOrDefault(x => x.InvoiceNumber == item.InvoiceNumber);
+                if (invoice != null)
+                {
+                    invoice.CreatedAt = item.ClosedDate ?? DateTime.Now;
+                    _context.Invoices.Update(invoice);
+                }
+            }
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.ToString());
+        }
+    }
+}
+
+public class FixedImport
+{
+    public string? InvoiceNumber { get; set; }
+    public DateTime? ClosedDate { get; set; }
 }

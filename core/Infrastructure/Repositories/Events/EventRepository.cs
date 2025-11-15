@@ -30,7 +30,6 @@ public class EventRepository(ApplicationDbContext context, IHCAService _hcaServi
             Code = contractCode,
             CreatedDate = DateTime.Now,
             SalesId = lead.SalesId,
-            IdentityNumber = lead.IdentityNumber,
             PhoneNumber = lead.PhoneNumber,
             ToById = lead.ToById,
             SourceId = lead.SourceId,

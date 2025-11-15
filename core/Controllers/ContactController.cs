@@ -317,7 +317,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
         var lead = await _context.Leads.FindAsync(id);
         if (lead == null) return BadRequest();
         if (!_hcaService.IsUserInAnyRole(RoleName.Admin, RoleName.Event)) return BadRequest("Bạn không có quyền!");
-        if (await _context.Contracts.AnyAsync(x => x.PhoneNumber == lead.PhoneNumber || x.IdentityNumber == lead.IdentityNumber))
+        if (await _context.Contracts.AnyAsync(x => x.LeadId == lead.Id))
         {
             return BadRequest("Khách hàng đã phát sinh hợp đồng, không thể xóa!");
         }
@@ -922,7 +922,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
                         from d in ad.DefaultIfEmpty()
                         join f in _context.Sources on a.SourceId equals f.Id into cf
                         from f in cf.DefaultIfEmpty()
-                        join contract in _context.Contracts on a.IdentityNumber equals contract.IdentityNumber into contractJoin
+                        join contract in _context.Contracts on a.Id equals contract.LeadId into contractJoin
                         from contract in contractJoin.DefaultIfEmpty()
                         where a.BranchId == user.BranchId && a.Status != LeadStatus.Pending && a.Status != LeadStatus.Approved
                         select new
