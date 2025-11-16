@@ -134,7 +134,7 @@ declare namespace API {
     roles: string[];
     emailConfirmed: boolean;
     phoneNumberConfirmed: boolean;
-    branch: 0 | 1;
+    branchId: number;
     name: string;
     dosId?: string;
     dotId?: string;

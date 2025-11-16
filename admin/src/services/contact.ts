@@ -237,3 +237,14 @@ export async function apiContactConfirm2(id: string) {
     method: 'POST',
   })
 }
+
+export async function apiContactDialedCalls(params: any) {
+  return request(`contact/dialed-calls`, { params });
+}
+
+export async function apiExportDialedCalls(params: any) {
+  return request(`contact/export-dialed-calls`, {
+    params,
+    responseType: 'blob'
+  });
+}

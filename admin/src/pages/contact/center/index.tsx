@@ -28,9 +28,13 @@ const Index: React.FC = () => {
                 </Col>
                 <Col xs={24} md={18}>
                     <ProTable
+                        headerTitle="Lịch sử cuộc gọi"
                         request={apiCallHistories}
                         search={{
                             layout: 'vertical'
+                        }}
+                        params={{
+                            contactId: id
                         }}
                         rowKey="id"
                         columns={[

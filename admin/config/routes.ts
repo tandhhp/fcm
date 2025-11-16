@@ -314,6 +314,11 @@ export default [
         hideInMenu: true
       },
       {
+        name: 'Đã gọi',
+        path: '/contact/dialed',
+        component: './contact/dialed'
+      },
+      {
         name: 'Lịch hẹn',
         path: '/contact/confirm2',
         component: './contact/confirm2'
@@ -672,9 +677,9 @@ export default [
   {
     icon: 'InfoCircleOutlined',
     name: 'Lịch sử',
-    path: '/logs',
+    path: '/history',
     access: 'canAdmin',
-    component: './logs'
+    component: './history'
   },
   {
     path: '*',

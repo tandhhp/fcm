@@ -9,6 +9,7 @@ namespace Waffle.Core.Interfaces.IRepository;
 
 public interface IContactRepository : IAsyncRepository<Contact>
 {
+    Task<ListResult<object>> DialedCallsAsync(ContactFilterOptions filterOptions);
     Task<ListResult<object>> GetBlacklistAsync(BlacklistFilterOptions filterOptions);
     Task<TResult<object>> GetTmrReportAsync();
     Task<List<Contact>> GetUnassignedContactsAsync(int numberOfContact, int sourceId);

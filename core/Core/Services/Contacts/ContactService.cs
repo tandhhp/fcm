@@ -307,4 +307,6 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
     public Task<ListResult<object>> NeedConfirmsAsync(ContactFilterOptions filterOptions) => _contactRepository.NeedConfirmsAsync(filterOptions);
 
     public Task<TResult<object>> GetTmrReportAsync() => _contactRepository.GetTmrReportAsync();
+
+    public Task<ListResult<object>> DialedCallsAsync(ContactFilterOptions filterOptions) => _contactRepository.DialedCallsAsync(filterOptions);
 }

@@ -29,6 +29,89 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
     [HttpGet("list")]
     public async Task<IActionResult> ListAsync([FromQuery] ContactFilterOptions filterOptions) => Ok(await _contactService.ListContactAsync(filterOptions));
 
+    [HttpGet("dialed-calls")]
+    public async Task<IActionResult> DialedCallsAsync([FromQuery] ContactFilterOptions filterOptions) => Ok(await _contactService.DialedCallsAsync(filterOptions));
+
+    [HttpGet("export-dialed-calls")]
+    public async Task<IActionResult> ExportDialedCallsAsync([FromQuery] ContactFilterOptions filterOptions)
+    {
+        var query = from c in _context.Contacts
+                                join ch in _context.CallHistories on c.Id equals ch.ContactId
+                                join u in _context.Users on c.UserId equals u.Id
+                                join s in _context.Sources on c.SourceId equals s.Id
+                                join cs in _context.CallStatuses on ch.CallStatusId equals cs.Id
+                                where c.Status != ContactStatus.Blacklisted
+                                select new
+                                {
+                                    c.Id,
+                                    c.Name,
+                                    c.PhoneNumber,
+                                    c.CreatedDate,
+                                    c.UserId,
+                                    TeleName = u.Name,
+                                    CalledAt = ch.CreatedDate,
+                                    ch.Note,
+                                    SourceName = s.Name,
+                                    CallStatusName = cs.Name,
+                                    ch.CallStatusId,
+                                    ch.Age,
+                                    ch.FollowUpDate,
+                                    ch.Job,
+                                    ch.ExtraStatus
+                                };
+        if (filterOptions.FromDate.HasValue && filterOptions.ToDate.HasValue)
+        {
+            query = query.Where(x => x.CalledAt.Date >= filterOptions.FromDate.Value.Date && x.CalledAt.Date <= filterOptions.ToDate.Value.Date);
+        }
+        query = query.OrderByDescending(x => x.CalledAt);
+        var contacts = await query.ToListAsync();
+        using var package = new ExcelPackage();
+        var worksheet = package.Workbook.Worksheets.Add("Dialed Calls");
+        // Add headers
+        worksheet.Cells[1, 1].Value = "STT";
+        worksheet.Cells[1, 2].Value = "Tên liên hệ";
+        worksheet.Cells[1, 3].Value = "Số điện thoại";
+        worksheet.Cells[1, 4].Value = "Ngày tạo";
+        worksheet.Cells[1, 5].Value = "Lần gọi cuối";
+        worksheet.Cells[1, 6].Value = "Người gọi";
+        worksheet.Cells[1, 7].Value = "Ghi chú lần gọi";
+        worksheet.Cells[1, 8].Value = "Nguồn";
+        worksheet.Cells[1, 9].Value = "Trạng thái cuộc gọi";
+        worksheet.Cells[1, 10].Value = "Tuổi";
+        worksheet.Cells[1, 11].Value = "Ngày hẹn gọi lại";
+        worksheet.Cells[1, 12].Value = "Công việc";
+        worksheet.Cells[1, 13].Value = "Trạng thái mở rộng";
+
+        using (var headerRange = worksheet.Cells[1, 1, 1, 13])
+        {
+            headerRange.Style.Font.Bold = true;
+            headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+            headerRange.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+        }
+        // Add data
+        for (int i = 0; i < contacts.Count; i++)
+        {
+            var contact = contacts[i];
+            worksheet.Cells[i + 2, 1].Value = i + 1;
+            worksheet.Cells[i + 2, 2].Value = contact.Name;
+            worksheet.Cells[i + 2, 3].Value = contact.PhoneNumber;
+            worksheet.Cells[i + 2, 4].Value = contact.CreatedDate.ToString("dd/MM/yyyy HH:mm");
+            worksheet.Cells[i + 2, 5].Value = contact.CalledAt.ToString("dd/MM/yyyy HH:mm");
+            worksheet.Cells[i + 2, 6].Value = contact.TeleName;
+            worksheet.Cells[i + 2, 7].Value = contact.Note;
+            worksheet.Cells[i + 2, 8].Value = contact.SourceName;
+            worksheet.Cells[i + 2, 9].Value = contact.CallStatusName;
+            worksheet.Cells[i + 2, 10].Value = contact.Age;
+            worksheet.Cells[i + 2, 11].Value = contact.FollowUpDate?.ToString("dd/MM/yyyy HH:mm");
+            worksheet.Cells[i + 2, 12].Value = contact.Job;
+            worksheet.Cells[i + 2, 13].Value = contact.ExtraStatus;
+        }
+        worksheet.Cells.AutoFitColumns();
+        var excelData = package.GetAsByteArray();
+        var fileName = $"Dialed_Calls_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+        return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+    }
+
     [HttpGet("need-confirms")]
     public async Task<IActionResult> NeedConfirmsAsync([FromQuery] ContactFilterOptions filterOptions) => Ok(await _contactService.NeedConfirmsAsync(filterOptions));
 

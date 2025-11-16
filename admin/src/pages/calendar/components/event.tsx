@@ -22,13 +22,15 @@ const Event: React.FC<Props> = (props) => {
 
     return (
         <>
-            <Drawer {...props} title="Sự kiện" width={800}>
+            <Drawer {...props} title={`Sự kiện ${props.selectedDate ? props.selectedDate.format("YYYY-MM-DD") : ""}`} width={800}>
                 <ProTable
+                    headerTitle={`Danh sách khách mời`}
                     actionRef={actionRef}
+                    size="small"
                     request={(params) => apiCalendarEvents({
                         ...params,
                         date: props.selectedDate ? props.selectedDate.format("YYYY-MM-DD") : undefined,
-                        branchId: 1
+                        branchId: initialState?.currentUser?.branchId
                     })}
                     search={false}
                     ghost
@@ -49,7 +51,7 @@ const Event: React.FC<Props> = (props) => {
                             search: false
                         },
                         {
-                            title: 'Trợ lý',
+                            title: 'Rep',
                             dataIndex: 'seller',
                             search: false
                         }

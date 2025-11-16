@@ -17,6 +17,49 @@ namespace Waffle.Infrastructure.Repositories;
 
 public class ContactRepository(ApplicationDbContext context, IHCAService _hcaService, UserManager<ApplicationUser> _userManager) : EfRepository<Contact>(context), IContactRepository
 {
+    public async Task<ListResult<object>> DialedCallsAsync(ContactFilterOptions filterOptions)
+    {
+        var userId = _hcaService.GetUserId();
+        var query = from c in _context.Contacts
+                    join ch in _context.CallHistories on c.Id equals ch.ContactId
+                    join u in _context.Users on c.UserId equals u.Id
+                    join s in _context.Sources on c.SourceId equals s.Id
+                    join cs in _context.CallStatuses on ch.CallStatusId equals cs.Id
+                    where c.Status != ContactStatus.Blacklisted
+                    select new
+                    {
+                        c.Id,
+                        c.Name,
+                        c.PhoneNumber,
+                        c.CreatedDate,
+                        c.UserId,
+                        TeleName = u.Name,
+                        CalledAt = ch.CreatedDate,
+                        ch.Note,
+                        SourceName = s.Name,
+                        CallStatusName = cs.Name,
+                        ch.CallStatusId,
+                        ch.Age,
+                        ch.FollowUpDate,
+                        ch.Job,
+                        ch.ExtraStatus
+                    };
+        if (!string.IsNullOrWhiteSpace(filterOptions.Name))
+        {
+            query = query.Where(c => c.Name.ToLower().Contains(filterOptions.Name.ToLower()));
+        }
+        if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
+        {
+            query = query.Where(c => c.PhoneNumber.Contains(filterOptions.PhoneNumber));
+        }
+        if (_hcaService.IsUserInRole(RoleName.Telesale))
+        {
+            query = query.Where(c => c.UserId == userId);
+        }
+        query = query.OrderByDescending(c => c.CalledAt);
+        return await ListResult<object>.Success(query, filterOptions);
+    }
+
     public async Task<ListResult<object>> GetBlacklistAsync(BlacklistFilterOptions filterOptions)
     {
         var query = from c in _context.Contacts
