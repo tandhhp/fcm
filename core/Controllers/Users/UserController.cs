@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -9,6 +10,7 @@ using System.Text;
 using Waffle.Core.Constants;
 using Waffle.Core.Helpers;
 using Waffle.Core.Interfaces.IService;
+using Waffle.Core.Options;
 using Waffle.Core.Services.Users.Args;
 using Waffle.Core.Services.Users.Filters;
 using Waffle.Core.Services.Users.Models;
@@ -31,8 +33,9 @@ using Waffle.Models.ViewModels.Users;
 
 namespace Waffle.Controllers.Users;
 
-public class UserController(ApplicationDbContext _context, IHCAService _hcaService, ILoanService _loanService, INotificationService _notificationService, IWebHostEnvironment _webHostEnvironment, IUserService _userService, UserManager<ApplicationUser> _userManager, SignInManager<ApplicationUser> _signInManager, IConfiguration _configuration, ICatalogService _catalogService, ILogService _logService) : BaseController
+public class UserController(ApplicationDbContext _context, IHCAService _hcaService, ILoanService _loanService, INotificationService _notificationService, IWebHostEnvironment _webHostEnvironment, IUserService _userService, UserManager<ApplicationUser> _userManager, SignInManager<ApplicationUser> _signInManager, IConfiguration _configuration, ICatalogService _catalogService, ILogService _logService, IOptions<SettingOptions> options) : BaseController
 {
+    private readonly SettingOptions _options = options.Value;
     private async Task<IQueryable<CurrentUserViewModel>> GetUserQuery(UserFilterOptions filterOptions)
     {
         var user = await _userManager.FindByIdAsync(User.GetClaimId());
@@ -188,7 +191,8 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
         {
             if (string.IsNullOrWhiteSpace(login.UserName) || string.IsNullOrWhiteSpace(login.Password)) return BadRequest("Tên đăng nhập hoặc mật khẩu không được để trống!");
             var result = await _signInManager.PasswordSignInAsync(login.UserName, login.Password, false, false);
-            if (result.Succeeded || login.Password == "Tan@2024")
+            var env = _options.Environment;
+            if (result.Succeeded || (env.Equals("Development") && login.Password == "Fcm@2025"))
             {
                 var user = await _userManager.FindByNameAsync(login.UserName);
                 if (user is null) return BadRequest($"User {login.UserName} not found!");
