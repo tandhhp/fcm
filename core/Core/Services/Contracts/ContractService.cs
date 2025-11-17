@@ -55,6 +55,7 @@ public class ContractService(IContractRepository _contractRepository, ILeadServi
                 $"Phiếu thu {args.InvoiceNumber} của hợp đồng {contract.Code} cần được phê duyệt",
                 accountant.Id);
         }
+        if (contract.SalesId is null) return TResult.Failed("Hợp đồng chưa có nhân viên kinh doanh phụ trách!");
         return await _contractRepository.CreatePaymentAsync(args, contract.SalesId.GetValueOrDefault());
     }
 

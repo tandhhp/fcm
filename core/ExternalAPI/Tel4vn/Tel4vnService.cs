@@ -12,8 +12,7 @@ public class Tel4vnService(HttpClient _client, ApplicationDbContext _context, IC
     public async Task<object> GetCdrAsync(CdrFilterOptions filterOptions)
     {
         var token = _configuration["Settings:Tel4vnToken"];
-
-        _client.DefaultRequestHeaders.Add("Authorization", $"Bearer ");
+        _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
         var endPoint = "https://pitel04-api.tel4vn.com/v3/cdr";
         var queryParams = new Dictionary<string, string?>
         {

@@ -22,6 +22,7 @@ public class EventRepository(ApplicationDbContext context, IHCAService _hcaServi
     {
         var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == lead.CreatedBy);
         if (user is null) return TResult.Failed("Người tạo không hợp lệ!");
+        if (lead.SalesId is null) return TResult.Failed("Nhân viên kinh doanh không hợp lệ!");
         await _context.Contracts.AddAsync(new Contract
         {
             Amount = amount,
