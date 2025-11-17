@@ -286,7 +286,8 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                 SourceId = args.SourceId,
                 ContractDate = args.ContractDate,
                 Position = args.Position,
-                DotId = args.DotId
+                DotId = args.DotId,
+                LineCode = args.LineCode,
             };
             if (args.TmId != null)
             {
@@ -345,6 +346,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
             user.SourceId = args.SourceId;
             user.Position = args.Position;
             user.ContractDate = args.ContractDate;
+            user.LineCode = args.LineCode;
             if (await _userManager.IsInRoleAsync(user, RoleName.TelesaleManager))
             {
                 if (args.DotId == null) return BadRequest("Vui lòng chọn DOT");

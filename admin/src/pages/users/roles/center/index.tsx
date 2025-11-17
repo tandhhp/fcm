@@ -115,6 +115,10 @@ const RoleCenter: React.FC = () => {
                 {
                     name: 'position',
                     value: user.position
+                },
+                {
+                    name: 'lineCode',
+                    value: user.lineCode
                 }
             ]);
 
@@ -444,7 +448,7 @@ const RoleCenter: React.FC = () => {
                         <ProFormSelect request={apiTelesalesManagerOptions} name="tmId" label="Tele Manager" showSearch />
                     </Col>
                     <Col md={8} xs={12}>
-                    <ProFormText name="position" label="Chức vụ" />
+                        <ProFormText name="position" label="Chức vụ" />
                     </Col>
                     <Col md={8} xs={12}>
                         <ProFormDatePicker name="contractDate" label="Ngày vào làm" width="lg" fieldProps={{
@@ -453,6 +457,9 @@ const RoleCenter: React.FC = () => {
                                 format: 'DD-MM-YYYY'
                             }
                         }} />
+                    </Col>
+                    <Col md={8} xs={12}>
+                        <ProFormText name="lineCode" label="Member Code" tooltip="Gán với Line Code" />
                     </Col>
                 </Row>
 

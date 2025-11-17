@@ -40,6 +40,7 @@ public class CreateUserModel : LoginModel
     public int? SourceId { get; set; }
     public string? Position { get; set; }
     public Guid? DotId { get; set; }
+    public string? LineCode { get; set; }
 }
 
 public class AddToRoleModel : BaseEntity
