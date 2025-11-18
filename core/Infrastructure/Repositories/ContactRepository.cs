@@ -165,7 +165,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         a.Note,
                         TelesalesId = a.UserId,
                         TelesalesName = b.Name,
-                        CallCount = _context.CallHistories.Count(x => x.ContactId == a.Id) + 1,
+                        CallCount = _context.CallHistories.Count(x => x.ContactId == a.Id),
                         a.Gender,
                         IsBooked = _context.Leads.Any(x => x.PhoneNumber == a.PhoneNumber),
                         a.SourceId,
