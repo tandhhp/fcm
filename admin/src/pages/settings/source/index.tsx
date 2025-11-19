@@ -1,15 +1,20 @@
 import { apiSourceList } from "@/services/settings/source";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { useRef, useState } from "react";
+import { EditOutlined, EyeOutlined, ImportOutlined, MoreOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
+import { Button, Dropdown, Space } from "antd";
 import SourceForm from "./components/form";
-import { EditOutlined, MoreOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
-import { Button, Dropdown } from "antd";
+import { history, useAccess } from "@umijs/max";
+import ContactImport from "@/pages/contact/components/import";
+import AssignForm from "./components/assign-form";
 
 const Index: React.FC = () => {
 
+    const access = useAccess();
     const actionRef = useRef<ActionType>(null);
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [selectedRow, setSelectedRow] = useState<any>(null);
+    const [openImport, setOpenImport] = useState<boolean>(false);
 
     return (
         <PageContainer extra={<Button type="primary" onClick={() => setOpenForm(true)} icon={<PlusOutlined />}>Thêm nguồn</Button>}>
@@ -19,6 +24,12 @@ const Index: React.FC = () => {
                 search={{
                     layout: 'vertical'
                 }}
+                headerTitle={(
+                    <Space>
+                        <Button icon={<ImportOutlined />} disabled={!access.canAdmin && !access.dot && !access.adminData} onClick={() => setOpenImport(true)}>Đổ dữ liệu</Button>
+                        <AssignForm reload={() => actionRef.current?.reload()} />
+                    </Space>
+                )}
                 request={apiSourceList}
                 columns={[
                     {
@@ -32,6 +43,48 @@ const Index: React.FC = () => {
                         dataIndex: 'name'
                     },
                     {
+                        title: 'SL liên hệ',
+                        dataIndex: 'contactCount',
+                        search: false,
+                        valueType: 'digit'
+                    },
+                    {
+                        title: 'Đã phân bổ',
+                        dataIndex: 'assignedCount',
+                        search: false,
+                        valueType: 'digit'
+                    },
+                    {
+                        title: 'Chưa phân bổ',
+                        search: false,
+                        valueType: 'digit',
+                        render: (_, entity) => {
+                            return entity.contactCount - entity.assignedCount;
+                        }
+                    },
+                    {
+                        title: 'Đã gọi',
+                        dataIndex: 'dialedCount',
+                        align: 'center',
+                        search: false,
+                        valueType: 'digit'
+                    },
+                    {
+                        title: 'Chưa gọi',
+                        align: 'center',
+                        search: false,
+                        valueType: 'digit',
+                        render: (_, entity) => {
+                            return entity.contactCount - entity.dialedCount;
+                        }
+                    },
+                    {
+                        title: 'SL cơ hội',
+                        dataIndex: 'leadCount',
+                        search: false,
+                        valueType: 'digit'
+                    },
+                    {
                         title: <SettingOutlined />,
                         valueType: 'option',
                         width: 50,
@@ -39,6 +92,14 @@ const Index: React.FC = () => {
                         render: (_, entity) => [
                             <Dropdown key={"more"} menu={{
                                 items: [
+                                    {
+                                        key: 'view',
+                                        label: 'Xem chi tiết',
+                                        icon: <EyeOutlined />,
+                                        onClick: () => {
+                                            history.push(`/contact/source/center/${entity.id}`);
+                                        }
+                                    },
                                     {
                                         key: 'edit',
                                         label: 'Chỉnh sửa',
@@ -57,6 +118,7 @@ const Index: React.FC = () => {
                 ]}
             />
             <SourceForm open={openForm} onOpenChange={setOpenForm} data={selectedRow} reload={() => actionRef.current?.reload()} />
+            <ContactImport open={openImport} onOpenChange={setOpenImport} reload={() => actionRef.current?.reload()} />
         </PageContainer>
     )
 }

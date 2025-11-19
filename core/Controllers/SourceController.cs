@@ -28,5 +28,11 @@ public class SourceController(ISourceService _sourceService) : BaseController
     public async Task<IActionResult> OptionsAsync([FromQuery] SelectOptions selectOptions) => Ok(await _sourceService.OptionsAsync(selectOptions));
 
     [HttpGet("report")]
-    public async Task<IActionResult> ReportAsync([FromQuery] FilterOptions filterOptions) => Ok(await _sourceService.ReportAsync(filterOptions)); 
+    public async Task<IActionResult> ReportAsync([FromQuery] FilterOptions filterOptions) => Ok(await _sourceService.ReportAsync(filterOptions));
+
+    [HttpGet("availables")]
+    public async Task<IActionResult> AvailablesAsync() => Ok(await _sourceService.AvailablesAsync());
+
+    [HttpPost("assign")]
+    public async Task<IActionResult> AssignAsync([FromBody] SourceAssignArgs args) => Ok(await _sourceService.AssignAsync(args));
 }

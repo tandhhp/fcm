@@ -25,13 +25,19 @@ export async function apiDotOptions(params?: any) {
 }
 
 export async function apiTelesalesManagerOptions(params?: any) {
-    return request('role/telesales-manager-options', {
+    return request<{
+        label: string;
+        value: string;
+    }[]>('role/telesales-manager-options', {
         params
     });
 }
 
 export async function apiTelesalesOptions(params?: any) {
-    return request('role/telesales-options', {
+    return request<{
+        label: string;
+        value: string;
+    }[]>('role/telesales-options', {
         params
     });
 }

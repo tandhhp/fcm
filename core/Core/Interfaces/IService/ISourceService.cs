@@ -8,6 +8,8 @@ namespace Waffle.Core.Interfaces.IService;
 
 public interface ISourceService
 {
+    Task<TResult> AssignAsync(SourceAssignArgs args);
+    Task<TResult<object>> AvailablesAsync();
     Task<TResult> CreateAsync(SourceCreateArgs args);
     Task<TResult> DeleteAsync(int id);
     Task<TResult<object>> DetailAsync(int id);

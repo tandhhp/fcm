@@ -31,7 +31,21 @@ export async function apiSourceDetail(id: number) {
 }
 
 export async function apiSourceOptions(params?: any) {
-    return request('source/options', {
+    return request<{
+        label: string;
+        value: string;
+    }[]>('source/options', {
         params
     });
+}
+
+export async function apiSourceAssign(data: any) {
+    return request('source/assign', {
+        method: 'POST',
+        data
+    });
+}
+
+export async function apiAvailableSource() {
+    return request(`source/availables`);
 }

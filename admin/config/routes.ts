@@ -330,9 +330,9 @@ export default [
       },
       {
         name: 'Nguồn dữ liệu',
-        path: '/contact/call-source',
-        component: './contact/source',
-        access: 'can_read_page_contact_source'
+        path: '/contact/source/center/:id',
+        component: './contact/source/center',
+        hideInMenu: true
       },
       {
         name: 'TMR Report',
@@ -340,10 +340,10 @@ export default [
         component: './contact/call-status'
       },
       {
-        name: 'Cấu hình nguồn',
-        path: '/contact/source-setting',
+        name: 'Nguồn dữ liệu',
+        path: '/contact/source',
         component: './settings/source',
-        access: 'adminData'
+        access: 'can_read_page_contact_source'
       },
       {
         name: 'Tele Report',
@@ -364,6 +364,12 @@ export default [
         name: 'Chi tiết DOS',
         path: '/contact/dos/tele/:id',
         component: './contact/dos/tele',
+        hideInMenu: true
+      },
+      {
+        name: 'Chi tiết nguồn',
+        path: '/contact/source/:id',
+        component: './contact/source/center',
         hideInMenu: true
       }
     ]

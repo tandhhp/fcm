@@ -10,6 +10,10 @@ namespace Waffle.Core.Services.Contacts;
 
 public class SourceService(ISourceRepository _sourceRepository, ILogService _logService) : ISourceService
 {
+    public Task<TResult> AssignAsync(SourceAssignArgs args) => _sourceRepository.AssignAsync(args);
+
+    public Task<TResult<object>> AvailablesAsync() => _sourceRepository.AvailablesAsync();
+
     public async Task<TResult> CreateAsync(SourceCreateArgs args)
     {
         try
