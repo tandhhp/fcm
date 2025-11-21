@@ -9,6 +9,6 @@ public interface IVoucherRepository : IAsyncRepository<Voucher>
 {
     Task<List<VoucherExportResult>> GetExportDataAsync(VoucherFilterOptions filterOptions);
     Task<object?> GetOptionsAsync(VoucherSelectOptions selectOptions);
-    Task<bool> IsUsedAsync(Guid id);
+    Task<bool> IsUsedAsync(Guid voucherId, Guid leadId);
     Task<ListResult<object>> ListAsync(VoucherFilterOptions filterOptions);
 }

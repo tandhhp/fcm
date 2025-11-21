@@ -42,9 +42,6 @@ const Login: React.FC = () => {
     try {
       values.isAdmin = true;
       const msg = await login({ ...values, type });
-      if (!msg.succeeded) {
-        return message.error('Đăng nhập thất bại');
-      }
       setLocale('vi-VN');
       localStorage.setItem('wf_token', msg.token);
       await fetchUserInfo();

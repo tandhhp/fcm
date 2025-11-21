@@ -14,7 +14,7 @@ public interface IVoucherService
     Task<Voucher?> FindAsync(Guid id);
     Task<object?> GetOptionsAsync(VoucherSelectOptions selectOptions);
     Task<TResult> ImportAsync(VoucherImportArgs args);
-    Task<bool> IsUsedAsync(Guid id);
+    Task<bool> IsUsedAsync(Guid voucherId, Guid leadId);
     Task<ListResult<object>> ListAsync(VoucherFilterOptions filterOptions);
     Task<TResult> UpdateAsync(VoucherUpdateArgs args);
 }

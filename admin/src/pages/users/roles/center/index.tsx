@@ -192,7 +192,6 @@ const RoleCenter: React.FC = () => {
         {
             title: 'Họ & Tên',
             dataIndex: 'name',
-            search: false,
             render: (dom, entity) => (
                 <div>
                     {entity.gender === false && (<ManOutlined className='text-blue-500' />)}{entity.gender === true && (<WomanOutlined className='text-red-500' />)} {dom}

@@ -304,7 +304,7 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
         {
             var voucher1 = await _voucherService.FindAsync(args.Voucher1Id.GetValueOrDefault());
             if (voucher1 is null) return TResult.Failed("Voucher không tồn tại");
-            if (await _voucherService.IsUsedAsync(voucher1.Id)) return TResult.Failed("Voucher đã được sử dụng");
+            if (await _voucherService.IsUsedAsync(voucher1.Id, lead.Id)) return TResult.Failed("Voucher đã được sử dụng");
             voucher1.ActiveAt = DateTime.Now;
             voucher1.ExpiredDate = DateTime.Now.AddDays(voucher1.ExpiredDays);
             voucher1.Status = VoucherStatus.Redeemed;
@@ -313,7 +313,7 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
         {
             var voucher2 = await _voucherService.FindAsync(args.Voucher2Id.GetValueOrDefault());
             if (voucher2 is null) return TResult.Failed("Voucher không tồn tại");
-            if (await _voucherService.IsUsedAsync(voucher2.Id)) return TResult.Failed("Voucher đã được sử dụng");
+            if (await _voucherService.IsUsedAsync(voucher2.Id, lead.Id)) return TResult.Failed("Voucher đã được sử dụng");
             voucher2.ActiveAt = DateTime.Now;
             voucher2.ExpiredDate = DateTime.Now.AddDays(voucher2.ExpiredDays);
             voucher2.Status = VoucherStatus.Redeemed;

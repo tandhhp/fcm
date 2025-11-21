@@ -173,7 +173,7 @@ const LeadFeedbackUpdateForm: React.FC<Props> = (props) => {
                     ]} />
                 </Col>
                 <Col md={6} xs={24}>
-                    <ProFormDatePicker name={"dateOfBirth"} label="Năm sinh" width="xl" />
+                    <ProFormDatePicker.Year label="Năm sinh" name="dateOfBirth" width="xl" rules={[{ required: true }]} />
                 </Col>
                 <Col md={4} xs={24}>
                     <ProFormSelect name={"gender"} label="Giới tính" options={GENDER_OPTIONS} />

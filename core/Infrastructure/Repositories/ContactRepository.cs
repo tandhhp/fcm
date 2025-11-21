@@ -165,7 +165,6 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         a.Note,
                         TelesalesId = a.UserId,
                         TelesalesName = b.Name,
-                        CallCount = _context.CallHistories.Count(x => x.ContactId == a.Id),
                         a.Gender,
                         IsBooked = _context.Leads.Any(x => x.PhoneNumber == a.PhoneNumber),
                         a.SourceId,
@@ -175,12 +174,9 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         a.Confirm1,
                         a.Confirm2,
                         SourceName = s.Name,
-                        LastCall = _context.CallHistories
-                                        .Where(ch => ch.ContactId == a.Id)
-                                        .OrderByDescending(ch => ch.CreatedDate)
-                                        .Select(ch => ch.CreatedDate)
-                                        .FirstOrDefault()
+                        IsCalled = _context.CallHistories.Any(x => x.ContactId == a.Id)
                     };
+        query = query.Where(x => !x.IsCalled);
         if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
         {
             query = query.Where(x => !string.IsNullOrEmpty(x.PhoneNumber) && x.PhoneNumber.ToLower().Contains(filterOptions.PhoneNumber.ToLower()));
@@ -204,10 +200,6 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         if (filterOptions.Confirm2.HasValue)
         {
             query = query.Where(x => x.Confirm2 == filterOptions.Confirm2);
-        }
-        if (filterOptions.FromDate.HasValue && filterOptions.ToDate.HasValue)
-        {
-            query = query.Where(x => x.LastCall.Date >= filterOptions.FromDate.Value.Date && x.LastCall.Date <= filterOptions.ToDate.Value.Date);
         }
         if (_hcaService.IsUserInRole(RoleName.Telesale))
         {

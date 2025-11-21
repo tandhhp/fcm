@@ -112,7 +112,8 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
             contact.Gender,
             user.TeamId,
             user.TmId,
-            TelesalesManagerName = telesalesManager.Name
+            TelesalesManagerName = telesalesManager.Name,
+            contact.SourceId
         });
     }
 
@@ -128,6 +129,9 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
         data.JobKindId = args.JobKindId;
         data.MarriedStatus = args.MarriedStatus;
         data.Note = args.Note;
+        data.SourceId = args.SourceId;
+        data.Gender = args.Gender;
+        data.TransportId = args.TransportId;
         await _logService.AddAsync($"Cập nhật liên hệ {data.Name} - {data.PhoneNumber}");
         await _contactRepository.UpdateAsync(data);
         return TResult.Success;
@@ -155,7 +159,8 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
                 MarriedStatus = args.MarriedStatus,
                 Note = args.Note,
                 Gender = args.Gender,
-                TransportId = args.TransportId
+                TransportId = args.TransportId,
+                SourceId = args.SourceId
             };
             if (_hcaService.IsUserInRole(RoleName.Telesale))
             {

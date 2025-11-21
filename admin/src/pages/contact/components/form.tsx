@@ -2,6 +2,7 @@ import { apiContactCreate, apiContactDetail, apiContactUpdate } from "@/services
 import { apiDistrictOptions } from "@/services/settings/district";
 import { apiJobKindOptions } from "@/services/settings/job-kind";
 import { apiProvinceOptions } from "@/services/settings/province";
+import { apiSourceOptions } from "@/services/settings/source";
 import { apiTransportOptions } from "@/services/settings/transport";
 import { apiUserOptions, apiUserTelesalesManagerOptions } from "@/services/user";
 import { GENDER_OPTIONS } from "@/utils/constants";
@@ -90,15 +91,19 @@ const ContactForm: React.FC<Props> = (props) => {
                     },
                     {
                         name: 'telesalesManagerId',
-                        value: response.data.telesalesManagerId
+                        value: response.data.tmId
                     },
                     {
                         name: 'marriedStatus',
                         value: response.data.marriedStatus
+                    },
+                    {
+                        name: 'sourceId',
+                        value: response.data.sourceId
                     }
                 ]);
                 setSelectedProvinceId(response.data.provinceId);
-                setTelesalesManagerId(response.data.telesalesManagerId);
+                setTelesalesManagerId(response.data.tmId);
             });
         }
     }, [props.open && props.data]);
@@ -122,10 +127,10 @@ const ContactForm: React.FC<Props> = (props) => {
                 <Col xs={24} md={12}>
                     <ProFormText name="name" label="Họ và tên" rules={[{ required: true, message: "Vui lòng nhập họ và tên" }]} />
                 </Col>
-                <Col xs={24} md={12}>
+                <Col xs={24} md={4}>
                     <ProFormSelect name="gender" label="Giới tính" options={GENDER_OPTIONS} />
                 </Col>
-                <Col xs={24} md={12}>
+                <Col xs={24} md={8}>
                     <ProFormText name="email" label="Email" rules={[{ type: "email", message: "Vui lòng nhập email hợp lệ" }]} />
                 </Col>
                 <Col xs={24} md={12}>
@@ -152,7 +157,7 @@ const ContactForm: React.FC<Props> = (props) => {
                         onChange={(value: number) => setSelectedProvinceId(value)}
                         showSearch />
                 </Col>
-                <Col xs={24} md={12}>
+                <Col xs={24} md={8}>
                     <ProFormSelect name={`districtId`} label="Xã/Phường" options={districtOptions} showSearch disabled={!selectedProvinceId} />
                 </Col>
                 <Col xs={24} md={8}>
@@ -168,6 +173,9 @@ const ContactForm: React.FC<Props> = (props) => {
                         { label: "Ly hôn", value: 2 },
                         { label: "Góa", value: 3 }
                     ]} />
+                </Col>
+                <Col xs={24} md={8}>
+                    <ProFormSelect name={`sourceId`} label="Nguồn danh bạ" request={apiSourceOptions} showSearch />
                 </Col>
             </Row>
             <ProFormTextArea name="note" label="Ghi chú" />

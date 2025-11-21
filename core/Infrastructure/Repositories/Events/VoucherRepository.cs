@@ -80,9 +80,11 @@ public class VoucherRepository(ApplicationDbContext context) : EfRepository<Vouc
         }).ToListAsync();
     }
 
-    public async Task<bool> IsUsedAsync(Guid id)
+    public async Task<bool> IsUsedAsync(Guid voucherId, Guid leadId)
     {
-        return await _context.Leads.AnyAsync(x => x.Voucher1Id == id) || await _context.Leads.AnyAsync(x => x.Voucher2Id == id);
+        var isVoucher1Used = await _context.Leads.AnyAsync(x => x.Voucher1Id == voucherId && x.Id != leadId);
+        var isVoucher2Used = await _context.Leads.AnyAsync(x => x.Voucher2Id == voucherId && x.Id != leadId);
+        return isVoucher1Used || isVoucher2Used;
     }
 
     public async Task<ListResult<object>> ListAsync(VoucherFilterOptions filterOptions)

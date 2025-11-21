@@ -40,7 +40,7 @@ public class VoucherService(IVoucherRepository _voucherRepository, ILogService _
     {
         var voucher = await _voucherRepository.FindAsync(id);
         if (voucher == null) return TResult.Failed("Không tìm thấy voucher.");
-        if (await _voucherRepository.IsUsedAsync(id)) return TResult.Failed("Voucher đã được sử dụng, không thể xóa.");
+        if (await _voucherRepository.IsUsedAsync(id, Guid.Empty)) return TResult.Failed("Voucher đã được sử dụng, không thể xóa.");
         await _logService.AddAsync($"Xóa voucher: {voucher.Name}");
         await _voucherRepository.DeleteAsync(voucher);
         return TResult.Success;
@@ -142,7 +142,7 @@ public class VoucherService(IVoucherRepository _voucherRepository, ILogService _
         return TResult.Success;
     }
 
-    public Task<bool> IsUsedAsync(Guid id) => _voucherRepository.IsUsedAsync(id);
+    public Task<bool> IsUsedAsync(Guid voucherId, Guid leadId) => _voucherRepository.IsUsedAsync(voucherId, leadId);
 
     public Task<ListResult<object>> ListAsync(VoucherFilterOptions filterOptions) => _voucherRepository.ListAsync(filterOptions);
 

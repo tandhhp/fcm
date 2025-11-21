@@ -68,11 +68,6 @@ const ContactPage: React.FC = () => {
             search: false
         },
         {
-            title: 'Lượt gọi',
-            dataIndex: 'callCount',
-            search: false
-        },
-        {
             title: 'Sự kiện',
             dataIndex: 'isBooked',
             valueType: 'select',
@@ -83,27 +78,9 @@ const ContactPage: React.FC = () => {
             width: 120
         },
         {
-            title: 'Lần gọi cuối',
-            dataIndex: 'lastCall',
-            hideInTable: true,
-            valueType: 'dateRange'
-        },
-        {
             title: 'Nguồn',
             dataIndex: 'sourceName',
             search: false
-        },
-        {
-            dataIndex: 'lastCall',
-            title: 'Lần gọi cuối',
-            valueType: 'dateTime',
-            search: false,
-            render: (dom, record) => {
-                if (dayjs(record.lastCall).isAfter('2000-01-01')) {
-                    return dom;
-                }
-                return 'Chưa gọi';
-            }
         },
         {
             title: 'Ghi chú',

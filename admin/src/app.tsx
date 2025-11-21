@@ -105,7 +105,7 @@ export const request: RequestConfig = {
   ],
   errorConfig: {
     errorHandler: (error: any) => {
-      if (error.response.data) {
+      if (error.response?.data) {
         message.error(error.response.data)
       }
     }
