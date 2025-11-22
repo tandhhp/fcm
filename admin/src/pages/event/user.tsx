@@ -142,7 +142,7 @@ const EventUserPage: React.FC = () => {
                                 0: <Tag color="warning" className="w-full text-center">Check-In</Tag>,
                                 1: <Tag color="success" className="w-full text-center">Đã duyệt</Tag>
                             },
-                            width: 80,
+                            width: 100,
                             minWidth: 80
                         },
                         {
