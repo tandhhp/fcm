@@ -22,7 +22,7 @@ public interface IContactService
     Task<ListResult<object>> GetUnassignedListAsync(UnassignedFilterOptions filterOptions);
     Task<TResult> AssignSourceAsync(ContactAssignSourceArgs args);
     Task<TResult> Confirm1Async(Guid id);
-    Task<TResult> Confirm2Async(Guid id);
+    Task<TResult> Confirm2Async(UpdateConfirm2Args args);
     Task<ListResult<object>> NeedConfirmsAsync(ContactFilterOptions filterOptions);
     Task<TResult<object>> GetTmrReportAsync();
     Task<ListResult<object>> DialedCallsAsync(ContactFilterOptions filterOptions);

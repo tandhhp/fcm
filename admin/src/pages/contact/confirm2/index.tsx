@@ -1,6 +1,6 @@
 import { apiContactConfirm2, apiContactNeedConfirm2 } from "@/services/contact";
 import { ManOutlined, WomanOutlined } from "@ant-design/icons";
-import { ActionType, PageContainer, ProColumnType, ProTable } from "@ant-design/pro-components"
+import { ActionType, PageContainer, ProColumnType, ProForm, ProFormSelect, ProTable } from "@ant-design/pro-components"
 import { useAccess } from "@umijs/max";
 import { message, Switch } from "antd";
 import { useRef } from "react";
@@ -9,6 +9,29 @@ const Index: React.FC = () => {
 
     const access = useAccess();
     const actionRef = useRef<ActionType>();
+
+    const confirm2Options = [
+        {
+            label: 'Chưa xác nhận',
+            value: 0
+        },
+        {
+            label: 'Đồng ý',
+            value: 1
+        },
+        {
+            label: 'Hủy',
+            value: 2
+        },
+        {
+            label: 'Chưa chắc chắn',
+            value: 3
+        },
+        {
+            label: 'Không nhấc máy',
+            value: 4
+        }
+    ];
 
     const columns: ProColumnType<any>[] = [
         {
@@ -68,21 +91,46 @@ const Index: React.FC = () => {
             search: false
         },
         {
+            title: 'Ngày sự kiện',
+            dataIndex: 'dateRange',
+            valueType: 'dateRange',
+            hideInTable: true
+        },
+        {
             title: 'Ghi chú',
             dataIndex: 'note',
             search: false
         },
         {
             title: 'Xác nhận 2',
-            dataIndex: 'confirm2',
+            dataIndex: 'confirm2Status',
             render: (text, record) => {
-                return <Switch checked={record.confirm2} size="small" onChange={async () => {
-                    await apiContactConfirm2(record.id);
-                    message.success('Xác nhận thành công!');
-                    actionRef.current?.reload();
-                }} disabled={!access.can_confirm2} />
+                return (
+                    <ProForm submitter={false} readonly={!access.can_confirm2}>
+                        <ProFormSelect name={"confirm2Status"} initialValue={record.confirm2Status} onChange={async (value) => {
+                            await apiContactConfirm2({
+                                contactId: record.id,
+                                confirm2Status: value
+                            });
+                            message.success('Xác nhận thành công!');
+                            actionRef.current?.reload();
+                        }} 
+                            formItemProps={{
+                                className: 'mb-0'
+                            }}
+                            options={confirm2Options}
+                            fieldProps={{
+                                autoFocus: false,
+                                variant: 'filled'
+                            }}
+                        />
+                    </ProForm>
+                )
             },
-            search: false
+            valueType: 'select',
+            fieldProps: {
+                options: confirm2Options
+            }
         }
     ]
 

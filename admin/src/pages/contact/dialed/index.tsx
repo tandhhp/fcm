@@ -1,12 +1,22 @@
+import { apiCallOptions } from "@/services/call";
 import { apiContactDialedCalls, apiExportDialedCalls } from "@/services/contact";
-import { ExportOutlined } from "@ant-design/icons";
-import { ModalForm, PageContainer, ProFormDateRangePicker, ProTable } from "@ant-design/pro-components"
-import { Button } from "antd";
-import { useState } from "react";
+import { CalendarOutlined, EditOutlined, ExportOutlined, EyeOutlined, MoreOutlined, PhoneOutlined, SettingOutlined } from "@ant-design/icons";
+import { ActionType, ModalForm, PageContainer, ProFormDateRangePicker, ProTable } from "@ant-design/pro-components"
+import { Button, Dropdown } from "antd";
+import { useRef, useState } from "react";
+import CallForm from "../components/call";
+import BookingForm from "../components/booking";
+import { history } from "@umijs/max";
+import ContactForm from "../components/form";
 
 const Index: React.FC = () => {
 
+    const actionRef = useRef<ActionType>();
     const [openExport, setOpenExport] = useState<boolean>(false);
+    const [openCall, setOpenCall] = useState<boolean>(false);
+    const [contact, setContact] = useState<any>();
+    const [openBooking, setOpenBooking] = useState<boolean>(false);
+    const [openForm, setOpenForm] = useState<boolean>(false);
 
     const onFinishExport = async (values: any) => {
         const response = await apiExportDialedCalls({
@@ -26,6 +36,7 @@ const Index: React.FC = () => {
     return (
         <PageContainer extra={<Button onClick={() => setOpenExport(true)} type="primary" icon={<ExportOutlined />}>Xuất dữ liệu</Button>}>
             <ProTable
+                actionRef={actionRef}
                 request={apiContactDialedCalls}
                 rowKey="id"
                 scroll={{
@@ -42,7 +53,15 @@ const Index: React.FC = () => {
                         title: 'SDT',
                         dataIndex: 'phoneNumber',
                         minWidth: 100,
-                        width: 100
+                        width: 100,
+                        render: (text, record) => {
+                            return (
+                                <Button type="link" size="small" icon={<PhoneOutlined />} onClick={() => {
+                                    setContact(record);
+                                    setOpenCall(true);
+                                }}>{text}</Button>
+                            )
+                        }
                     },
                     {
                         title: 'Tên liên hệ',
@@ -59,8 +78,12 @@ const Index: React.FC = () => {
                     },
                     {
                         title: 'Trạng thái',
-                        dataIndex: 'callStatusName',
-                        search: false
+                        dataIndex: 'callStatusId',
+                        request: apiCallOptions,
+                        valueType: 'select',
+                        fieldProps: {
+                            showSearch: true
+                        }
                     },
                     {
                         title: 'Nguồn',
@@ -74,18 +97,15 @@ const Index: React.FC = () => {
                     },
                     {
                         title: 'Extra',
-                        dataIndex: 'extraStatus',
-                        search: false
+                        dataIndex: 'extraStatus'
                     },
                     {
                         title: 'Tuổi',
-                        dataIndex: 'age',
-                        search: false
+                        dataIndex: 'age'
                     },
                     {
                         title: 'Công việc',
-                        dataIndex: 'job',
-                        search: false
+                        dataIndex: 'job'
                     },
                     {
                         title: 'Follow',
@@ -97,15 +117,63 @@ const Index: React.FC = () => {
                     },
                     {
                         title: 'Ghi chú',
-                        dataIndex: 'note',
-                        search: false
+                        dataIndex: 'note'
+                    },
+                    {
+                        title: <SettingOutlined />,
+                        valueType: 'option',
+                        render: (dom, entity) => [
+                            <Dropdown key="more" menu={{
+                                items: [
+                                    {
+                                        key: 'view',
+                                        label: 'Chi tiết',
+                                        onClick: () => {
+                                            history.push(`/contact/center/${entity.id}`);
+                                        },
+                                        icon: <EyeOutlined />
+                                    },
+                                    {
+                                        key: 'edit',
+                                        label: 'Chỉnh sửa',
+                                        icon: <EditOutlined />,
+                                        onClick: () => {
+                                            setContact(entity);
+                                            setOpenForm(true);
+                                        }
+                                    },
+                                    {
+                                        key: 'call',
+                                        label: 'Cuộc gọi',
+                                        onClick: () => {
+                                            setContact(entity);
+                                            setOpenCall(true);
+                                        },
+                                        icon: <PhoneOutlined />
+                                    },
+                                    {
+                                        key: 'booking',
+                                        label: 'Đặt lịch hẹn',
+                                        onClick: () => {
+                                            setContact(entity);
+                                            setOpenBooking(true);
+                                        },
+                                        icon: <CalendarOutlined />,
+                                        disabled: entity.isBooked
+                                    }
+                                ]
+                            }}>
+                                <Button size="small" type="dashed" icon={<MoreOutlined />} />
+                            </Dropdown>
+                        ],
+                        width: 40
                     }
                 ]}
                 search={{
                     layout: 'vertical'
                 }}
             />
-            <ModalForm 
+            <ModalForm
                 open={openExport}
                 onOpenChange={setOpenExport}
                 title="Xuất dữ liệu cuộc gọi đã gọi"
@@ -118,6 +186,9 @@ const Index: React.FC = () => {
                     width="md"
                 />
             </ModalForm>
+            <ContactForm open={openForm} onOpenChange={setOpenForm} data={contact} reload={() => actionRef.current?.reload()} />
+            <CallForm open={openCall} data={contact} onOpenChange={setOpenCall} reload={() => actionRef.current?.reload()} />
+            <BookingForm open={openBooking} data={contact} onOpenChange={setOpenBooking} reload={() => actionRef.current?.reload()} />
         </PageContainer>
     )
 }

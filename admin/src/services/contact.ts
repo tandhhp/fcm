@@ -229,12 +229,20 @@ export async function apiContactAssignSource(data: any) {
 }
 
 export async function apiContactNeedConfirm2(params: any) {
-  return request(`contact/need-confirms`, { params });
+  return request(`contact/need-confirms`, { 
+    params: {
+      ...params,
+      fromDate: params?.dateRange ? params.dateRange[0] : undefined,
+      toDate: params?.dateRange ? params.dateRange[1] : undefined,
+      dateRange: undefined
+    }
+   });
 }
 
-export async function apiContactConfirm2(id: string) {
-  return request(`contact/confirm2/${id}`, {
+export async function apiContactConfirm2(data: any) {
+  return request(`contact/confirm2`, {
     method: 'POST',
+    data
   })
 }
 

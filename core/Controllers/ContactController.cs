@@ -1188,8 +1188,8 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
     [HttpPost("confirm1/{id}")]
     public async Task<IActionResult> Confirm1Async([FromRoute] Guid id) => Ok(await _contactService.Confirm1Async(id));
 
-    [HttpPost("confirm2/{id}")]
-    public async Task<IActionResult> Confirm2Async([FromRoute] Guid id) => Ok(await _contactService.Confirm2Async(id));
+    [HttpPost("confirm2")]
+    public async Task<IActionResult> Confirm2Async([FromBody] UpdateConfirm2Args args) => Ok(await _contactService.Confirm2Async(args));
 
     [HttpGet("tmr-report")]
     public async Task<IActionResult> GetTmrReportAsync() => Ok(await _contactService.GetTmrReportAsync());

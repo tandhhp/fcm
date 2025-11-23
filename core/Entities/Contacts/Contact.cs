@@ -29,7 +29,7 @@ public class Contact : AuditEntity
     [ForeignKey(nameof(Source))]
     public int? SourceId { get; set; }
     public bool Confirm1 { get; set; }
-    public bool Confirm2 { get; set; }
+    public Confirm2Status Confirm2Status { get; set; }
 
     public virtual Transport? Transport { get; set; }
     public virtual District? District { get; set; }
@@ -45,6 +45,20 @@ public enum ContactStatus
     New,
     [Display(Name = "Danh sách đen")]
     Blacklisted
+}
+
+public enum Confirm2Status
+{
+    [Display(Name = "Chưa xác nhận")]
+    UnConfirmed,
+    [Display(Name = "Đồng ý")]
+    Ok,
+    [Display(Name = "Hủy")]
+    Canceled,
+    [Display(Name = "Chưa chắc chắn")]
+    NotSure,
+    [Display(Name = "Không nhấc máy")]
+    NoAnswer
 }
 
 public enum MarriedStatus

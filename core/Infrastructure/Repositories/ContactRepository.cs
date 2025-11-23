@@ -48,9 +48,33 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         {
             query = query.Where(c => c.Name.ToLower().Contains(filterOptions.Name.ToLower()));
         }
+        if (filterOptions.CallStatusId.HasValue)
+        {
+            query = query.Where(c => c.CallStatusId == filterOptions.CallStatusId);
+        }
+        if (filterOptions.FromDate.HasValue && filterOptions.ToDate.HasValue)
+        {
+            query = query.Where(c => c.CalledAt.Date >= filterOptions.FromDate.Value.Date && c.CalledAt.Date <= filterOptions.ToDate.Value.Date);
+        }
         if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
         {
             query = query.Where(c => c.PhoneNumber.Contains(filterOptions.PhoneNumber));
+        }
+        if (!string.IsNullOrWhiteSpace(filterOptions.Job))
+        {
+            query = query.Where(c => c.Job != null && c.Job.ToLower().Contains(filterOptions.Job.ToLower()));
+        }
+        if (!string.IsNullOrWhiteSpace(filterOptions.Age))
+        {
+            query = query.Where(c => c.Age != null && c.Age.ToLower().Contains(filterOptions.Age.ToLower()));
+        }
+        if (!string.IsNullOrWhiteSpace(filterOptions.ExtraStatus))
+        {
+            query = query.Where(c => c.ExtraStatus != null && c.ExtraStatus.ToLower().Contains(filterOptions.ExtraStatus.ToLower()));
+        }
+        if (!string.IsNullOrWhiteSpace(filterOptions.Note))
+        {
+            query = query.Where(x => x.Note != null && x.Note.ToLower().Contains(filterOptions.Note.ToLower()));
         }
         if (_hcaService.IsUserInRole(RoleName.Telesale))
         {
@@ -172,7 +196,6 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         b.DotId,
                         b.DosId,
                         a.Confirm1,
-                        a.Confirm2,
                         SourceName = s.Name,
                         IsCalled = _context.CallHistories.Any(x => x.ContactId == a.Id)
                     };
@@ -196,10 +219,6 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         if (filterOptions.Confirm1.HasValue)
         {
             query = query.Where(x => x.Confirm1 == filterOptions.Confirm1);
-        }
-        if (filterOptions.Confirm2.HasValue)
-        {
-            query = query.Where(x => x.Confirm2 == filterOptions.Confirm2);
         }
         if (_hcaService.IsUserInRole(RoleName.Telesale))
         {
@@ -239,7 +258,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         TelesalesId = a.UserId,
                         TelesalesName = b.Name,
                         CallCount = _context.CallHistories.Count(x => x.ContactId == a.Id) + 1,
-                        a.Confirm2,
+                        a.Confirm2Status,
                         c.EventDate,
                         EventName = d.Name,
                         b.TmId
@@ -251,6 +270,14 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {
             query = query.Where(x => !string.IsNullOrEmpty(x.Name) && x.Email.Contains(filterOptions.Name));
+        }
+        if (filterOptions.Confirm2Status.HasValue)
+        {
+            query = query.Where(x => x.Confirm2Status == filterOptions.Confirm2Status);
+        }
+        if (filterOptions.FromDate.HasValue && filterOptions.ToDate.HasValue)
+        {
+            query = query.Where(x => x.EventDate.Date >= filterOptions.FromDate.Value.Date && x.EventDate.Date <= filterOptions.ToDate.Value.Date);
         }
         if (_hcaService.IsUserInRole(RoleName.Telesale))
         {

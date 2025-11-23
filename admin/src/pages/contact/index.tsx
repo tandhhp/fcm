@@ -8,7 +8,6 @@ import BlockContactModal from "./components/block-modal";
 import ContactForm from "./components/form";
 import CallForm from "./components/call";
 import BookingForm from "./components/booking";
-import dayjs from "dayjs";
 
 const ContactPage: React.FC = () => {
 

@@ -300,11 +300,12 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
         return TResult.Success;
     }
 
-    public async Task<TResult> Confirm2Async(Guid id)
+    public async Task<TResult> Confirm2Async(UpdateConfirm2Args args)
     {
-        var contact = await _contactRepository.FindAsync(id);
+        var contact = await _contactRepository.FindAsync(args.ContactId);
         if (contact is null) return TResult.Failed("Không tìm thấy liên hệ!");
-        contact.Confirm2 = !contact.Confirm2;
+        contact.Confirm2Status = args.Confirm2Status;
+        await _logService.AddAsync($"Cập nhật xác nhận 2 cho liên hệ {contact.Name} - {contact.PhoneNumber} thành {EnumHelper.GetDisplayName(args.Confirm2Status)}");
         await _contactRepository.UpdateAsync(contact);
         return TResult.Success;
     }
