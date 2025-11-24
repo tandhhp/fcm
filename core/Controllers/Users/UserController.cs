@@ -267,6 +267,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
     {
         try
         {
+            if (await _context.Users.AnyAsync(x => x.LineCode == args.LineCode)) return BadRequest("Mã line đã tồn tại!");
             var user = new ApplicationUser
             {
                 UserName = args.UserName,
@@ -347,6 +348,10 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
             user.Position = args.Position;
             user.ContractDate = args.ContractDate;
             user.LineCode = args.LineCode;
+            if (await _context.Users.AnyAsync(x => x.LineCode == args.LineCode && x.Id != user.Id))
+            {
+                return BadRequest("Mã line đã tồn tại!");
+            }
             if (await _userManager.IsInRoleAsync(user, RoleName.TelesaleManager))
             {
                 if (args.DotId == null) return BadRequest("Vui lòng chọn DOT");
