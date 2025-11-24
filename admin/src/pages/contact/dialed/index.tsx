@@ -108,12 +108,21 @@ const Index: React.FC = () => {
                         dataIndex: 'job'
                     },
                     {
-                        title: 'Follow',
+                        title: 'Hẹn gọi',
                         dataIndex: 'followUpDate',
                         valueType: 'date',
                         search: false,
                         width: 100,
                         minWidth: 100
+                    },
+                    {
+                        title: 'Sự kiện',
+                        dataIndex: 'isBooked',
+                        valueType: 'select',
+                        valueEnum: {
+                            true: { text: 'Đã đặt', status: 'Success' },
+                            false: { text: 'Chưa đặt', status: 'Default' }
+                        }
                     },
                     {
                         title: 'Ghi chú',

@@ -42,7 +42,8 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         ch.Age,
                         ch.FollowUpDate,
                         ch.Job,
-                        ch.ExtraStatus
+                        ch.ExtraStatus,
+                        IsBooked = _context.Leads.Any(x => x.PhoneNumber == c.PhoneNumber)
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {
@@ -75,6 +76,10 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         if (!string.IsNullOrWhiteSpace(filterOptions.Note))
         {
             query = query.Where(x => x.Note != null && x.Note.ToLower().Contains(filterOptions.Note.ToLower()));
+        }
+        if (filterOptions.IsBooked.HasValue)
+        {
+            query = query.Where(c => c.IsBooked == filterOptions.IsBooked);
         }
         if (_hcaService.IsUserInRole(RoleName.Telesale))
         {
