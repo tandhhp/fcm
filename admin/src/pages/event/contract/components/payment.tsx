@@ -26,7 +26,8 @@ const ContractPayment: React.FC<Props> = (props) => {
             amount: values.amount,
             paymentMethod: values.paymentMethod,
             evidenceUrl: values.evidenceUrl,
-            invoiceNumber: values.invoiceNumber
+            invoiceNumber: values.invoiceNumber,
+            createdDate: values.createdDate ? dayjs(values.createdDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
         });
         message.success('Tạo phiếu thu thành công');
         formRef.current?.resetFields();

@@ -179,28 +179,35 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
 
     public async Task<TResult> BookAsync(ContactBookArgs args)
     {
-        if (args.EventDate.Date < DateTime.Now) return TResult.Failed("Ngày sự kiện không hợp lệ!");
-        var contact = await _contactRepository.FindAsync(args.Id);
-        if (contact is null) return TResult.Failed("Không tìm thấy liên hệ!");
-        if (string.IsNullOrEmpty(contact.PhoneNumber)) return TResult.Failed("Liên hệ chưa có số điện thoại!");
-        var lead = await _leadService.FindByPhoneNumberAsync(contact.PhoneNumber);
-        if (lead != null && !lead.Duplicated) return TResult.Failed($"Liên hệ đã có lịch hẹn vào ngày {lead.EventDate:dd-MM-yyyy}!");
-        if (contact.UserId == null) return TResult.Failed("Liên hệ chưa có người phụ trách!");
-        var telesales = await _userManager.FindByIdAsync(contact.UserId.GetValueOrDefault().ToString());
-        if (telesales is null) return TResult.Failed("Người phụ trách không tồn tại!");
-        await _leadService.AddAsync(new LeadCreateArgs
+        try
         {
-            Name = contact.Name,
-            PhoneNumber = contact.PhoneNumber,
-            Email = contact.Email,
-            EventDate = args.EventDate,
-            EventId = args.EventId,
-            Gender = contact.Gender,
-            Note = args.Note,
-            TelesalesId = contact.UserId,
-            BranchId = telesales.BranchId
-        });
-        return TResult.Success;
+            if (args.EventDate.Date < DateTime.Now) return TResult.Failed("Ngày sự kiện không hợp lệ!");
+            var contact = await _contactRepository.FindAsync(args.Id);
+            if (contact is null) return TResult.Failed("Không tìm thấy liên hệ!");
+            if (string.IsNullOrEmpty(contact.PhoneNumber)) return TResult.Failed("Liên hệ chưa có số điện thoại!");
+            var lead = await _leadService.FindByPhoneNumberAsync(contact.PhoneNumber);
+            if (lead != null && !lead.Duplicated) return TResult.Failed($"Liên hệ đã có lịch hẹn vào ngày {lead.EventDate:dd-MM-yyyy}!");
+            if (contact.UserId == null) return TResult.Failed("Liên hệ chưa có người phụ trách!");
+            var telesales = await _userManager.FindByIdAsync(contact.UserId.GetValueOrDefault().ToString());
+            if (telesales is null) return TResult.Failed("Người phụ trách không tồn tại!");
+            await _leadService.AddAsync(new LeadCreateArgs
+            {
+                Name = contact.Name,
+                PhoneNumber = contact.PhoneNumber,
+                Email = contact.Email,
+                EventDate = args.EventDate,
+                EventId = args.EventId,
+                Gender = contact.Gender,
+                Note = args.Note,
+                TelesalesId = contact.UserId,
+                BranchId = telesales.BranchId
+            });
+            return TResult.Success;
+        }
+        catch (Exception ex)
+        {
+            return TResult.Failed(ex.ToString());
+        }
     }
 
     public Task<ListResult<dynamic>> ListContactAsync(ContactFilterOptions filterOptions) => _contactRepository.ListAsync(filterOptions);
