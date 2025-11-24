@@ -1,7 +1,8 @@
 import { apiCalendarEvents } from "@/services/calendar";
+import { LeadStatus } from "@/utils/constants";
 import { ActionType, ProTable } from "@ant-design/pro-components";
 import { useModel } from "@umijs/max";
-import { Drawer, DrawerProps } from "antd";
+import { Drawer, DrawerProps, Tag } from "antd";
 import { Dayjs } from "dayjs";
 import { useEffect, useRef } from "react";
 
@@ -48,12 +49,25 @@ const Event: React.FC<Props> = (props) => {
                         {
                             title: 'Thời gian',
                             dataIndex: 'eventName',
+                            search: false,
+                            width: 100
+                        },
+                        {
+                            title: 'Key-In',
+                            dataIndex: 'keyInName',
                             search: false
                         },
                         {
-                            title: 'Rep',
-                            dataIndex: 'seller',
-                            search: false
+                            title: 'Trạng thái',
+                            dataIndex: 'status',
+                            search: false,
+                            render: (_, record) => {
+                                if (record.status === LeadStatus.Checkin) {
+                                    return <Tag color="success" className="text-center w-full">Check-In</Tag>
+                                }
+                                return <Tag color="warning" className="text-center w-full">Chờ duyệt</Tag>
+                            },
+                            width: 100
                         }
                     ]}
                 />
