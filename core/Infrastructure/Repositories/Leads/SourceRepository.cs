@@ -61,9 +61,9 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
                     {
                         Value = s.Id,
                         Label = s.Name,
-                        ContactCount = _context.Contacts.Count(c => c.SourceId == s.Id && c.UserId == null)
+                        ContactCount = _context.Contacts.Count(c => c.SourceId == s.Id)
                     };
-        var data = await query.Where(x => x.ContactCount > 0).ToListAsync();
+        var data = await query.ToListAsync();
         return TResult<object>.Ok(data);
     }
 

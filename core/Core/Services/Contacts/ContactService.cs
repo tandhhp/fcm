@@ -181,7 +181,7 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
     {
         try
         {
-            if (args.EventDate.Date < DateTime.Now) return TResult.Failed("Ngày sự kiện không hợp lệ!");
+            if (args.EventDate.Date < DateTime.Now.AddDays(1)) return TResult.Failed("Ngày sự kiện không hợp lệ!");
             var contact = await _contactRepository.FindAsync(args.Id);
             if (contact is null) return TResult.Failed("Không tìm thấy liên hệ!");
             if (string.IsNullOrEmpty(contact.PhoneNumber)) return TResult.Failed("Liên hệ chưa có số điện thoại!");

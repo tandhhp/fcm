@@ -4,7 +4,6 @@ using Waffle.Core.Constants;
 using Waffle.Core.Foundations;
 using Waffle.Core.Interfaces.IRepository;
 using Waffle.Core.Interfaces.IService;
-using Waffle.Core.Services.Contacts.Args;
 using Waffle.Core.Services.Contacts.Filters;
 using Waffle.Core.Services.Contacts.Models;
 using Waffle.Data;
@@ -21,10 +20,8 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
     {
         var userId = _hcaService.GetUserId();
         var query = from c in _context.Contacts
-                    join ch in _context.CallHistories on c.Id equals ch.ContactId
                     join u in _context.Users on c.UserId equals u.Id
                     join s in _context.Sources on c.SourceId equals s.Id
-                    join cs in _context.CallStatuses on ch.CallStatusId equals cs.Id
                     where c.Status != ContactStatus.Blacklisted
                     select new
                     {
@@ -34,17 +31,41 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         c.CreatedDate,
                         c.UserId,
                         TeleName = u.Name,
-                        CalledAt = ch.CreatedDate,
-                        ch.Note,
+                        CalledAt = _context.CallHistories
+                            .Where(ch => ch.ContactId == c.Id)
+                            .OrderByDescending(ch => ch.CreatedDate)
+                            .Select(ch => ch.CreatedDate)
+                            .FirstOrDefault(),
+                        Note = _context.CallHistories
+                            .Where(ch => ch.ContactId == c.Id)
+                            .OrderByDescending(ch => ch.CreatedDate)
+                            .Select(ch => ch.Note)
+                            .FirstOrDefault(),
                         SourceName = s.Name,
-                        CallStatusName = cs.Name,
-                        ch.CallStatusId,
-                        ch.Age,
-                        ch.FollowUpDate,
-                        ch.Job,
-                        ch.ExtraStatus,
+                        CallStatusId = _context.CallHistories.Where(ch => ch.ContactId == c.Id).OrderByDescending(ch => ch.CreatedDate).Select(ch => ch.CallStatusId).FirstOrDefault(),
+                        Age = _context.CallHistories
+                            .Where(ch => ch.ContactId == c.Id)
+                            .OrderByDescending(ch => ch.CreatedDate)
+                            .Select(ch => ch.Age)
+                            .FirstOrDefault(),
+                        FollowUpDate = _context.CallHistories
+                            .Where(ch => ch.ContactId == c.Id)
+                            .OrderByDescending(ch => ch.CreatedDate)
+                            .Select(ch => ch.FollowUpDate)
+                            .FirstOrDefault(),
+                        Job = _context.CallHistories
+                            .Where(ch => ch.ContactId == c.Id)
+                            .OrderByDescending(ch => ch.CreatedDate)
+                            .Select(ch => ch.Job)
+                            .FirstOrDefault(),
+                        ExtraStatus = _context.CallHistories
+                            .Where(ch => ch.ContactId == c.Id)
+                            .OrderByDescending(ch => ch.CreatedDate)
+                            .Select(ch => ch.ExtraStatus)
+                            .FirstOrDefault(),
                         IsBooked = _context.Leads.Any(x => x.PhoneNumber == c.PhoneNumber)
                     };
+        query = query.Where(c => c.CallStatusId != 0);
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {
             query = query.Where(c => c.Name.ToLower().Contains(filterOptions.Name.ToLower()));

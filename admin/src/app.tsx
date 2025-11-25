@@ -84,7 +84,7 @@ export const request: RequestConfig = {
   requestInterceptors: [
     (config: RequestOptions) => {
       const token = localStorage.getItem('wf_token');
-      config.baseURL = new URL(`api/`, 'https://api.1stclass.com.vn/').href;
+      config.baseURL = new URL(`api/`, 'https://api-demo.1stclass.com.vn/').href;
       //config.baseURL = new URL(`api/`, 'https://localhost:52588/').href;
       config.headers = {
         authorization: `Bearer ${token}`,

@@ -110,6 +110,60 @@ public class ReportController(ApplicationDbContext _context, UserManager<Applica
         return Ok(result);
     }
 
+    [HttpGet("revenue-by-day")]
+    public async Task<IActionResult> RevenueByDayAsync([FromQuery] int year, int month)
+    {
+        var query = from a in _context.Users
+                    join b in _context.Invoices on a.Id equals b.SalesId
+                    where b.Amount > 0 && b.Status == InvoiceStatus.Approved && b.CreatedAt.Year == year && b.CreatedAt.Month == month
+                    select new
+                    {
+                        b.Id,
+                        b.SalesId,
+                        b.Amount,
+                        a.Name,
+                        a.UserName,
+                        a.Email,
+                        b.CreatedAt,
+                        a.SmId,
+                        a.DosId
+                    };
+        var data = await query.ToListAsync();
+        var result = data.GroupBy(x => new { x.CreatedAt.Day, x.SalesId }).Select(x => new
+        {
+            x.Key.Day,
+            Amount = x.Sum(s => s.Amount),
+            x.Key.SalesId
+        }).OrderBy(x => x.Day);
+        var fullResult = new List<UserByDay>();
+        var dayAmounts = new List<DayAmount>();
+        var fistDayOfMonth = new DateTime(year, month, 1);
+        var lastDayOfMonth = fistDayOfMonth.AddMonths(1).AddDays(-1);
+
+        var sales = await _userManager.GetUsersInRoleAsync(RoleName.Sales);
+        foreach (var sale in sales)
+        {
+            dayAmounts = new List<DayAmount>();
+            for (var date = fistDayOfMonth; date <= lastDayOfMonth; date = date.AddDays(1))
+            {
+                var dayData = result.FirstOrDefault(x => x.Day == date.Day && x.SalesId == sale.Id);
+                dayAmounts.Add(new DayAmount
+                {
+                    Day = date.Day,
+                    Amount = dayData != null ? dayData.Amount : 0
+                });
+            }
+            fullResult.Add(new UserByDay
+            {
+                UserId = sale.Id,
+                Name = sale.Name,
+                Days = dayAmounts
+            });
+        }
+        return Ok(fullResult);
+    }
+
+
     [HttpGet("sales")]
     public async Task<IActionResult> SalesAsync([FromQuery] int year)
     {

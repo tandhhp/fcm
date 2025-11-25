@@ -187,6 +187,10 @@ export const apiSalesListReport = (year: number) => request(`report/sales`, {
   params: { year }
 });
 
+export const apiMonthlySalesReport = (year: number, month: number) => request(`report/revenue-by-day`, {
+  params: { year, month }
+});
+
 export const apiUserChangeList = (params: any) => request(`user/changes-list`, { params });
 
 export const apiUserChangeApprove = (id: string) => request(`user/approve-changes/${id}`, {

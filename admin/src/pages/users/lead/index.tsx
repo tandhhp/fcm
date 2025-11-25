@@ -74,6 +74,67 @@ const LeadPage: React.FC = () => {
                         width: 30
                     },
                     {
+                        title: <SettingOutlined />,
+                        valueType: 'option',
+                        render: (_, entity) => [
+                            <Popconfirm title="Xác nhận xóa?" key="delete" onConfirm={async () => {
+                                await apiDeleteLead(entity.id);
+                                message.success('Thành công!');
+                                actionRef.current?.reload();
+                            }}>
+                                <Button type="primary" danger size="small" icon={<DeleteOutlined />} hidden={!access.canAdmin} />
+                            </Popconfirm>,
+                            <Dropdown key="event" menu={{
+                                items: [
+                                    {
+                                        key: 'edit',
+                                        label: 'Chỉnh sửa',
+                                        icon: <EditOutlined />,
+                                        onClick: () => {
+                                            setLead(entity);
+                                            setOpenForm(true);
+                                        },
+                                        disabled: access.cx || access.sales
+                                    },
+                                    {
+                                        key: 'close-deal',
+                                        label: 'Chốt deal',
+                                        icon: <CheckOutlined />,
+                                        onClick: () => {
+                                            setLead(entity);
+                                            setOpenCloseDeal(true);
+                                        },
+                                        disabled: access.cx || access.sales
+                                    },
+                                    {
+                                        key: 'reject',
+                                        label: 'Từ chối',
+                                        icon: <CloseOutlined />,
+                                        onClick: () => {
+                                            setLead(entity);
+                                            setOpenReject(true);
+                                        },
+                                        disabled: true
+                                    },
+                                    {
+                                        key: 'reinvite',
+                                        label: 'Mời lại',
+                                        icon: <ReloadOutlined />,
+                                        onClick: () => {
+                                            setLead(entity);
+                                            setOpenReinvite(true);
+                                        },
+                                        disabled: true
+                                    }
+                                ]
+                            }}>
+                                <Button icon={<MoreOutlined />} size="small" type="dashed"></Button>
+                            </Dropdown>
+                        ],
+                        width: 50,
+                        align: 'center'
+                    },
+                    {
                         title: 'Bàn',
                         dataIndex: 'tableId',
                         search: false,
@@ -245,67 +306,6 @@ const LeadPage: React.FC = () => {
                         dataIndex: 'note',
                         search: false,
                         minWidth: 200
-                    },
-                    {
-                        title: <SettingOutlined />,
-                        valueType: 'option',
-                        render: (_, entity) => [
-                            <Popconfirm title="Xác nhận xóa?" key="delete" onConfirm={async () => {
-                                await apiDeleteLead(entity.id);
-                                message.success('Thành công!');
-                                actionRef.current?.reload();
-                            }}>
-                                <Button type="primary" danger size="small" icon={<DeleteOutlined />} hidden={!access.canAdmin} />
-                            </Popconfirm>,
-                            <Dropdown key="event" menu={{
-                                items: [
-                                    {
-                                        key: 'edit',
-                                        label: 'Chỉnh sửa',
-                                        icon: <EditOutlined />,
-                                        onClick: () => {
-                                            setLead(entity);
-                                            setOpenForm(true);
-                                        },
-                                        disabled: access.cx || access.sales
-                                    },
-                                    {
-                                        key: 'close-deal',
-                                        label: 'Chốt deal',
-                                        icon: <CheckOutlined />,
-                                        onClick: () => {
-                                            setLead(entity);
-                                            setOpenCloseDeal(true);
-                                        },
-                                        disabled: access.cx || access.sales
-                                    },
-                                    {
-                                        key: 'reject',
-                                        label: 'Từ chối',
-                                        icon: <CloseOutlined />,
-                                        onClick: () => {
-                                            setLead(entity);
-                                            setOpenReject(true);
-                                        },
-                                        disabled: true
-                                    },
-                                    {
-                                        key: 'reinvite',
-                                        label: 'Mời lại',
-                                        icon: <ReloadOutlined />,
-                                        onClick: () => {
-                                            setLead(entity);
-                                            setOpenReinvite(true);
-                                        },
-                                        disabled: true
-                                    }
-                                ]
-                            }}>
-                                <Button icon={<MoreOutlined />} size="small" type="dashed"></Button>
-                            </Dropdown>
-                        ],
-                        width: 50,
-                        align: 'center'
                     }
                 ]}
             />
