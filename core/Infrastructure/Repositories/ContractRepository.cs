@@ -232,6 +232,10 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
         {
             query = query.Where(c => c.CreatedDate.Date >= filterOptions.FromDate.Value.Date && c.CreatedDate.Date <= filterOptions.ToDate.Value.Date);
         }
+        if (!string.IsNullOrWhiteSpace(filterOptions.CustomerName))
+        {
+            query = query.Where(c => c.CustomerName != null && c.CustomerName.ToLower().Contains(filterOptions.CustomerName.ToLower()));
+        }
         if (filterOptions.LeadId.HasValue)
         {
             query = query.Where(c => c.LeadId == filterOptions.LeadId);

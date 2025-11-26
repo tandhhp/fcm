@@ -33,7 +33,8 @@ public class ContractService(IContractRepository _contractRepository, ILeadServi
             SourceId = args.SourceId,
             ToById = args.ToById,
             TeamKeyInId = args.TeamKeyInId,
-            KeyInId = args.KeyInId
+            KeyInId = args.KeyInId,
+            LeadId = args.LeadId
         });
         await _logService.AddAsync($"Hợp đồng {args.Code} đã được tạo");
         return TResult.Success;

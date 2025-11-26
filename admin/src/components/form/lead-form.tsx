@@ -139,11 +139,7 @@ const LeadForm: React.FC<Props> = (props) => {
                     ]} />
                 </Col>
                 <Col xs={12} md={6}>
-                    <ProFormText name="identityNumber" label="Số CCCD" rules={[
-                        {
-                            required: true
-                        }
-                    ]} />
+                    <ProFormText name="identityNumber" label="Số CCCD" />
                 </Col>
                 <Col xs={12} md={4}>
                     <ProFormDatePicker.Year name="dateOfBirth" label="Năm sinh" fieldProps={{

@@ -37,4 +37,12 @@ public class RoleName
     /// </summary>
     public const string Dot = "dot";
     public const string AdminData = "admindata";
+    /// <summary>
+    /// SA verify chứng từ xong mới đổ về KT aprroved
+    /// </summary>
+    public const string SalesAdmin = "salesadmin";
+    /// <summary>
+    /// Nhân viên pháp lý
+    /// </summary>
+    public const string LegalExecutive = "legalexecutive";
 }

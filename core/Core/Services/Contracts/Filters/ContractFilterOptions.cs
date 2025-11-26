@@ -10,4 +10,5 @@ public class ContractFilterOptions : FilterOptions
     public DateTime? FromDate { get; set; }
     public DateTime? ToDate { get; set; }
     public Guid? LeadId { get; set; }
+    public string? CustomerName { get; set; }
 }

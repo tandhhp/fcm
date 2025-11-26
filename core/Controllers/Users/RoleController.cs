@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Waffle.Core.Constants;
@@ -189,7 +190,7 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
         }).ToListAsync());
     }
 
-    [HttpGet("init")]
+    [HttpGet("init"), AllowAnonymous]
     public async Task<IActionResult> InitRolesAsync()
     {
         var roles = new List<ApplicationRole>
@@ -207,7 +208,9 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
             new() { Name = RoleName.Telesale, DisplayName = "Telesale", Description = "Telesale" },
             new() { Name = RoleName.TelesaleManager, DisplayName = "Trưởng nhóm Telesale", Description = "Trưởng nhóm Telesale" },
             new() { Name = RoleName.Dot, DisplayName = "Giám đốc Telesale", Description = "Giám đốc Telesale" },
-            new() { Name = RoleName.AdminData, DisplayName = "Quản trị dữ liệu", Description = "Quản trị dữ liệu" }
+            new() { Name = RoleName.AdminData, DisplayName = "Quản trị dữ liệu", Description = "Quản trị dữ liệu" },
+            new() { Name = RoleName.SalesAdmin, DisplayName = "Trợ lý kinh doanh", Description = "Trợ lý kinh doanh" },
+            new() { Name = RoleName.LegalExecutive, DisplayName = "Nhân viên pháp chế", Description = "Nhân viên pháp chế" }
         };
         foreach (var role in roles)
         {
