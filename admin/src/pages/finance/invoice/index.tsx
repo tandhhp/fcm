@@ -75,7 +75,9 @@ const Index: React.FC = () => {
                         valueEnum: {
                             0: { text: 'Chờ duyệt', status: 'Default' },
                             1: { text: 'Đã duyệt', status: 'Success' },
-                            2: { text: 'Từ chối', status: 'Error' }
+                            2: { text: 'Từ chối', status: 'Error' },
+                            3: { text: 'Đã hủy', status: 'Warning' },
+                            4: { text: 'SA xác nhận', status: 'Processing' }
                         }
                     },
                     {

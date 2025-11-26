@@ -1,4 +1,5 @@
 ﻿using OfficeOpenXml;
+using Waffle.Core.Constants;
 using Waffle.Core.Helpers;
 using Waffle.Core.Interfaces.IRepository.Finances;
 using Waffle.Core.Interfaces.IService;
@@ -10,13 +11,20 @@ using Waffle.Models;
 
 namespace Waffle.Core.Services.Finances.Invoices;
 
-public class InvoiceService(IInvoiceRepository _invoiceRepository, ILogService _logService) : IInvoiceService
+public class InvoiceService(IInvoiceRepository _invoiceRepository, ILogService _logService, IHCAService _hcaService) : IInvoiceService
 {
     public async Task<TResult> ApproveAsync(Guid id)
     {
         var invoice = await _invoiceRepository.FindAsync(id);
         if (invoice is null) return TResult.Failed("Không tìm thấy hóa đơn!");
-        invoice.Status = InvoiceStatus.Approved;
+        if (_hcaService.IsUserInRole(RoleName.SalesAdmin))
+        {
+            invoice.Status = InvoiceStatus.SAConfirmed;
+        }
+        else
+        {
+            invoice.Status = InvoiceStatus.Approved;
+        }
         await _logService.AddAsync($"Hóa đơn {invoice.InvoiceNumber} đã được duyệt.");
         await _invoiceRepository.UpdateAsync(invoice);
         return TResult.Success;

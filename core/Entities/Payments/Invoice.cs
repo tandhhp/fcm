@@ -35,7 +35,9 @@ public enum InvoiceStatus
     [Display(Name = "Từ chối")]
     Rejected,
     [Display(Name = "Hủy")]
-    Cancelled
+    Cancelled,
+    [Display(Name = "Xác nhận bởi SA")]
+    SAConfirmed
 }
 
 public enum PaymentMethod

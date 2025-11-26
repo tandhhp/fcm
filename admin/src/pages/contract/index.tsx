@@ -52,7 +52,7 @@ const Index: React.FC = () => {
             type="primary" onClick={onExport} loading={loadingExport}>Xuất dữ liệu</Button>}>
             <ProTable
                 headerTitle={<Button type="primary" onClick={() => setOpenForm(true)} icon={<PlusOutlined />}
-                    disabled={access.sales || access.telesale || access.telesaleManager || access.sm}>Tạo hợp đồng</Button>}
+                    disabled={access.sales || access.telesale || access.telesaleManager || access.sm || access.legalExcutive}>Tạo hợp đồng</Button>}
                 actionRef={actionRef}
                 request={apiContractList}
                 rowKey="id"
@@ -153,7 +153,8 @@ const Index: React.FC = () => {
                                             setContract(record);
                                             setOpenBillForm(true);
                                         },
-                                        icon: <ArrowLeftOutlined />
+                                        icon: <ArrowLeftOutlined />,
+                                        disabled: access.legalExcutive
                                     },
                                     {
                                         key: 'invoice',
@@ -190,7 +191,8 @@ const Index: React.FC = () => {
                                             setContract(record);
                                             setCouponFormOpen(true);
                                         },
-                                        icon: <TagOutlined />
+                                        icon: <TagOutlined />,
+                                        disabled: access.legalExcutive
                                     }
                                 ]
                             }}>

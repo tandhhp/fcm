@@ -80,6 +80,8 @@ export default (initialState: { currentUser?: API.User }) => {
   const accountant = currentUser && (currentUser.roles.includes('accountant') || currentUser.roles.includes('ChiefAccountant'));
   const chiefAccountant = currentUser && currentUser.roles.includes('ChiefAccountant');
   const adminData = currentUser && currentUser.roles.includes('admindata');
+  const legalExcutive = currentUser && currentUser.roles.includes('legalexecutive');
+  const salesAdmin = currentUser && currentUser.roles.includes('salesadmin');
 
   const canEvent = currentUser && (sales || currentUser.roles.includes('event') || sm || dos || canAdmin);
 
@@ -99,9 +101,13 @@ export default (initialState: { currentUser?: API.User }) => {
 
   const canTelesales = currentUser && (telesale || telesaleManager || dot || canAdmin || adminData);
 
-  const canContract = currentUser && (sales || sm || dos || canAdmin || currentUser.roles.includes('cxtp') || currentUser.roles.includes('cx') || currentUser.roles.includes('accountant') || currentUser.roles.includes('ChiefAccountant'));
+  const canContract = currentUser && (sales || sm || dos || legalExcutive || canAdmin || currentUser.roles.includes('cxtp') || currentUser.roles.includes('cx') || currentUser.roles.includes('accountant') || currentUser.roles.includes('ChiefAccountant'));
 
-  const can_read_page_finance = accountant || chiefAccountant || canAdmin || cx;
+  const can_read_page_finance = accountant || chiefAccountant || canAdmin || cx || salesAdmin;
+  const can_read_page_finance_invoice = accountant || chiefAccountant || canAdmin;
+  const can_read_page_finance_bill = accountant || chiefAccountant || canAdmin;
+  const can_read_page_finance_report = accountant || chiefAccountant || canAdmin;
+  const can_read_page_finance_sales_admin = salesAdmin || canAdmin;
   const can_read_page_contact_source = adminData || dot || canAdmin;
   const can_read_page_event_customer = dos || dot || event || canAdmin;
   const can_read_page_event_invoice = sm || dot || dos || event || canAdmin;
@@ -142,10 +148,16 @@ export default (initialState: { currentUser?: API.User }) => {
     accountant,
     chiefAccountant,
     sm,
+    legalExcutive,
+    salesAdmin,
     adminData,
     canTelesales,
     canContract,
     can_read_page_finance,
+    can_read_page_finance_bill,
+    can_read_page_finance_invoice,
+    can_read_page_finance_report,
+    can_read_page_finance_sales_admin,
     can_read_page_contact_source,
     can_read_page_event,
     can_read_page_event_customer,

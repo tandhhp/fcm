@@ -457,22 +457,26 @@ export default [
       {
         name: 'Phiếu thu',
         path: '/finance/invoice',
-        component: './finance/invoice'
+        component: './finance/invoice',
+        access: 'can_read_page_finance_invoice'
       },
       {
         name: 'Phiếu chi',
         path: '/finance/bill',
-        component: './finance/bill'
+        component: './finance/bill',
+        access: 'can_read_page_finance_bill'
       },
       {
-        name: 'Duyệt điểm',
-        path: '/finance/loyalty',
-        component: './users/loyalty'
+        name: 'SA xác nhận',
+        path: '/finance/sa-confirm',
+        component: './finance/sa-confirm',
+        access: 'can_read_page_finance_sales_admin'
       },
       {
         name: 'Báo cáo doanh số',
         path: '/finance/report',
-        component: './debt'
+        component: './debt',
+        access: 'can_read_page_finance_report'
       }
     ]
   },

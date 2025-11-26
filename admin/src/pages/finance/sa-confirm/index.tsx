@@ -1,29 +1,29 @@
-import { apiInvoiceList } from "@/services/finances/invoice";
-import { EditOutlined, MoreOutlined, PictureOutlined, SettingOutlined } from "@ant-design/icons";
-import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components";
-import { Button, Dropdown } from "antd";
-import { useRef, useState } from "react";
+import access from "@/access";
 import InvoiceEvidence from "@/components/invoices/evidence";
-import InvoiceExportForm from "@/components/form/invoice-export-form";
-import InvoiceForm from "@/components/form/invoice";
+import { apiInvoiceList, apiInvoiceApprove } from "@/services/finances/invoice";
+import { InvoiceStatus } from "@/utils/enum";
+import { SettingOutlined, CheckOutlined, PictureOutlined, EditOutlined, CloseOutlined, MoreOutlined } from "@ant-design/icons";
+import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { useAccess } from "@umijs/max";
+import { Popconfirm, message, Button, Dropdown } from "antd";
+import { useRef, useState } from "react";
+import InvoiceRejectForm from "../invoice/components/reject";
 
 const Index: React.FC = () => {
 
+    const access = useAccess();
     const actionRef = useRef<ActionType>(null);
     const [invoice, setInvoice] = useState<any>(null);
+    const [openReject, setOpenReject] = useState<boolean>(false);
     const [openEvidence, setOpenEvidence] = useState<boolean>(false);
-    const [filterOptions, setFilterOptions] = useState<any>({});
-    const [openForm, setOpenForm] = useState<boolean>(false);
-    const access = useAccess();
 
     return (
-        <PageContainer extra={<InvoiceExportForm exportOptions={filterOptions} />}>
+        <PageContainer>
             <ProTable
                 actionRef={actionRef}
-                request={(params) => {
-                    setFilterOptions(params);
-                    return apiInvoiceList(params);
+                request={apiInvoiceList}
+                params={{
+                    status: 0
                 }}
                 rowKey="id"
                 search={{
@@ -57,12 +57,6 @@ const Index: React.FC = () => {
                         search: false
                     },
                     {
-                        title: 'Thời gian',
-                        dataIndex: 'dateRange',
-                        valueType: 'dateRange',
-                        hideInTable: true
-                    },
-                    {
                         title: 'Phương thức',
                         dataIndex: 'paymentMethod',
                         valueEnum: {
@@ -84,6 +78,18 @@ const Index: React.FC = () => {
                         }
                     },
                     {
+                        title: 'Từ ngày',
+                        dataIndex: 'fromDate',
+                        valueType: 'date',
+                        hideInTable: true
+                    },
+                    {
+                        title: 'Đến ngày',
+                        dataIndex: 'toDate',
+                        valueType: 'date',
+                        hideInTable: true
+                    },
+                    {
                         title: 'Ghi chú',
                         dataIndex: 'note',
                         search: false,
@@ -92,9 +98,16 @@ const Index: React.FC = () => {
                     {
                         title: <SettingOutlined />,
                         valueType: 'option',
-                        width: 60,
+                        width: 80,
                         align: 'center',
                         render: (_, record) => [
+                            <Popconfirm key={`approve`} title="Xác nhận duyệt hóa đơn?" onConfirm={async () => {
+                                await apiInvoiceApprove(record.id);
+                                message.success('Duyệt hóa đơn thành công');
+                                actionRef.current?.reload();
+                            }} okText="Duyệt" cancelText="Hủy">
+                                <Button type="primary" icon={<CheckOutlined />} size="small" disabled={record.status !== InvoiceStatus.Pending || !access.accountant}></Button>
+                            </Popconfirm>,
                             <Dropdown key={"more"} menu={{
                                 items: [
                                     {
@@ -107,14 +120,14 @@ const Index: React.FC = () => {
                                         }
                                     },
                                     {
-                                        key: 'edit',
-                                        label: 'Cập nhật',
-                                        icon: <EditOutlined />,
+                                        key: 'reject',
+                                        label: 'Từ chối',
+                                        icon: <CloseOutlined />,
+                                        disabled: record.status !== InvoiceStatus.Pending,
                                         onClick: () => {
                                             setInvoice(record);
-                                            setOpenForm(true);
-                                        },
-                                        disabled: !access.event && !access.accountant || record.status !== 0
+                                            setOpenReject(true);
+                                        }
                                     }
                                 ]
                             }}>
@@ -125,7 +138,7 @@ const Index: React.FC = () => {
                 ]}
             />
             <InvoiceEvidence open={openEvidence} onOpenChange={setOpenEvidence} data={invoice} />
-            <InvoiceForm open={openForm} onOpenChange={setOpenForm} data={invoice} reload={() => actionRef.current?.reload()} />
+            <InvoiceRejectForm open={openReject} onOpenChange={setOpenReject} data={invoice} reload={() => actionRef.current?.reload()} />
         </PageContainer>
     )
 }
