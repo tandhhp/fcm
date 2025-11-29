@@ -308,4 +308,18 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
             Value = x.Id
         }).ToListAsync());
     }
+
+    [HttpGet("{name}")]
+    public async Task<IActionResult> GetByNameAsync([FromRoute] string name)
+    {
+        var role = await _roleManager.FindByNameAsync(name);
+        if (role == null) return NotFound($"Role {name} not found.");
+        return Ok(TResult<object>.Ok(new
+        {
+            role.Id,
+            role.Name,
+            role.DisplayName,
+            role.Description
+        }));
+    }
 }

@@ -2,7 +2,7 @@ import { apiTelesalesOptions } from "@/services/role";
 import { apiUserListTele, apiUserSetDos } from "@/services/user";
 import { LeftOutlined, UserAddOutlined } from "@ant-design/icons";
 import { ActionType, ModalForm, PageContainer, ProFormSelect, ProTable } from "@ant-design/pro-components"
-import { history, useParams } from "@umijs/max";
+import { history, useAccess, useParams } from "@umijs/max";
 import { Button, message } from "antd";
 import { useRef, useState } from "react";
 
@@ -11,13 +11,16 @@ const Index: React.FC = () => {
     const { id } = useParams();
     const [open, setOpen] = useState(false);
     const actionRef = useRef<ActionType>();
+    const access = useAccess();
 
     return (
         <PageContainer extra={<Button icon={<LeftOutlined />} onClick={() => history.back()}>Quay lại</Button>}>
 
             <ProTable
                 actionRef={actionRef}
-                headerTitle={<Button icon={<UserAddOutlined />} type="primary" onClick={() => setOpen(true)}>Thêm mới</Button>}
+                headerTitle={<Button
+                    disabled={access.telesale}
+                    icon={<UserAddOutlined />} type="primary" onClick={() => setOpen(true)}>Thêm mới</Button>}
                 request={apiUserListTele}
                 params={{
                     dosId: id

@@ -64,3 +64,7 @@ export async function apiKeyInOptions(params?: any) {
         params
     });
 }
+
+export async function apiRoleDetail(name: string) {
+    return request(`role/${name}`);
+}

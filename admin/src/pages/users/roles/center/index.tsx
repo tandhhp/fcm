@@ -1,11 +1,11 @@
-import { apiTelesalesManagerOptions } from "@/services/role";
+import { apiRoleDetail, apiTelesalesManagerOptions } from "@/services/role";
 import { apiBranchOptions } from "@/services/settings/branch";
 import { apiSourceOptions } from "@/services/settings/source";
 import { apiDosOptions, apiLockUser, apiRoleOptions, apiSetPassword, apiSmOptions, apiUnLockUser, apiUserByRoleOptions, apiUserUpdate, createEmployee, deleteUser, getUserInRoles } from "@/services/user";
 import { GENDER_OPTIONS, UserStatus } from "@/utils/constants";
 import { DeleteOutlined, EditOutlined, LockOutlined, ManOutlined, MoreOutlined, SettingOutlined, UserAddOutlined, UserOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, DrawerForm, ModalForm, PageContainer, ProColumns, ProFormDatePicker, ProFormInstance, ProFormSelect, ProFormText, ProTable } from "@ant-design/pro-components"
-import { useAccess, useParams } from "@umijs/max";
+import { useAccess, useParams, useRequest } from "@umijs/max";
 import { Button, Col, Dropdown, Popconfirm, Row, Select, Space, Tag, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
@@ -23,6 +23,7 @@ const RoleCenter: React.FC = () => {
     const [openChangePassword, setOpenChangePassword] = useState<boolean>(false);
     const [status, setStatus] = useState<number>(UserStatus.Working);
     const [openClaim, setOpenClaim] = useState<boolean>(false);
+    const { data } = useRequest(() => apiRoleDetail(id!));
 
     useEffect(() => {
         if (user && open) {
@@ -310,7 +311,9 @@ const RoleCenter: React.FC = () => {
     ]
 
     return (
-        <PageContainer extra={<Button type='primary' icon={<UserAddOutlined />} onClick={() => setOpen(true)} hidden={!access.canCreateEmployee}>Thêm nhân viên</Button>}>
+        <PageContainer
+        title={data?.displayName}
+        extra={<Button type='primary' icon={<UserAddOutlined />} onClick={() => setOpen(true)} hidden={!access.canCreateEmployee}>Thêm nhân viên</Button>}>
             <ProTable
                 headerTitle={(
                     <Space>

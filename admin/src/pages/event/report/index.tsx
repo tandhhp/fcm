@@ -73,6 +73,7 @@ const Index: React.FC = () => {
                             onChange: (date: any) => {
                                 setFromDate(date ? date.format('YYYY-MM-DD') : '');
                             },
+                            autoFocus: false
                         }} />
                         <ProFormDatePicker name="toDate" label="Đến ngày" initialValue={toDate ? dayjs(toDate) : undefined} fieldProps={{
                             onChange: (date: any) => {
@@ -83,14 +84,16 @@ const Index: React.FC = () => {
                             fieldProps={{
                                 onChange: (value: string) => {
                                     setDosId(value);
-                                }
+                                },
+                                popupMatchSelectWidth: false
                             }}
                         />
                         <ProFormSelect name="dotId" label="DOT" placeholder="Chọn DOT" request={apiDotOptions}
                             fieldProps={{
                                 onChange: (value: string) => {
                                     setDotId(value);
-                                }
+                                },
+                                popupMatchSelectWidth: false
                             }}
                         />
                     </ProForm>

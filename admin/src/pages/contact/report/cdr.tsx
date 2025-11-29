@@ -23,6 +23,12 @@ const Index: React.FC = () => {
                     title: 'Code',
                     dataIndex: 'username',
                     width: 60,
+                    hideInSearch: true
+                },
+                {
+                    title: 'Line',
+                    dataIndex: 'extension',
+                    hideInTable: true
                 },
                 {
                     title: 'SDT',

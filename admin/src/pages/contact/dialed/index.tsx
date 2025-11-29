@@ -1,6 +1,6 @@
 import { apiCallOptions } from "@/services/call";
 import { apiContactDialedCalls, apiExportDialedCalls } from "@/services/contact";
-import { CalendarOutlined, EditOutlined, ExportOutlined, EyeOutlined, MoreOutlined, PhoneOutlined, SettingOutlined } from "@ant-design/icons";
+import { CalendarOutlined, EditOutlined, ExportOutlined, EyeOutlined, MoreOutlined, PhoneOutlined, SettingOutlined, StopOutlined } from "@ant-design/icons";
 import { ActionType, ModalForm, PageContainer, ProFormDateRangePicker, ProTable } from "@ant-design/pro-components"
 import { Button, Dropdown } from "antd";
 import { useRef, useState } from "react";
@@ -8,6 +8,7 @@ import CallForm from "../components/call";
 import BookingForm from "../components/booking";
 import { history } from "@umijs/max";
 import ContactForm from "../components/form";
+import BlockContactModal from "../components/block-modal";
 
 const Index: React.FC = () => {
 
@@ -17,6 +18,7 @@ const Index: React.FC = () => {
     const [contact, setContact] = useState<any>();
     const [openBooking, setOpenBooking] = useState<boolean>(false);
     const [openForm, setOpenForm] = useState<boolean>(false);
+    const [openBlock, setOpenBlock] = useState<boolean>(false);
 
     const onFinishExport = async (values: any) => {
         const response = await apiExportDialedCalls({
@@ -169,6 +171,16 @@ const Index: React.FC = () => {
                                         },
                                         icon: <CalendarOutlined />,
                                         disabled: entity.isBooked
+                                    },
+                                    {
+                                        key: 'block',
+                                        label: 'Chặn liên hệ',
+                                        onClick: () => {
+                                            setContact(entity);
+                                            setOpenBlock(true);
+                                        },
+                                        icon: <StopOutlined />,
+                                        disabled: entity.isBlocked
                                     }
                                 ]
                             }}>
@@ -195,6 +207,7 @@ const Index: React.FC = () => {
                     width="md"
                 />
             </ModalForm>
+            <BlockContactModal open={openBlock} contact={contact} reload={() => actionRef.current?.reload()} onOpenChange={setOpenBlock} />
             <ContactForm open={openForm} onOpenChange={setOpenForm} data={contact} reload={() => actionRef.current?.reload()} />
             <CallForm open={openCall} data={contact} onOpenChange={setOpenCall} reload={() => actionRef.current?.reload()} />
             <BookingForm open={openBooking} data={contact} onOpenChange={setOpenBooking} reload={() => actionRef.current?.reload()} />
