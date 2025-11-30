@@ -63,7 +63,8 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                             .OrderByDescending(ch => ch.CreatedDate)
                             .Select(ch => ch.ExtraStatus)
                             .FirstOrDefault(),
-                        IsBooked = _context.Leads.Any(x => x.PhoneNumber == c.PhoneNumber)
+                        IsBooked = _context.Leads.Any(x => x.PhoneNumber == c.PhoneNumber),
+                        c.SourceId
                     };
         query = query.Where(c => c.CallStatusId != 0);
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
@@ -93,6 +94,10 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         if (!string.IsNullOrWhiteSpace(filterOptions.ExtraStatus))
         {
             query = query.Where(c => c.ExtraStatus != null && c.ExtraStatus.ToLower().Contains(filterOptions.ExtraStatus.ToLower()));
+        }
+        if (filterOptions.SourceId.HasValue)
+        {
+            query = query.Where(x => x.SourceId == filterOptions.SourceId);
         }
         if (!string.IsNullOrWhiteSpace(filterOptions.Note))
         {
@@ -237,6 +242,10 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {
             query = query.Where(x => !string.IsNullOrEmpty(x.Name) && x.Name.ToLower().Contains(filterOptions.Name.ToLower()));
+        }
+        if (filterOptions.SourceId.HasValue)
+        {
+            query = query.Where(x => x.SourceId == filterOptions.SourceId);
         }
         if (filterOptions.IsBooked.HasValue)
         {

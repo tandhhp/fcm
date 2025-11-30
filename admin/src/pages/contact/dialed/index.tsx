@@ -9,6 +9,7 @@ import BookingForm from "../components/booking";
 import { history } from "@umijs/max";
 import ContactForm from "../components/form";
 import BlockContactModal from "../components/block-modal";
+import { apiSourceOptions } from "@/services/settings/source";
 
 const Index: React.FC = () => {
 
@@ -98,8 +99,19 @@ const Index: React.FC = () => {
                         search: false
                     },
                     {
+                        title: 'Nguồn',
+                        dataIndex: 'sourceId',
+                        hideInTable: true,
+                        valueType: 'select',
+                        request: apiSourceOptions,
+                        fieldProps: {
+                            showSearch: true
+                        }
+                    },
+                    {
                         title: 'Extra',
-                        dataIndex: 'extraStatus'
+                        dataIndex: 'extraStatus',
+                        search: false
                     },
                     {
                         title: 'Tuổi',

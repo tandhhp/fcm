@@ -8,6 +8,7 @@ import BlockContactModal from "./components/block-modal";
 import ContactForm from "./components/form";
 import CallForm from "./components/call";
 import BookingForm from "./components/booking";
+import { apiSourceOptions } from "@/services/settings/source";
 
 const ContactPage: React.FC = () => {
 
@@ -51,8 +52,19 @@ const ContactPage: React.FC = () => {
             }
         },
         {
+            title: 'Nguồn',
+            dataIndex: 'sourceId',
+            hideInTable: true,
+            valueType: 'select',
+            request: apiSourceOptions,
+            fieldProps: {
+                showSearch: true
+            }
+        },
+        {
             title: 'Email',
-            dataIndex: 'email'
+            dataIndex: 'email',
+            search: false
         },
         {
             title: 'Ngày tạo',

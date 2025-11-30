@@ -17,4 +17,5 @@ public class ContactFilterOptions : FilterOptions
     public string? Job { get; set; }
     public string? Age { get; set; }
     public string? ExtraStatus { get; set; }
+    public int? SourceId { get; set; }
 }
