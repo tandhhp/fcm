@@ -1,5 +1,5 @@
 import { apiContractExport, apiContractList } from "@/services/finances/contract";
-import { EditOutlined, ExportOutlined, ManOutlined, MoneyCollectOutlined, MoreOutlined, PlusOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
+import { EditOutlined, ExportOutlined, ManOutlined, MoneyCollectOutlined, MoreOutlined, PictureOutlined, PlusOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { useRef, useState } from "react";
 import { Button, Dropdown } from "antd";
@@ -7,6 +7,7 @@ import ContractPayment from "./components/payment";
 import ContractInvoice from "./components/invoice";
 import { useAccess } from "@umijs/max";
 import ContractForm from "@/components/form/contract";
+import ContractEvidence from "@/components/contract-evidence";
 
 const Index: React.FC = () => {
 
@@ -17,6 +18,7 @@ const Index: React.FC = () => {
     const [openInvoice, setOpenInvoice] = useState<boolean>(false);
     const [loadingExport, setLoadingExport] = useState<boolean>(false);
     const [openForm, setOpenForm] = useState<boolean>(false);
+    const [openEvidence, setOpenEvidence] = useState<boolean>(false);
 
     const onExport = async () => {
         setLoadingExport(true);
@@ -161,6 +163,16 @@ const Index: React.FC = () => {
                                         icon: <MoneyCollectOutlined />
                                     },
                                     {
+                                        title: 'Thư viện ảnh',
+                                        key: 'evidence',
+                                        label: 'Thư viện ảnh',
+                                        onClick: () => {
+                                            setContract(record);
+                                            setOpenEvidence(true);
+                                        },
+                                        icon: <PictureOutlined />
+                                    },
+                                    {
                                         key: 'edit',
                                         label: 'Chỉnh sửa',
                                         onClick: () => {
@@ -182,6 +194,7 @@ const Index: React.FC = () => {
             <ContractPayment open={openPayment} data={contract} onOpenChange={setOpenPayment} reload={() => actionRef.current?.reload()} />
             <ContractInvoice open={openInvoice} data={contract} onOpenChange={setOpenInvoice} />
             <ContractForm open={openForm} onOpenChange={setOpenForm} reload={() => actionRef.current?.reload()} data={contract} />
+            <ContractEvidence contractId={contract?.id} onOpenChange={setOpenEvidence} open={openEvidence} />
         </PageContainer>
     )
 }

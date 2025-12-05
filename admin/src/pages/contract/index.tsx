@@ -1,5 +1,5 @@
 import { apiContractExport, apiContractList } from "@/services/finances/contract";
-import { ArrowLeftOutlined, DeleteOutlined, ExportOutlined, GiftOutlined, ManOutlined, MoreOutlined, PlusOutlined, SettingOutlined, TableOutlined, TagOutlined, WomanOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, DeleteOutlined, ExportOutlined, GiftOutlined, ManOutlined, MoreOutlined, PictureOutlined, PlusOutlined, SettingOutlined, TableOutlined, TagOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { useRef, useState } from "react";
 import ContractInvoice from "./components/invoice";
@@ -11,6 +11,7 @@ import GiftList from "./components/gift-list";
 import ContractForm from "@/components/form/contract";
 import BillForm from "./components/bill-form";
 import CouponForm from "./components/coupon-form";
+import ContractEvidence from "@/components/contract-evidence";
 
 const Index: React.FC = () => {
 
@@ -24,6 +25,7 @@ const Index: React.FC = () => {
     const [giftListOpen, setGiftListOpen] = useState<boolean>(false);
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [couponFormOpen, setCouponFormOpen] = useState<boolean>(false);
+    const [openEvidence, setOpenEvidence] = useState<boolean>(false);
 
     const onDelete = async (id: string) => {
         await apiContractDelete(id);
@@ -176,6 +178,16 @@ const Index: React.FC = () => {
                                         disabled: !access.canCX
                                     },
                                     {
+                                        title: 'Thư viện ảnh',
+                                        key: 'evidence',
+                                        label: 'Thư viện ảnh',
+                                        onClick: () => {
+                                            setContract(record);
+                                            setOpenEvidence(true);
+                                        },
+                                        icon: <PictureOutlined />
+                                    },
+                                    {
                                         key: 'gift-list',
                                         label: 'Danh sách quà tặng',
                                         onClick: () => {
@@ -207,6 +219,7 @@ const Index: React.FC = () => {
                     }
                 ]}
             />
+            <ContractEvidence contractId={contract?.id} onOpenChange={setOpenEvidence} open={openEvidence} />
             <ContractInvoice open={openInvoice} onOpenChange={setOpenInvoice} data={contract} />
             <GiftForm open={giftFormOpen} onOpenChange={setGiftFormOpen} data={contract} reload={() => actionRef.current?.reload()} />
             <GiftList open={giftListOpen} onOpenChange={setGiftListOpen} data={contract} />

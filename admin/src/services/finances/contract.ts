@@ -80,3 +80,29 @@ export async function apiContractUpdate(data: any) {
     data
   });
 }
+
+export async function apiContractEvidenceUpload(data: FormData) {
+  return request('contract/upload-evidences', {
+    method: 'POST',
+    data,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+}
+
+export async function apiContractEvidenceList(contractId: string) {
+  return request(`contract/evidences/${contractId}`);
+}
+
+export async function apiContractEvidenceDelete(id: string) {
+  return request(`contract/evidence/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function apiContractEvidenceTypeOptions(params: any) {
+  return request('contract/evidence-type-options', {
+    params
+  });
+}

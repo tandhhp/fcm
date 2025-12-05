@@ -29,4 +29,5 @@ public class Contract : AuditEntity
     public virtual ICollection<Invoice>? Invoices { get; set; }
     public virtual ICollection<Bill>? Bills { get; set; }
     public virtual ICollection<Coupon>? Coupons { get; set; }
+    public virtual ICollection<Evidence>? Evidences { get; set; }
 }

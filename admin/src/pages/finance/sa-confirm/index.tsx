@@ -1,8 +1,7 @@
-import access from "@/access";
 import InvoiceEvidence from "@/components/invoices/evidence";
 import { apiInvoiceList, apiInvoiceApprove } from "@/services/finances/invoice";
 import { InvoiceStatus } from "@/utils/enum";
-import { SettingOutlined, CheckOutlined, PictureOutlined, EditOutlined, CloseOutlined, MoreOutlined } from "@ant-design/icons";
+import { SettingOutlined, CheckOutlined, PictureOutlined, CloseOutlined, MoreOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { useAccess } from "@umijs/max";
 import { Popconfirm, message, Button, Dropdown } from "antd";
@@ -106,7 +105,7 @@ const Index: React.FC = () => {
                                 message.success('Duyệt hóa đơn thành công');
                                 actionRef.current?.reload();
                             }} okText="Duyệt" cancelText="Hủy">
-                                <Button type="primary" icon={<CheckOutlined />} size="small" disabled={record.status !== InvoiceStatus.Pending || !access.accountant}></Button>
+                                <Button type="primary" icon={<CheckOutlined />} size="small" disabled={record.status !== InvoiceStatus.Pending || !access.salesAdmin}></Button>
                             </Popconfirm>,
                             <Dropdown key={"more"} menu={{
                                 items: [

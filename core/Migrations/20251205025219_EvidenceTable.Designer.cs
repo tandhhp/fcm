@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Waffle.Data;
 
@@ -11,9 +12,11 @@ using Waffle.Data;
 namespace Waffle.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251205025219_EvidenceTable")]
+    partial class EvidenceTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1224,7 +1227,7 @@ namespace Waffle.Migrations
 
                     b.HasIndex("EvidenceTypeId");
 
-                    b.ToTable("Evidences");
+                    b.ToTable("Evidence");
                 });
 
             modelBuilder.Entity("Waffle.Entities.Contracts.EvidenceType", b =>
@@ -1243,7 +1246,7 @@ namespace Waffle.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EvidenceTypes");
+                    b.ToTable("EvidenceType");
                 });
 
             modelBuilder.Entity("Waffle.Entities.Contracts.Voucher", b =>

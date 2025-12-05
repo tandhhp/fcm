@@ -49,4 +49,20 @@ public class ContractController(IContractService _contractService) : BaseControl
 
     [HttpPut]
     public async Task<IActionResult> UpdateAsync([FromBody] ContractUpdateArgs args) => Ok(await _contractService.UpdateAsync(args));
+
+    [HttpPost("upload-evidences")]
+    public async Task<IActionResult> UploadEvidencesAsync([FromForm] UploadEvidencesArgs args)
+    {
+        var host = $"{Request.Scheme}://{Request.Host.Value}";
+        return Ok(await _contractService.UploadEvidencesAsync(args, host));
+    }
+
+    [HttpGet("evidence-type-options")]
+    public async Task<IActionResult> GetEvidenceTypeOptionsAsync() => Ok(await _contractService.GetEvidenceTypeOptionsAsync());
+
+    [HttpGet("evidences/{contractId}")]
+    public async Task<IActionResult> GetEvidencesAsync([FromRoute] Guid contractId) => Ok(await _contractService.GetEvidencesAsync(contractId));
+
+    [HttpDelete("evidence/{id}")]
+    public async Task<IActionResult> DeleteEvidenceAsync([FromRoute] Guid id) => Ok(await _contractService.DeleteEvidenceAsync(id));
 }

@@ -20,4 +20,8 @@ public interface IContractRepository : IAsyncRepository<Contract>
     Task<TResult> GiftContractAsync(ContractGiftArgs args);
     Task DeleteGiftsAsync(Guid id);
     Task<object?> GetLeadOptionsAsync(ContactLeadSelectOptions selectOptions);
+    Task<TResult> AddEvidencesAsync(List<Evidence> evidences);
+    Task<object> GetEvidenceTypeOptionsAsync();
+    Task<TResult<object>> GetEvidencesAsync(Guid contractId);
+    Task<TResult> DeleteEvidenceAsync(Guid id);
 }

@@ -11,7 +11,7 @@ using Waffle.Models;
 
 namespace Waffle.Core.Services.Contracts;
 
-public class ContractService(IContractRepository _contractRepository, ILeadService _leadService, ILogService _logService, INotificationService _notificationService, UserManager<ApplicationUser> _userManager, IHCAService _hcaService) : IContractService
+public class ContractService(IContractRepository _contractRepository, IWebHostEnvironment _webHostEnvironment, ILeadService _leadService, ILogService _logService, INotificationService _notificationService, UserManager<ApplicationUser> _userManager, IHCAService _hcaService) : IContractService
 {
     public Task<bool> AnyAsync(string contractCode) => _contractRepository.AnyAsync(contractCode);
 
@@ -71,6 +71,8 @@ public class ContractService(IContractRepository _contractRepository, ILeadServi
         await _contractRepository.DeleteAsync(contract);
         return TResult.Success;
     }
+
+    public Task<TResult> DeleteEvidenceAsync(Guid id) => _contractRepository.DeleteEvidenceAsync(id);
 
     public Task<TResult> DeleteGiftContractAsync(ContractGiftArgs args) => _contractRepository.DeleteGiftContractAsync(args);
 
@@ -187,6 +189,10 @@ public class ContractService(IContractRepository _contractRepository, ILeadServi
 
     public Task<Contract?> FindAsync(Guid id) => _contractRepository.FindAsync(id);
 
+    public Task<TResult<object>> GetEvidencesAsync(Guid contractId) => _contractRepository.GetEvidencesAsync(contractId);
+
+    public Task<object> GetEvidenceTypeOptionsAsync() => _contractRepository.GetEvidenceTypeOptionsAsync();
+
     public Task<ListResult<object>> GetGiftsAsync(ContractGiftFilterOptions filterOptions) => _contractRepository.GetGiftsAsync(filterOptions);
 
     public Task<ListResult<object>> GetInvoicesAsync(ContractInvoiceFilterOptions filterOptions) => _contractRepository.GetInvoicesAsync(filterOptions);
@@ -215,6 +221,37 @@ public class ContractService(IContractRepository _contractRepository, ILeadServi
         contract.CreatedDate = args.CreatedDate ?? contract.CreatedDate;
         await _contractRepository.UpdateAsync(contract);
         await _logService.AddAsync($"Hợp đồng {args.Code} đã được cập nhật");
+        return TResult.Success;
+    }
+
+    public async Task<TResult> UploadEvidencesAsync(UploadEvidencesArgs args, string host)
+    {
+        var contract = await _contractRepository.FindAsync(args.ContractId);
+        if (contract is null) return TResult.Failed("Không tìm thấy hợp đồng!");
+        if (args.Files is null) return TResult.Failed("Chưa có tệp tin để tải lên!");
+        var evidences = new List<Evidence>();
+        foreach (var file in args.Files)
+        {
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "evidences", fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+            var evidence = new Evidence
+            {
+                ContractId = args.ContractId,
+                FileName = file.FileName,
+                Url = $"{host}/uploads/evidences/{fileName}",
+                UploaderId = _hcaService.GetUserId(),
+                EvidenceTypeId = args.EvidenceTypeId,
+                UploadAt = DateTime.Now
+            };
+            evidences.Add(evidence);
+        }
+        await _contractRepository.AddEvidencesAsync(evidences);
+        await _logService.AddAsync($"Đã tải lên {args.Files.Count} bằng chứng cho hợp đồng {contract.Code}");
         return TResult.Success;
     }
 }

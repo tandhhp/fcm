@@ -16,6 +16,13 @@ namespace Waffle.Infrastructure.Repositories;
 
 public class ContractRepository(ApplicationDbContext context, IHCAService _hcaService) : EfRepository<Contract>(context), IContractRepository
 {
+    public async Task<TResult> AddEvidencesAsync(List<Evidence> evidences)
+    {
+        await _context.Evidences.AddRangeAsync(evidences);
+        await _context.SaveChangesAsync();
+        return TResult.Success;
+    }
+
     public async Task<bool> AnyAsync(string contractCode) => await _context.Contracts.AnyAsync(c => c.Code.ToLower() == contractCode.ToLower());
 
     public async Task<TResult> CreatePaymentAsync(ContractCreatePayment args, Guid salesId)
@@ -34,6 +41,15 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
             PaymentMethod = args.PaymentMethod
         };
         await _context.Invoices.AddAsync(invoice);
+        await _context.SaveChangesAsync();
+        return TResult.Success;
+    }
+
+    public async Task<TResult> DeleteEvidenceAsync(Guid id)
+    {
+        var evidence = await _context.Evidences.FindAsync(id);
+        if (evidence is null) return TResult.Failed("Không tìm thấy bằng chứng!");
+        _context.Evidences.Remove(evidence);
         await _context.SaveChangesAsync();
         return TResult.Success;
     }
@@ -60,6 +76,49 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
         if (invoices.Count == 0) return;
         _context.Invoices.RemoveRange(invoices);
     }
+
+    public async Task<TResult<object>> GetEvidencesAsync(Guid contractId)
+    {
+        try
+        {
+            var query = from e in _context.Evidences
+                        join et in _context.EvidenceTypes on e.EvidenceTypeId equals et.Id
+                        where e.ContractId == contractId
+                        select new
+                        {
+                            e.Id,
+                            e.Url,
+                            e.FileName,
+                            e.UploadAt,
+                            e.UploaderId,
+                            EvidenceTypeName = et.Name
+                        };
+            var data = await query.OrderByDescending(e => e.UploadAt).ToListAsync();
+            var result = data.GroupBy(x => x.EvidenceTypeName).Select(x => new
+            {
+                x.Key,
+                Evidences = x.Select(e => new
+                {
+                    e.Id,
+                    e.Url,
+                    e.FileName,
+                    e.UploadAt,
+                    e.UploaderId
+                })
+            });
+            return TResult<object>.Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return TResult<object>.Failed(ex.ToString());
+        }
+    }
+
+    public async Task<object> GetEvidenceTypeOptionsAsync() => await _context.EvidenceTypes.Select(x => new
+    {
+        Label = x.Name,
+        Value = x.Id
+    }).ToListAsync();
 
     public async Task<List<ContractExportResult>> GetExportDataAsync(ContractFilterOptions filterOptions)
     {
