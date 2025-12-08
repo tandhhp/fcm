@@ -81,8 +81,9 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
     {
         try
         {
+            var contract = await _context.Contracts.FindAsync(contractId);
+            if (contract is null) return TResult<object>.Failed("Không tìm thấy hợp đồng!");
             var query = from e in _context.Evidences
-                        join et in _context.EvidenceTypes on e.EvidenceTypeId equals et.Id
                         where e.ContractId == contractId
                         select new
                         {
@@ -90,22 +91,41 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
                             e.Url,
                             e.FileName,
                             e.UploadAt,
-                            e.UploaderId,
-                            EvidenceTypeName = et.Name
+                            e.UploaderId
                         };
+            var evidenceTypes = await _context.EvidenceTypes.AsNoTracking().ToListAsync();
             var data = await query.OrderByDescending(e => e.UploadAt).ToListAsync();
-            var result = data.GroupBy(x => x.EvidenceTypeName).Select(x => new
+            var invoices = await _context.Invoices.Where(i => i.ContractId == contractId && !string.IsNullOrEmpty(i.EvidenceUrl)).AsNoTracking().ToListAsync();
+            var result = evidenceTypes.Select(x =>
             {
-                x.Key,
-                Evidences = x.Select(e => new
+                var evidences = data.Select(e => new
                 {
                     e.Id,
                     e.Url,
                     e.FileName,
                     e.UploadAt,
                     e.UploaderId
-                })
-            });
+                }).ToList();
+                if (x.Name == "Chứng từ thu tiền")
+                {
+                    if (invoices.Count > 0)
+                    {
+                        evidences.AddRange(invoices.Select(i => new
+                        {
+                            i.Id,
+                            Url = i.EvidenceUrl!,
+                            FileName = $"Hóa đơn {i.InvoiceNumber}",
+                            UploadAt = i.CreatedAt,
+                            UploaderId = i.CreatedBy
+                        }));
+                    }
+                }
+                return new
+                {
+                    Key = x.Name,
+                    Evidences = evidences
+                };
+            }).ToList();
             return TResult<object>.Ok(result);
         }
         catch (Exception ex)
