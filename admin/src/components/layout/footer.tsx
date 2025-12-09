@@ -1,9 +1,13 @@
 import { HomeOutlined, MessageOutlined } from "@ant-design/icons";
 import { DefaultFooter } from "@ant-design/pro-components";
-import { history } from "@umijs/max";
-import { FloatButton } from "antd";
+import { FloatButton, Drawer } from "antd";
+import { useState } from "react";
+import ChatAssistant from "../chat-assistant/ChatAssistant";
 
 const Footer: React.FC = () => {
+
+    const [openChat, setOpenChat] = useState<boolean>(false);
+
     return (
         <>
             <DefaultFooter copyright="2025 First Class Membership. All rights reserved." links={[
@@ -21,8 +25,17 @@ const Footer: React.FC = () => {
                 }
             ]} />
             <FloatButton.Group>
-                <FloatButton icon={<MessageOutlined />} tooltip="Trợ lý ảo" onClick={() => history.push('/chat')} />
+                <FloatButton icon={<MessageOutlined />} tooltip="Trợ lý ảo" onClick={() => setOpenChat(true)} />
             </FloatButton.Group>
+            <Drawer
+            width={600}
+                title="Trợ lý ảo AI"
+                placement="right"
+                onClose={() => setOpenChat(false)}
+                open={openChat}
+            >
+                <ChatAssistant onClose={() => setOpenChat(false)} />
+            </Drawer>
         </>
     );
 };

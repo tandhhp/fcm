@@ -144,5 +144,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IBillRepository, BillRepository>();
         services.AddScoped<IBillService, BillService>();
         #endregion
+
+        services.AddScoped<IAIService, AIService>();
     }
 }
