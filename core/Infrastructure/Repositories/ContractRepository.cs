@@ -91,14 +91,15 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
                             e.Url,
                             e.FileName,
                             e.UploadAt,
-                            e.UploaderId
+                            e.UploaderId,
+                            e.EvidenceTypeId
                         };
             var evidenceTypes = await _context.EvidenceTypes.AsNoTracking().ToListAsync();
             var data = await query.OrderByDescending(e => e.UploadAt).ToListAsync();
             var invoices = await _context.Invoices.Where(i => i.ContractId == contractId && !string.IsNullOrEmpty(i.EvidenceUrl)).AsNoTracking().ToListAsync();
             var result = evidenceTypes.Select(x =>
             {
-                var evidences = data.Select(e => new
+                var evidences = data.Where(d => d.EvidenceTypeId == x.Id).Select(e => new
                 {
                     e.Id,
                     e.Url,
