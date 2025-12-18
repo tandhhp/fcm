@@ -48,7 +48,15 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
     public async Task<TResult> DeleteEvidenceAsync(Guid id)
     {
         var evidence = await _context.Evidences.FindAsync(id);
-        if (evidence is null) return TResult.Failed("Không tìm thấy bằng chứng!");
+        if (evidence is null)
+        {
+            var invoice = await _context.Invoices.FindAsync(id);
+            if (invoice is null) return TResult.Failed("Không tìm thấy chứng từ!");
+            invoice.EvidenceUrl = null;
+            _context.Invoices.Update(invoice);
+            await _context.SaveChangesAsync();
+            return TResult.Success;
+        }
         _context.Evidences.Remove(evidence);
         await _context.SaveChangesAsync();
         return TResult.Success;
@@ -115,7 +123,7 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
                         {
                             i.Id,
                             Url = i.EvidenceUrl!,
-                            FileName = $"Hóa đơn {i.InvoiceNumber}",
+                            FileName = $"INV",
                             UploadAt = i.CreatedAt,
                             UploaderId = i.CreatedBy
                         }));
