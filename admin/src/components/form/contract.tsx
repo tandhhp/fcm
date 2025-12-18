@@ -78,6 +78,8 @@ const ContractForm: React.FC<Props> = (props) => {
                 setSalesManagerId(data.salesManagerId);
                 setTeamKeyInId(data.teamKeyInId);
             });
+        } else {
+            formRef.current?.resetFields();
         }
     }, [props.open, props.data]);
 
