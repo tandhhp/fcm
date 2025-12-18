@@ -40,7 +40,10 @@ const Index: React.FC = () => {
             disabled={access.sales || access.telesale || access.telesaleManager || access.sm}
             onClick={onExport} loading={loadingExport}>Xuất dữ liệu</Button>}>
             <ProTable
-                headerTitle={<Button type="primary" onClick={() => setOpenForm(true)} icon={<PlusOutlined />}
+                headerTitle={<Button type="primary" onClick={() => {
+                    setContract(null);
+                    setOpenForm(true);
+                }} icon={<PlusOutlined />}
                     disabled={access.sales || access.telesale || access.telesaleManager || access.sm}
                 >Tạo hợp đồng</Button>}
                 actionRef={actionRef}
