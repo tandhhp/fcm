@@ -105,6 +105,10 @@ const ContactForm: React.FC<Props> = (props) => {
                 setSelectedProvinceId(response.data.provinceId);
                 setTelesalesManagerId(response.data.tmId);
             });
+        } else {
+            formRef.current?.resetFields();
+            setSelectedProvinceId(undefined);
+            setTelesalesManagerId(undefined);
         }
     }, [props.open && props.data]);
 
@@ -121,7 +125,7 @@ const ContactForm: React.FC<Props> = (props) => {
     }
 
     return (
-        <DrawerForm {...props} title="Liên hệ" formRef={formRef} onFinish={onFinish}>
+        <DrawerForm {...props} title={`Liên hệ ${props.data ? props.data.name : ''}`} formRef={formRef} onFinish={onFinish}>
             <ProFormText name={"id"} hidden />
             <Row gutter={[16, 16]}>
                 <Col xs={24} md={12}>
@@ -145,12 +149,23 @@ const ContactForm: React.FC<Props> = (props) => {
                     ]} />
                 </Col>
                 <Col xs={24} md={12} hidden={access.telesale}>
-                    <ProFormSelect name={`telesalesManagerId`} label="Quản lý Telesales" request={apiUserTelesalesManagerOptions} showSearch
+                    <ProFormSelect name={`telesalesManagerId`}
+                        rules={[
+                            {
+                                required: true
+                            }
+                        ]}
+                        label="Quản lý Telesales" request={apiUserTelesalesManagerOptions} showSearch
                         onChange={(value: number) => setTelesalesManagerId(value)}
                     />
                 </Col>
                 <Col xs={24} md={12} hidden={access.telesale}>
-                    <ProFormSelect name={`userId`} label="Nhân viên phụ trách" showSearch options={userOptions} disabled={!telesalesManagerId} />
+                    <ProFormSelect name={`userId`} label="Nhân viên phụ trách"
+                        rules={[
+                            {
+                                required: true
+                            }
+                        ]} showSearch options={userOptions} disabled={!telesalesManagerId} />
                 </Col>
                 <Col xs={24} md={12}>
                     <ProFormSelect name={`provinceId`} label="Tỉnh/Thành phố" request={apiProvinceOptions}

@@ -982,16 +982,26 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
     }
 
     [HttpGet("options")]
-    public async Task<IActionResult> GetOptionsAsync()
+    public async Task<IActionResult> GetOptionsAsync([FromQuery] Guid? telesalesManagerId)
     {
         var query = from a in _context.Users
                     where a.Status == UserStatus.Working
                     select new
                     {
-                        label = $"{a.Name} - {a.UserName}",
-                        value = a.Id
+                        a.TmId,
+                        a.UserName,
+                        a.Name,
+                        a.Id
                     };
-        return Ok(await query.ToListAsync());
+        if (telesalesManagerId != null)
+        {
+            query = query.Where(x => x.TmId == telesalesManagerId);
+        }
+        return Ok(await query.Select(a => new
+        {
+            label = $"{a.Name} - {a.UserName}",
+            value = a.Id
+        }).ToListAsync());
     }
 
     [HttpGet("dos/options")]

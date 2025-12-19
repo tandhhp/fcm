@@ -167,7 +167,10 @@ const ContactPage: React.FC = () => {
     ]
 
     return (
-        <PageContainer extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => setOpenForm(true)}>Tạo mới</Button>}>
+        <PageContainer extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => {
+            setContact(undefined);
+            setOpenForm(true);
+        }}>Tạo mới</Button>}>
             <ProTable
                 scroll={{
                     x: true

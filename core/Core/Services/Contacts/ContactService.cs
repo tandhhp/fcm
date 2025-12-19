@@ -107,7 +107,7 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
             contact.CreatedDate,
             contact.UserId,
             DistrictName = district.Name,
-            district.ProvinceId,
+            ProvinceId = contact.DistrictId.HasValue ? district?.ProvinceId : null,
             ProvinceName = province.Name,
             contact.Gender,
             user.TeamId,
