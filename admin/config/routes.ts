@@ -399,12 +399,6 @@ export default [
     access: 'hr',
     routes: [
       {
-        name: 'Chủ thẻ',
-        path: '/user/member',
-        component: './users/member',
-        access: 'canCardHolder'
-      },
-      {
         name: 'Hoạt động',
         path: '/user/contact/activity/:id',
         component: './users/contact/activity',

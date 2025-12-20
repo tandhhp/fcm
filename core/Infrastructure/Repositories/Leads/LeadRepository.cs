@@ -341,6 +341,15 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
         return await ListResult<object>.Success(query, filterOptions);
     }
 
+    public async Task<bool> IsCitizenIdExistAsync(string citizenId, Guid leadId)
+    {
+        if (string.IsNullOrWhiteSpace(citizenId))
+        {
+            return false;
+        }
+        return await _context.Leads.AnyAsync(x => x.IdentityNumber == citizenId && leadId != x.Id);
+    }
+
     public async Task<LeadFeedback> SaveFeedbackAsync(Guid leadId, int? tableId)
     {
         var feedback = await _context.LeadFeedbacks.FirstOrDefaultAsync(x => x.LeadId == leadId);

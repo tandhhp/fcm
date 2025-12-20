@@ -262,7 +262,7 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
         if (lead == null) return TResult.Failed("Không tìm thấy khách hàng!");
         var creator = await _userManager.FindByIdAsync(lead.CreatedBy.ToString());
         if (creator is null) return TResult.Failed("Không tìm thấy người tạo khách hàng!");
-        if (string.IsNullOrWhiteSpace(args.IdentityNumber)) return TResult.Failed("Chưa nhập số CCCD!");
+        if (await _leadRepository.IsCitizenIdExistAsync(args.IdentityNumber, lead.Id)) return TResult.Failed("CCCD đã tồn tại!");
         lead.Name = args.Name;
         lead.DateOfBirth = args.DateOfBirth;
         lead.Gender = args.Gender;

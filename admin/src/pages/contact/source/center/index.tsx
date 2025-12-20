@@ -1,15 +1,18 @@
 import { apiContactUnassignedList, deleteContact } from "@/services/contact";
 import { DeleteOutlined, ImportOutlined, LeftOutlined, SettingOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
-import { history, useAccess, useParams } from "@umijs/max";
+import { history, useAccess, useParams, useRequest } from "@umijs/max";
 import { Button, message, Popconfirm, Space } from "antd";
 import { useRef, useState } from "react";
-import { apiSourceOptions } from "@/services/settings/source";
+import { apiSourceDetail, apiSourceOptions } from "@/services/settings/source";
 
 const Index: React.FC = () => {
 
     const { id } = useParams<{ id: string }>();
     const access = useAccess();
+
+    const { data } = useRequest(() => apiSourceDetail(id!));
+
     const actionRef = useRef<ActionType>();
 
     const onDelete = async (id: string) => {
@@ -19,7 +22,9 @@ const Index: React.FC = () => {
     }
 
     return (
-        <PageContainer extra={<Button icon={<LeftOutlined />} onClick={() => history.back()}>Quay lại</Button>}>
+        <PageContainer
+            title={data?.name}
+            extra={<Button icon={<LeftOutlined />} onClick={() => history.back()}>Quay lại</Button>}>
             <ProTable
                 actionRef={actionRef}
                 request={apiContactUnassignedList}
@@ -63,7 +68,8 @@ const Index: React.FC = () => {
                         title: 'Nguồn liên hệ',
                         dataIndex: 'sourceId',
                         valueType: 'select',
-                        request: apiSourceOptions                        
+                        request: apiSourceOptions,
+                        search: false,
                     },
                     {
                         title: 'Ghi chú',

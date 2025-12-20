@@ -26,7 +26,7 @@ export async function apiSourceDelete(id: number) {
     });
 }
 
-export async function apiSourceDetail(id: number) {
+export async function apiSourceDetail(id: string) {
     return request(`source/${id}`);
 }
 
