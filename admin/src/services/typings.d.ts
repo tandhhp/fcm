@@ -3,6 +3,11 @@ declare namespace API {
     id?: string;
   };
 
+  type ListResult<T> = {
+    data: T[];
+    total: number;
+  }
+
   type AbtractComponent = BaseEntity & {
     name: string;
     className: string;

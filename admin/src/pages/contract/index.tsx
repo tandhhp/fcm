@@ -12,6 +12,8 @@ import ContractForm from "@/components/form/contract";
 import BillForm from "./components/bill-form";
 import CouponForm from "./components/coupon-form";
 import ContractEvidence from "@/components/contract-evidence";
+import ServiceUsageList from "./components/service-usage-list";
+import LeaveVoucherUsageList from "./components/leave-voucher-usage-list";
 
 const Index: React.FC = () => {
 
@@ -26,6 +28,8 @@ const Index: React.FC = () => {
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [couponFormOpen, setCouponFormOpen] = useState<boolean>(false);
     const [openEvidence, setOpenEvidence] = useState<boolean>(false);
+    const [serviceUsageOpen, setServiceUsageOpen] = useState<boolean>(false);
+    const [leaveVoucherUsageOpen, setLeaveVoucherUsageOpen] = useState<boolean>(false);
 
     const onDelete = async (id: string) => {
         await apiContractDelete(id);
@@ -205,6 +209,26 @@ const Index: React.FC = () => {
                                         },
                                         icon: <TagOutlined />,
                                         disabled: access.legalExcutive || access.cx
+                                    },
+                                    {
+                                        key: 'service-usage',
+                                        label: 'Phiếu sử dụng dịch vụ',
+                                        onClick: () => {
+                                            setContract(record);
+                                            setServiceUsageOpen(true);
+                                        },
+                                        icon: <TagOutlined />,
+                                        disabled: !access.cx
+                                    },
+                                    {
+                                        key: 'leave-voucher-usage',
+                                        label: 'Phiếu sử dụng quyền nghỉ',
+                                        onClick: () => {
+                                            setContract(record);
+                                            setLeaveVoucherUsageOpen(true);
+                                        },
+                                        icon: <TagOutlined />,
+                                        disabled: !access.cx
                                     }
                                 ]
                             }}>
@@ -226,6 +250,8 @@ const Index: React.FC = () => {
             <ContractForm open={openForm} onOpenChange={setOpenForm} reload={() => actionRef.current?.reload()} />
             <BillForm open={openBillForm} onOpenChange={setOpenBillForm} data={contract} reload={() => actionRef.current?.reload()} />
             <CouponForm open={couponFormOpen} onOpenChange={setCouponFormOpen} data={contract} reload={() => actionRef.current?.reload()} />
+            <ServiceUsageList open={serviceUsageOpen} onOpenChange={setServiceUsageOpen} data={contract} />
+            <LeaveVoucherUsageList open={leaveVoucherUsageOpen} onOpenChange={setLeaveVoucherUsageOpen} data={contract} />
         </PageContainer>
     )
 }
