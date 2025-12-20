@@ -50,7 +50,7 @@ const Index: React.FC = () => {
 
     return (
         <PageContainer extra={<Button icon={<ExportOutlined />}
-            disabled={access.sales || access.telesale || access.telesaleManager || access.sm}
+            disabled={access.sales || access.telesale || access.telesaleManager || access.sm || access.salesAdmin}
             type="primary" onClick={onExport} loading={loadingExport}>Xuất dữ liệu</Button>}>
             <ProTable
                 headerTitle={<Button type="primary" onClick={() => setOpenForm(true)} icon={<PlusOutlined />}
@@ -156,7 +156,7 @@ const Index: React.FC = () => {
                                             setOpenBillForm(true);
                                         },
                                         icon: <ArrowLeftOutlined />,
-                                        disabled: access.legalExcutive
+                                        disabled: access.legalExcutive || access.salesAdmin
                                     },
                                     {
                                         key: 'invoice',
@@ -204,7 +204,7 @@ const Index: React.FC = () => {
                                             setCouponFormOpen(true);
                                         },
                                         icon: <TagOutlined />,
-                                        disabled: access.legalExcutive
+                                        disabled: access.legalExcutive || access.cx
                                     }
                                 ]
                             }}>

@@ -101,7 +101,7 @@ export default (initialState: { currentUser?: API.User }) => {
 
   const canTelesales = currentUser && (telesale || telesaleManager || dot || canAdmin || adminData);
 
-  const canContract = currentUser && (sales || sm || dos || legalExcutive || canAdmin || currentUser.roles.includes('cxtp') || currentUser.roles.includes('cx') || currentUser.roles.includes('accountant') || currentUser.roles.includes('ChiefAccountant'));
+  const canContract = currentUser && (sales || sm || dos || legalExcutive || canAdmin || salesAdmin || currentUser.roles.includes('cxtp') || currentUser.roles.includes('cx') || currentUser.roles.includes('accountant') || currentUser.roles.includes('ChiefAccountant'));
 
   const can_read_page_finance = accountant || chiefAccountant || canAdmin || cx || salesAdmin;
   const can_read_page_finance_invoice = accountant || chiefAccountant || canAdmin;

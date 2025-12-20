@@ -29,7 +29,7 @@ const GiftList: React.FC<Props> = (props) => {
     }
 
     return (
-        <DrawerForm {...props} title="Danh sách quà tặng">
+        <DrawerForm {...props} title="Danh sách quà tặng" submitter={false}>
             <ProTable
                 actionRef={actionRef}
                 ghost
