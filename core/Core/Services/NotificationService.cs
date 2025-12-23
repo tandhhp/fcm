@@ -39,7 +39,7 @@ public class NotificationService(ApplicationDbContext _context, IHCAService _hca
 
     public async Task CreateAsync(string title, string message, List<Guid> userIds)
     {
-        if (!userIds.Any()) return;
+        if (userIds.Count == 0) return;
         try
         {
             foreach (var userId in userIds)
@@ -50,7 +50,7 @@ public class NotificationService(ApplicationDbContext _context, IHCAService _hca
                     Message = message,
                     UserId = userId,
                     IsRead = false,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.UtcNow
                 };
                 await _context.Notifications.AddAsync(notification);
             }

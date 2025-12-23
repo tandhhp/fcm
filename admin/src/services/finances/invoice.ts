@@ -58,3 +58,9 @@ export async function apiInvoiceUpdate(data: any) {
 export async function apiInvoiceDetail(id: string) {
     return request(`invoice/${id}`);
 }
+
+export async function apiInvoiceDelete(id: string) {
+    return request(`invoice/${id}`, {
+        method: 'DELETE'
+    });
+}

@@ -214,8 +214,7 @@ public class ToolController : BaseController
                         CreatedDate = contractDate ?? DateTime.Now,
                         ToById = to?.Id,
                         SalesId = sales?.Id,
-                        KeyInId = keyInUser?.Id,
-                        PhoneNumber = phoneNumber
+                        KeyInId = keyInUser?.Id
                     };
 
                     await _context.Contracts.AddAsync(contract);

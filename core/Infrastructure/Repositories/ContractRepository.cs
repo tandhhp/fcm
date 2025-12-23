@@ -169,10 +169,10 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
                         AmountPaid = _context.Invoices.Where(i => i.ContractId == c.Id && i.Status == InvoiceStatus.Approved).Sum(i => i.Amount),
                         CustomerName = l.Name,
                         CustomerIdNumber = l.IdentityNumber,
-                        CustomerPhone = c.PhoneNumber,
+                        CustomerPhone = l.PhoneNumber,
                         SalesName = sales.Name,
                         TOName = to.Name,
-                        AmountPending = _context.Invoices.Where(i => i.ContractId == c.Id && i.Status == InvoiceStatus.Pending).Sum(i => i.Amount),
+                        AmountPending = _context.Invoices.Where(i => i.ContractId == c.Id && (i.Status == InvoiceStatus.Pending || i.Status == InvoiceStatus.SAConfirmed)).Sum(i => i.Amount),
                         DOS = sales != null && sales.DosId != null ? _context.Users.First(x => x.Id == sales.Id).Name : string.Empty,
                         SM = sales != null && sales.SmId != null ? _context.Users.First(x => x.Id == sales.SmId).Name : string.Empty,
                         KeyIn = creator.Name,
@@ -282,6 +282,8 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
                     join l in _context.Leads on c.LeadId equals l.Id
                     join sales in _context.Users on c.SalesId equals sales.Id into salesJoin
                     from sales in salesJoin.DefaultIfEmpty()
+                    join s in _context.Sources on l.SourceId equals s.Id into sourceJoin
+                    from s in sourceJoin.DefaultIfEmpty()
                     select new
                     {
                         c.Id,
@@ -293,16 +295,17 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
                         PaidAmount = _context.Invoices.Where(i => i.ContractId == c.Id && i.Status == InvoiceStatus.Approved).Sum(i => i.Amount),
                         CustomerName = l.Name,
                         l.Gender,
-                        c.PhoneNumber,
+                        l.PhoneNumber,
                         l.IdentityNumber,
                         l.DateOfBirth,
                         SalesName = sales.Name,
-                        PendingAmount = _context.Invoices.Where(i => i.ContractId == c.Id && i.Status == InvoiceStatus.Pending).Sum(i => i.Amount),
+                        PendingAmount = _context.Invoices.Where(i => i.ContractId == c.Id && (i.Status == InvoiceStatus.Pending || i.Status == InvoiceStatus.SAConfirmed)).Sum(i => i.Amount),
                         c.SalesId,
                         SalesManagerId = sales.SmId,
                         GiftCount = _context.ContractGifts.Count(g => g.ContractId == c.Id),
                         Discount = _context.Coupons.Where(cp => cp.ContractId == c.Id).Sum(cp => cp.Discount),
-                        c.LeadId
+                        c.LeadId,
+                        SourceName = s.Name
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.ContractCode))
         {

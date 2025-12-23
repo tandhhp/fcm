@@ -8,10 +8,11 @@ using Waffle.Models;
 
 namespace Waffle.Core.Services.Finances.Counpons;
 
-public class CouponService(ICouponRepository _couponRepository, IHCAService _hcaService) : ICouponService
+public class CouponService(ICouponRepository _couponRepository, IHCAService _hcaService, ILogService _logService) : ICouponService
 {
     public async Task<TResult> CreateAsync(CouponCreateArgs args)
     {
+        await _logService.AddAsync($"Coupon {args.Name} was created by user {_hcaService.GetUserName()}");
         await _couponRepository.AddAsync(new Coupon
         {
             ContractId = args.ContractId,
@@ -27,6 +28,7 @@ public class CouponService(ICouponRepository _couponRepository, IHCAService _hca
     {
         var coupon = await _couponRepository.FindAsync(id);
         if (coupon is null) return TResult.Failed("Coupon not found");
+        await _logService.AddAsync($"Coupon {coupon.Name} was deleted by user {_hcaService.GetUserName()}");
         await _couponRepository.DeleteAsync(coupon);
         return TResult.Success;
     }
@@ -37,6 +39,7 @@ public class CouponService(ICouponRepository _couponRepository, IHCAService _hca
     {
         var coupon = await _couponRepository.FindAsync(args.Id);
         if (coupon is null) return TResult.Failed("Coupon not found");
+        await _logService.AddAsync($"Coupon {coupon.Name} was updated by user {_hcaService.GetUserName()}");
         coupon.Name = args.Name;
         coupon.Discount = args.Discount;
         coupon.ModifiedBy = _hcaService.GetUserId();

@@ -15,8 +15,6 @@ public class Contract : AuditEntity
     public Guid? SalesId { get; set; }
     [ForeignKey(nameof(Card))]
     public Guid? CardId { get; set; }
-    [StringLength(20)]
-    public string? PhoneNumber { get; set; }
     public Guid? ToById { get; set; }
     public int? SourceId { get; set; }
     public Guid? TeamKeyInId { get; set; }

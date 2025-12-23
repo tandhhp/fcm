@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using Microsoft.AspNetCore.Identity;
+using OfficeOpenXml;
 using Waffle.Core.Constants;
 using Waffle.Core.Helpers;
 using Waffle.Core.Interfaces.IRepository.Finances;
@@ -6,12 +7,13 @@ using Waffle.Core.Interfaces.IService;
 using Waffle.Core.Services.Finances.Invoices.Args;
 using Waffle.Core.Services.Finances.Invoices.Filters;
 using Waffle.Core.Services.Finances.Invoices.Results;
+using Waffle.Entities;
 using Waffle.Entities.Payments;
 using Waffle.Models;
 
 namespace Waffle.Core.Services.Finances.Invoices;
 
-public class InvoiceService(IInvoiceRepository _invoiceRepository, ILogService _logService, IHCAService _hcaService) : IInvoiceService
+public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<ApplicationUser> _userManager, ILogService _logService, IHCAService _hcaService, INotificationService _notificationService) : IInvoiceService
 {
     public async Task<TResult> ApproveAsync(Guid id)
     {
@@ -37,7 +39,23 @@ public class InvoiceService(IInvoiceRepository _invoiceRepository, ILogService _
         invoice.Status = InvoiceStatus.Cancelled;
         invoice.Note = args.Note;
         await _logService.AddAsync($"Hóa đơn {invoice.InvoiceNumber} đã bị hủy. Lý do: {args.Note}");
+        var events = await _userManager.GetUsersInRoleAsync(RoleName.Event);
+        await _notificationService.CreateAsync(
+                $"Chứng từ {invoice.InvoiceNumber} đã bị hủy",
+                $"Chứng từ {invoice.InvoiceNumber} đã bị hủy. Lý do: {args.Note}",
+                [.. events.Select(x => x.Id)]);
         await _invoiceRepository.UpdateAsync(invoice);
+        return TResult.Success;
+    }
+
+    public async Task<TResult> DeleteAsync(Guid id)
+    {
+        if (!_hcaService.IsUserInAnyRole(RoleName.Event, RoleName.Admin)) return TResult.Failed("Không có quyền xóa hóa đơn.");
+        var invoice = await _invoiceRepository.FindAsync(id);
+        if (invoice is null) return TResult.Failed("Không tìm thấy hóa đơn!");
+        if (invoice.Status != InvoiceStatus.Pending) return TResult.Failed("Chỉ có thể xóa các hóa đơn ở trạng thái Chờ duyệt.");
+        await _invoiceRepository.DeleteAsync(invoice);
+        await _logService.AddAsync($"Hóa đơn {invoice.InvoiceNumber} đã bị xóa.");
         return TResult.Success;
     }
 

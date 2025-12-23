@@ -1,7 +1,7 @@
-import { apiInvoiceList } from "@/services/finances/invoice";
-import { EditOutlined, MoreOutlined, PictureOutlined, SettingOutlined } from "@ant-design/icons";
+import { apiInvoiceDelete, apiInvoiceList } from "@/services/finances/invoice";
+import { DeleteOutlined, EditOutlined, MoreOutlined, PictureOutlined, SettingOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components";
-import { Button, Dropdown } from "antd";
+import { Button, Dropdown, message, Popconfirm } from "antd";
 import { useRef, useState } from "react";
 import InvoiceEvidence from "@/components/invoices/evidence";
 import InvoiceExportForm from "@/components/form/invoice-export-form";
@@ -16,6 +16,12 @@ const Index: React.FC = () => {
     const [filterOptions, setFilterOptions] = useState<any>({});
     const [openForm, setOpenForm] = useState<boolean>(false);
     const access = useAccess();
+
+    const onDelete = async (id: string) => {
+        await apiInvoiceDelete(id);
+        message.success('Xóa phiếu thu thành công');
+        actionRef.current?.reload();
+    }
 
     return (
         <PageContainer extra={<InvoiceExportForm exportOptions={filterOptions} />}>
@@ -48,13 +54,15 @@ const Index: React.FC = () => {
                         title: 'Số tiền',
                         dataIndex: 'amount',
                         valueType: 'digit',
-                        search: false
+                        search: false,
+                        width: 120
                     },
                     {
                         title: 'Ngày thu',
                         dataIndex: 'createdAt',
                         valueType: 'date',
-                        search: false
+                        search: false,
+                        width: 100
                     },
                     {
                         title: 'Thời gian',
@@ -92,7 +100,7 @@ const Index: React.FC = () => {
                     {
                         title: <SettingOutlined />,
                         valueType: 'option',
-                        width: 60,
+                        width: 70,
                         align: 'center',
                         render: (_, record) => [
                             <Dropdown key={"more"} menu={{
@@ -119,7 +127,10 @@ const Index: React.FC = () => {
                                 ]
                             }}>
                                 <Button type="dashed" icon={<MoreOutlined />} size="small" />
-                            </Dropdown>
+                            </Dropdown>,
+                            <Popconfirm title="Bạn có chắc chắn muốn xóa?" onConfirm={() => onDelete(record.id)}>
+                                <Button key={"delete"} type="primary" icon={<DeleteOutlined />} danger size="small" disabled={!access.event || record.status !== 0}></Button>
+                            </Popconfirm>
                         ]
                     }
                 ]}

@@ -20,11 +20,12 @@ public class CouponRepository(ApplicationDbContext context) : EfRepository<Coupo
                         c.CreatedDate,
                         c.CreatedBy,
                         c.ModifiedDate,
-                        c.ModifiedBy
+                        c.ModifiedBy,
+                        c.ContractId
                     };
         if (filterOptions.ContractId.HasValue)
         {
-            query = query.Where(x => x.Id == filterOptions.ContractId);
+            query = query.Where(x => x.ContractId == filterOptions.ContractId);
         }
         query = query.OrderByDescending(x => x.CreatedDate);
         return await ListResult<object>.Success(query, filterOptions);

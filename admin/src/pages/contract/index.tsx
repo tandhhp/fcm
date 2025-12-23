@@ -3,7 +3,7 @@ import { ArrowLeftOutlined, DeleteOutlined, ExportOutlined, GiftOutlined, ManOut
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { useRef, useState } from "react";
 import ContractInvoice from "./components/invoice";
-import { Button, Dropdown, message, Popconfirm } from "antd";
+import { Button, Dropdown, message, Popconfirm, Tag } from "antd";
 import { FormattedNumber, useAccess } from "@umijs/max";
 import { apiContractDelete } from "@/services/contact";
 import GiftForm from "./components/gift-form";
@@ -14,6 +14,7 @@ import CouponForm from "./components/coupon-form";
 import ContractEvidence from "@/components/contract-evidence";
 import ServiceUsageList from "./components/service-usage-list";
 import LeaveVoucherUsageList from "./components/leave-voucher-usage-list";
+import Coupon from "./components/coupon";
 
 const Index: React.FC = () => {
 
@@ -30,6 +31,7 @@ const Index: React.FC = () => {
     const [openEvidence, setOpenEvidence] = useState<boolean>(false);
     const [serviceUsageOpen, setServiceUsageOpen] = useState<boolean>(false);
     const [leaveVoucherUsageOpen, setLeaveVoucherUsageOpen] = useState<boolean>(false);
+    const [couponOpen, setCouponOpen] = useState<boolean>(false);
 
     const onDelete = async (id: string) => {
         await apiContractDelete(id);
@@ -65,6 +67,9 @@ const Index: React.FC = () => {
                 search={{
                     layout: 'vertical'
                 }}
+                scroll={{
+                    x: true
+                }}
                 columns={[
                     {
                         title: '#',
@@ -95,10 +100,16 @@ const Index: React.FC = () => {
                         dataIndex: 'identityNumber',
                     },
                     {
+                        title: 'Nguồn',
+                        dataIndex: 'sourceName',
+                        search: false
+                    },
+                    {
                         title: 'Ngày tạo',
                         dataIndex: 'createdDate',
                         valueType: 'date',
-                        search: false
+                        search: false,
+                        width: 90
                     },
                     {
                         title: 'GTHĐ',
@@ -106,6 +117,30 @@ const Index: React.FC = () => {
                         valueType: 'digit',
                         search: false,
                         tip: 'Giá trị hợp đồng',
+                        render: (dom, record) => (
+                            <Tag color="blue" className="w-full text-center font-semibold border-0 text-sm">{dom}₫</Tag>
+                        ),
+                        width: 100
+                    },
+                    {
+                        title: 'GTTT',
+                        valueType: 'digit',
+                        tip: 'Giá trị thực thu',
+                        search: false,
+                        render: (_, record) => (
+                            <Tag color="green" className="w-full text-center font-semibold border-0 text-sm">{<FormattedNumber value={record.amount - record.discount} />}₫</Tag>
+                        ),
+                        width: 100
+                    },
+                    {
+                        title: 'Đã TT',
+                        dataIndex: 'paidAmount',
+                        valueType: 'digit',
+                        search: false,
+                        render: (dom, record) => (
+                            <Tag color="orange" className="w-full text-center font-semibold border-0 text-sm">{dom}₫</Tag>
+                        ),
+                        width: 100
                     },
                     {
                         title: 'GTQD',
@@ -113,38 +148,35 @@ const Index: React.FC = () => {
                         valueType: 'digit',
                         search: false,
                         tip: 'Giá trị quy đổi',
-                    },
-                    {
-                        title: 'GTTT',
-                        valueType: 'digit',
-                        tip: 'Giá trị thực thu',
-                        search: false,
-                        render: (_, record) => <FormattedNumber value={record.amount - record.discount} />
-                    },
-                    {
-                        title: 'Đã TT',
-                        dataIndex: 'paidAmount',
-                        valueType: 'digit',
-                        search: false
+                        render: (dom, record) => (
+                            <Tag color="red"
+                                onClick={() => {
+                                    setContract(record);
+                                    setCouponOpen(true);
+                                }}
+                                className="w-full text-center font-semibold border-0 cursor-pointer hover:bg-red-100 text-sm">{dom}₫</Tag>
+                        ),
+                        width: 100
                     },
                     {
                         title: 'Chờ duyệt',
                         dataIndex: 'pendingAmount',
                         valueType: 'digit',
-                        search: false
+                        search: false,
+                        render: (dom, record) => (
+                            <Tag color="yellow" className="w-full text-center font-semibold border-0 cursor-pointer hover:bg-yellow-100 text-sm">{dom}₫</Tag>
+                        ),
+                        width: 100
                     },
                     {
-                        title: 'Quà tặng',
-                        dataIndex: 'giftCount',
-                        valueType: 'digit',
+                        title: 'Tỷ lệ TT',
+                        dataIndex: 'paymentRate',
+                        valueType: 'percent',
                         search: false,
-                        width: 80,
                         render: (dom, record) => (
-                            <Button type="primary" size="small" onClick={() => {
-                                setContract(record);
-                                setGiftListOpen(true);
-                            }}>{dom}</Button>
-                        )
+                            <Tag color="purple" className="w-full text-center font-semibold border-0 text-sm">{(record.paidAmount / record.amount * 100).toFixed(1)}%</Tag>
+                        ),
+                        width: 80
                     },
                     {
                         title: <SettingOutlined />,
@@ -252,6 +284,7 @@ const Index: React.FC = () => {
             <CouponForm open={couponFormOpen} onOpenChange={setCouponFormOpen} data={contract} reload={() => actionRef.current?.reload()} />
             <ServiceUsageList open={serviceUsageOpen} onOpenChange={setServiceUsageOpen} data={contract} />
             <LeaveVoucherUsageList open={leaveVoucherUsageOpen} onOpenChange={setLeaveVoucherUsageOpen} data={contract} />
+            <Coupon open={couponOpen} onClose={() => setCouponOpen(false)} data={contract} reload={() => actionRef.current?.reload()} />
         </PageContainer>
     )
 }

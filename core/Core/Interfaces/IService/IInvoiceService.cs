@@ -10,6 +10,7 @@ public interface IInvoiceService
 {
     Task<TResult> ApproveAsync(Guid id);
     Task<TResult> CancelAsync(InvoiceCancelArgs args);
+    Task<TResult> DeleteAsync(Guid id);
     Task<TResult<object>> DetailAsync(Guid id);
     Task<TResult<byte[]?>> ExportAsync(InvoiceExportFilterOptions args);
     Task<string> GenerateInvoiceNumberAsync();

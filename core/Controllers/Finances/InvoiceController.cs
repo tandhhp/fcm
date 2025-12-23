@@ -37,4 +37,7 @@ public class InvoiceController(IInvoiceService _invoiceService) : BaseController
 
     [HttpGet("{id}")]
     public async Task<IActionResult> DetailAsync([FromRoute] Guid id) => Ok(await _invoiceService.DetailAsync(id));
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync([FromRoute] Guid id) => Ok(await _invoiceService.DeleteAsync(id));
 }

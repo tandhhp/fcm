@@ -28,7 +28,6 @@ public class ContractService(IContractRepository _contractRepository, IWebHostEn
             CreatedDate = args.CreatedDate ?? DateTime.Now,
             CreatedBy = _hcaService.GetUserId(),
             Code = args.Code,
-            PhoneNumber = lead.PhoneNumber,
             SalesId = args.SalesId,
             SourceId = args.SourceId,
             ToById = args.ToById,
@@ -56,6 +55,10 @@ public class ContractService(IContractRepository _contractRepository, IWebHostEn
                 $"Phiếu thu {args.InvoiceNumber} của hợp đồng {contract.Code} cần được phê duyệt",
                 accountant.Id);
         }
+        var salesAdmins = await _userManager.GetUsersInRoleAsync(RoleName.SalesAdmin);
+        await _notificationService.CreateAsync($"Phiếu thu {args.InvoiceNumber} đã được tạo",
+            $"Phiếu thu {args.InvoiceNumber} của hợp đồng {contract.Code} đã được tạo và đang chờ phê duyệt",
+            [.. salesAdmins.Select(sa => sa.Id)]);
         if (contract.SalesId is null) return TResult.Failed("Hợp đồng chưa có nhân viên kinh doanh phụ trách!");
         return await _contractRepository.CreatePaymentAsync(args, contract.SalesId.GetValueOrDefault());
     }
@@ -98,7 +101,7 @@ public class ContractService(IContractRepository _contractRepository, IWebHostEn
             contract.ToById,
             lead.DateOfBirth,
             contract.SalesId,
-            contract.PhoneNumber,
+            lead.PhoneNumber,
             lead.IdentityNumber,
             contract.CreatedDate,
             lead.Gender,
