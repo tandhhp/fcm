@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Waffle.Entities.Contracts;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Waffle.Entities;
 
@@ -7,7 +7,7 @@ public class Gift : BaseEntity
 {
     [StringLength(256)]
     public string Name { get; set; } = default!;
-    public int Quantity { get; set; }
-
-    public virtual ICollection<Contract>? Contracts { get; set; }
+    [Column(TypeName = "money")]
+    public decimal Amount { get; set; }
+    public DateOnly CreatedDate { get; set; }
 }

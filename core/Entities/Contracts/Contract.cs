@@ -8,8 +8,6 @@ public class Contract : AuditEntity
 {
     [StringLength(256)]
     public string Code { get; set; } = default!;
-    [ForeignKey(nameof(Gift))]
-    public Guid? GiftId { get; set; }
     [Column(TypeName = "money")]
     public decimal Amount { get; set; }
     public Guid? SalesId { get; set; }

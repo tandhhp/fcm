@@ -76,6 +76,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Coupon> Coupons { get; set; }
     public DbSet<Evidence> Evidences { get; set; }
     public DbSet<EvidenceType> EvidenceTypes { get; set; }
+    public DbSet<InvoiceHistory> InvoiceHistories { get; set; }
     #endregion
 
     protected override void OnModelCreating(ModelBuilder builder)

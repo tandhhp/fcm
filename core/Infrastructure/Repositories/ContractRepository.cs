@@ -305,7 +305,9 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
                         GiftCount = _context.ContractGifts.Count(g => g.ContractId == c.Id),
                         Discount = _context.Coupons.Where(cp => cp.ContractId == c.Id).Sum(cp => cp.Discount),
                         c.LeadId,
-                        SourceName = s.Name
+                        SourceName = s.Name,
+                        Dos = sales != null && sales.DosId != null ? _context.Users.First(x => x.Id == sales.DosId).Name : string.Empty,
+                        SmName = sales != null && sales.SmId != null ? _context.Users.First(x => x.Id == sales.SmId).Name : string.Empty,
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.ContractCode))
         {

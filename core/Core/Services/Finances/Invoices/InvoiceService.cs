@@ -15,6 +15,20 @@ namespace Waffle.Core.Services.Finances.Invoices;
 
 public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<ApplicationUser> _userManager, ILogService _logService, IHCAService _hcaService, INotificationService _notificationService) : IInvoiceService
 {
+    private async Task CreateHistoryAsync(InvoiceStatus status, string? note)
+    {
+        var history = new InvoiceHistory
+        {
+            Id = Guid.NewGuid(),
+            InvoiceId = Guid.Empty,
+            CreatedAt = DateTime.UtcNow,
+            UserId = _hcaService.GetUserId(),
+            Status = status,
+            Note = note
+        };
+        await _invoiceRepository.AddHistoryAsync(history);
+    }
+
     public async Task<TResult> ApproveAsync(Guid id)
     {
         var invoice = await _invoiceRepository.FindAsync(id);
@@ -22,10 +36,12 @@ public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<A
         if (_hcaService.IsUserInRole(RoleName.SalesAdmin))
         {
             invoice.Status = InvoiceStatus.SAConfirmed;
+            await CreateHistoryAsync(invoice.Status, "Xác nhận phiếu thu");
         }
         else
         {
             invoice.Status = InvoiceStatus.Approved;
+            await CreateHistoryAsync(invoice.Status, "Xác nhận phiếu thu");
         }
         await _logService.AddAsync($"Hóa đơn {invoice.InvoiceNumber} đã được duyệt.");
         await _invoiceRepository.UpdateAsync(invoice);
@@ -44,6 +60,7 @@ public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<A
                 $"Chứng từ {invoice.InvoiceNumber} đã bị hủy",
                 $"Chứng từ {invoice.InvoiceNumber} đã bị hủy. Lý do: {args.Note}",
                 [.. events.Select(x => x.Id)]);
+        await CreateHistoryAsync(invoice.Status, args.Note);
         await _invoiceRepository.UpdateAsync(invoice);
         return TResult.Success;
     }
@@ -158,6 +175,11 @@ public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<A
             }
         }
         return newInvoiceNumber;
+    }
+
+    public Task<ListResult<object>> GetHistoriesAsync(Guid invoiceId, FilterOptions filterOptions)
+    {
+        throw new NotImplementedException();
     }
 
     public Task<ListResult<InvoiceListItem>> ListAsync(InvoiceFilterOptions filterOptions) => _invoiceRepository.ListAsync(filterOptions);

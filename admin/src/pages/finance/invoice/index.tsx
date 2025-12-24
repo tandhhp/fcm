@@ -1,7 +1,7 @@
 import { apiInvoiceApprove, apiInvoiceList } from "@/services/finances/invoice";
 import { CheckOutlined, CloseOutlined, EditOutlined, MoreOutlined, PictureOutlined, SettingOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components";
-import { Button, Dropdown, message, Popconfirm } from "antd";
+import { Button, Dropdown, message, Popconfirm, Tag } from "antd";
 import { useRef, useState } from "react";
 import { InvoiceStatus } from "@/utils/enum";
 import InvoiceRejectForm from "./components/reject";
@@ -10,6 +10,7 @@ import InvoiceStatistics from "./components/statisticts";
 import InvoiceExportForm from "@/components/form/invoice-export-form";
 import InvoiceForm from "@/components/form/invoice";
 import { useAccess } from "@umijs/max";
+import dayjs from "dayjs";
 
 const Index: React.FC = () => {
 
@@ -19,6 +20,19 @@ const Index: React.FC = () => {
     const [openEvidence, setOpenEvidence] = useState<boolean>(false);
     const [openReject, setOpenReject] = useState<boolean>(false);
     const [openForm, setOpenForm] = useState<boolean>(false);
+
+    const canApprove = (status: InvoiceStatus) => {
+        if (!access.accountant && !access.salesAdmin && !access.canAdmin) {
+            return false;
+        }
+        if (status !== InvoiceStatus.Pending && access.salesAdmin) {
+            return false;
+        }
+        if (status !== InvoiceStatus.SAConfirmed && access.accountant) {
+            return false;
+        }
+        return true;
+    }
 
     return (
         <PageContainer extra={(
@@ -48,16 +62,26 @@ const Index: React.FC = () => {
                         dataIndex: 'contractCode',
                     },
                     {
+                        title: 'Sales',
+                        dataIndex: 'salesName',
+                        search: false
+                    },
+                    {
                         title: 'Số tiền',
                         dataIndex: 'amount',
                         valueType: 'digit',
-                        search: false
+                        search: false,
+                        render: (dom) => (
+                            <Tag color="success" className="w-full text-center text-sm font-semibold border-0">{dom}₫</Tag>
+                        ),
+                        width: 120
                     },
                     {
                         title: 'Ngày thu',
                         dataIndex: 'createdAt',
                         valueType: 'date',
-                        search: false
+                        search: false,
+                        render: (_, record) => dayjs(record.createdAt).format('DD-MM-YYYY')
                     },
                     {
                         title: 'Phương thức',
@@ -109,7 +133,8 @@ const Index: React.FC = () => {
                                 message.success('Duyệt hóa đơn thành công');
                                 actionRef.current?.reload();
                             }} okText="Duyệt" cancelText="Hủy">
-                                <Button type="primary" icon={<CheckOutlined />} size="small" disabled={record.status !== InvoiceStatus.Pending || !access.accountant}></Button>
+                                <Button type="primary" icon={<CheckOutlined />} size="small" 
+                                disabled={!canApprove(record.status)}></Button>
                             </Popconfirm>,
                             <Dropdown key={"more"} menu={{
                                 items: [
@@ -136,7 +161,7 @@ const Index: React.FC = () => {
                                         key: 'reject',
                                         label: 'Từ chối',
                                         icon: <CloseOutlined />,
-                                        disabled: record.status !== InvoiceStatus.Pending,
+                                        disabled: !canApprove(record.status),
                                         onClick: () => {
                                             setInvoice(record);
                                             setOpenReject(true);

@@ -24,6 +24,7 @@ public class Invoice : BaseEntity
     public PaymentMethod PaymentMethod { get; set; }
 
     public Contract? Contract { get; set; }
+    public ICollection<InvoiceHistory>? InvoiceHistories { get; set; }
 }
 
 public enum InvoiceStatus

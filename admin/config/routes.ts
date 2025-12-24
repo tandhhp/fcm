@@ -275,11 +275,6 @@ export default [
         name: 'Thành tựu',
         path: '/catalog/achievement',
         component: './achievement'
-      },
-      {
-        name: 'Quà tặng',
-        path: '/catalog/gift',
-        component: './gift'
       }
     ]
   },
@@ -471,6 +466,11 @@ export default [
         path: '/finance/report',
         component: './debt',
         access: 'can_read_page_finance_report'
+      },
+      {
+        name: 'Quà tặng',
+        path: '/finance/gift',
+        component: './gift'
       }
     ]
   },

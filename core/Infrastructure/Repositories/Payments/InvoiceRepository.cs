@@ -14,6 +14,11 @@ namespace Waffle.Infrastructure.Repositories.Payments;
 
 public class InvoiceRepository(ApplicationDbContext context, IHCAService _hcaService) : EfRepository<Invoice>(context), IInvoiceRepository
 {
+    public async Task AddHistoryAsync(InvoiceHistory history)
+    {
+        await _context.InvoiceHistories.AddAsync(history);
+    }
+
     public async Task<List<InvoiceExportListItem>> GetExportListAsync(InvoiceExportFilterOptions filterOptions)
     {
         var query = from i in _context.Invoices

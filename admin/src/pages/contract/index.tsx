@@ -1,5 +1,5 @@
 import { apiContractExport, apiContractList } from "@/services/finances/contract";
-import { ArrowLeftOutlined, DeleteOutlined, ExportOutlined, GiftOutlined, ManOutlined, MoreOutlined, PictureOutlined, PlusOutlined, SettingOutlined, TableOutlined, TagOutlined, WomanOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, DeleteOutlined, ExportOutlined, GiftOutlined, ManOutlined, MoreOutlined, PhoneOutlined, PictureOutlined, PlusOutlined, SettingOutlined, TableOutlined, TagOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { useRef, useState } from "react";
 import ContractInvoice from "./components/invoice";
@@ -15,6 +15,7 @@ import ContractEvidence from "@/components/contract-evidence";
 import ServiceUsageList from "./components/service-usage-list";
 import LeaveVoucherUsageList from "./components/leave-voucher-usage-list";
 import Coupon from "./components/coupon";
+import dayjs from "dayjs";
 
 const Index: React.FC = () => {
 
@@ -80,36 +81,46 @@ const Index: React.FC = () => {
                     {
                         title: 'Số hợp đồng',
                         dataIndex: 'contractCode',
+                        render: (dom, record) => (
+                            <div>
+                                <div className="font-semibold">{dom}</div>
+                                <div className="text-gray-500">Ngày tạo: {dayjs(record.createdDate).format('DD-MM-YYYY')}</div>
+                                <div className="text-gray-500">Nguồn: {record.sourceName}</div>
+                            </div>
+                        )
                     },
                     {
                         title: 'Họ và tên',
                         dataIndex: 'customerName',
-                        render: (_, record) => {
-                            if (record.gender) {
-                                return <><WomanOutlined className="text-pink-500" /> {record.customerName}</>
-                            }
-                            return <><ManOutlined className="text-blue-500" /> {record.customerName}</>
-                        }
+                        render: (_, record) => (
+                            <div>
+                                <div className="font-semibold">{record.gender ? <WomanOutlined className="text-pink-500" /> : <ManOutlined className="text-blue-500" />} {record.customerName}</div>
+                                <div className="text-gray-500"><PhoneOutlined /> {record.phoneNumber}</div>
+                                <div className="text-gray-500">CCCD: {record.identityNumber}</div>
+                            </div>
+                        )
                     },
                     {
                         title: 'SDT',
                         dataIndex: 'phoneNumber',
+                        hideInTable: true
                     },
                     {
                         title: 'Số CCCD',
                         dataIndex: 'identityNumber',
+                        hideInTable: true
                     },
                     {
-                        title: 'Nguồn',
-                        dataIndex: 'sourceName',
-                        search: false
-                    },
-                    {
-                        title: 'Ngày tạo',
-                        dataIndex: 'createdDate',
-                        valueType: 'date',
-                        search: false,
-                        width: 90
+                        title: 'Nhân sự',
+                        dataIndex: 'salesName',
+                        render: (_, record) => (
+                            <div>
+                                <div>Sales: {record.salesName}</div>
+                                <div>SM: {record.smName}</div>
+                                <div>DOS: {record.dos}</div>
+                            </div>
+                        ),
+                        minWidth: 180
                     },
                     {
                         title: 'GTHĐ',
@@ -117,7 +128,7 @@ const Index: React.FC = () => {
                         valueType: 'digit',
                         search: false,
                         tip: 'Giá trị hợp đồng',
-                        render: (dom, record) => (
+                        render: (dom) => (
                             <Tag color="blue" className="w-full text-center font-semibold border-0 text-sm">{dom}₫</Tag>
                         ),
                         width: 100
@@ -137,7 +148,7 @@ const Index: React.FC = () => {
                         dataIndex: 'paidAmount',
                         valueType: 'digit',
                         search: false,
-                        render: (dom, record) => (
+                        render: (dom) => (
                             <Tag color="orange" className="w-full text-center font-semibold border-0 text-sm">{dom}₫</Tag>
                         ),
                         width: 100
@@ -163,7 +174,7 @@ const Index: React.FC = () => {
                         dataIndex: 'pendingAmount',
                         valueType: 'digit',
                         search: false,
-                        render: (dom, record) => (
+                        render: (dom) => (
                             <Tag color="yellow" className="w-full text-center font-semibold border-0 cursor-pointer hover:bg-yellow-100 text-sm">{dom}₫</Tag>
                         ),
                         width: 100
@@ -177,6 +188,16 @@ const Index: React.FC = () => {
                             <Tag color="purple" className="w-full text-center font-semibold border-0 text-sm">{(record.paidAmount / record.amount * 100).toFixed(1)}%</Tag>
                         ),
                         width: 80
+                    },
+                    {
+                        title: 'Cần TT',
+                        dataIndex: 'remainingAmount',
+                        valueType: 'digit',
+                        search: false,
+                        render: (dom, record) => (
+                            <Tag color="pink" className="w-full text-center font-semibold border-0 text-sm">{<FormattedNumber value={(record.amount - record.discount - record.paidAmount)} />}₫</Tag>
+                        ),
+                        width: 100
                     },
                     {
                         title: <SettingOutlined />,

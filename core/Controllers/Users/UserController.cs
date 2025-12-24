@@ -268,6 +268,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
         try
         {
             if (!string.IsNullOrWhiteSpace(args.LineCode) && await _context.Users.AnyAsync(x => x.LineCode == args.LineCode)) return BadRequest("Mã line đã tồn tại!");
+            if (await _context.Users.AnyAsync(x => x.UserName == args.UserName)) return BadRequest("Tên đăng nhập đã tồn tại!");
             var user = new ApplicationUser
             {
                 UserName = args.UserName,

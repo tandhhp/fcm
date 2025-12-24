@@ -14,6 +14,7 @@ public interface IInvoiceService
     Task<TResult<object>> DetailAsync(Guid id);
     Task<TResult<byte[]?>> ExportAsync(InvoiceExportFilterOptions args);
     Task<string> GenerateInvoiceNumberAsync();
+    Task<ListResult<object>> GetHistoriesAsync(Guid invoiceId, FilterOptions filterOptions);
     Task<ListResult<InvoiceListItem>> ListAsync(InvoiceFilterOptions filterOptions);
     Task<TResult> RejectAsync(InvoiceRejectArgs args);
     Task<TResult<object>> StatisticsAsync();

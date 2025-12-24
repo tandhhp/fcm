@@ -3,6 +3,7 @@ using Waffle.Core.Interfaces.IService;
 using Waffle.Core.Services.Finances.Invoices.Args;
 using Waffle.Core.Services.Finances.Invoices.Filters;
 using Waffle.Foundations;
+using Waffle.Models;
 
 namespace Waffle.Controllers.Finances;
 
@@ -40,4 +41,7 @@ public class InvoiceController(IInvoiceService _invoiceService) : BaseController
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync([FromRoute] Guid id) => Ok(await _invoiceService.DeleteAsync(id));
+
+    [HttpGet("histories/{invoiceId}")]
+    public async Task<IActionResult> GetHistoriesAsync([FromRoute] Guid invoiceId, [FromQuery] FilterOptions filterOptions) => Ok(await _invoiceService.GetHistoriesAsync(invoiceId, filterOptions));
 }
