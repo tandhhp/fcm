@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Waffle.Data;
 
@@ -11,9 +12,11 @@ using Waffle.Data;
 namespace Waffle.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251224093836_GiftFieldTable")]
+    partial class GiftFieldTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1091,6 +1094,9 @@ namespace Waffle.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("GiftId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("KeyInId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1119,7 +1125,30 @@ namespace Waffle.Migrations
 
                     b.HasIndex("CardId");
 
+                    b.HasIndex("GiftId");
+
                     b.ToTable("Contracts");
+                });
+
+            modelBuilder.Entity("Waffle.Entities.Contracts.ContractGift", b =>
+                {
+                    b.Property<Guid>("ContractId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("GiftId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ContractId", "GiftId");
+
+                    b.HasIndex("GiftId");
+
+                    b.ToTable("ContractGifts");
                 });
 
             modelBuilder.Entity("Waffle.Entities.Contracts.ContractLeaveVoucherUsage", b =>
@@ -1550,9 +1579,6 @@ namespace Waffle.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("money");
 
-                    b.Property<Guid>("ContractId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -1568,8 +1594,6 @@ namespace Waffle.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ContractId");
 
                     b.ToTable("Gifts");
                 });
@@ -2712,7 +2736,32 @@ namespace Waffle.Migrations
                         .WithMany("Contracts")
                         .HasForeignKey("CardId");
 
+                    b.HasOne("Waffle.Entities.Gift", "Gift")
+                        .WithMany()
+                        .HasForeignKey("GiftId");
+
                     b.Navigation("Card");
+
+                    b.Navigation("Gift");
+                });
+
+            modelBuilder.Entity("Waffle.Entities.Contracts.ContractGift", b =>
+                {
+                    b.HasOne("Waffle.Entities.Contracts.Contract", "Contract")
+                        .WithMany()
+                        .HasForeignKey("ContractId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Waffle.Entities.Gift", "Gift")
+                        .WithMany()
+                        .HasForeignKey("GiftId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contract");
+
+                    b.Navigation("Gift");
                 });
 
             modelBuilder.Entity("Waffle.Entities.Contracts.ContractLeaveVoucherUsage", b =>
@@ -2790,17 +2839,6 @@ namespace Waffle.Migrations
                     b.HasOne("Waffle.Entities.Campaign", null)
                         .WithMany("Events")
                         .HasForeignKey("CampaignId");
-                });
-
-            modelBuilder.Entity("Waffle.Entities.Gift", b =>
-                {
-                    b.HasOne("Waffle.Entities.Contracts.Contract", "Contract")
-                        .WithMany("Gifts")
-                        .HasForeignKey("ContractId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Contract");
                 });
 
             modelBuilder.Entity("Waffle.Entities.Healthcares.Healthcare", b =>
@@ -3064,8 +3102,6 @@ namespace Waffle.Migrations
                     b.Navigation("Coupons");
 
                     b.Navigation("Evidences");
-
-                    b.Navigation("Gifts");
 
                     b.Navigation("Invoices");
                 });

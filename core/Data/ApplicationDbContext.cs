@@ -66,7 +66,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public virtual DbSet<CallHistory> CallHistories { get; set; }
     public DbSet<Campaign> Campaigns { get; set; }
     public DbSet<Source> Sources { get; set; }
-    public DbSet<ContractGift> ContractGifts { get; set; }
     public DbSet<CallCenter> CallCenters { get; set; }
     public DbSet<GroupData> GroupDatas { get; set; }
     public DbSet<ContractServiceUsage> ContractServiceUsages { get; set; }
@@ -84,7 +83,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         base.OnModelCreating(builder);
         builder.Entity<WorkItem>().HasKey(k => new { k.WorkId, k.CatalogId });
         builder.Entity<TourAmenity>().HasKey(k => new { k.CatalogId, k.AmenityId });
-        builder.Entity<ContractGift>().HasKey(k => new { k.ContractId, k.GiftId });
 
         builder.Entity<ContractServiceUsage>()
             .HasOne(x => x.Contract)

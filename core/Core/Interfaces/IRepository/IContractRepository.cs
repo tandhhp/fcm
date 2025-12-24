@@ -15,10 +15,6 @@ public interface IContractRepository : IAsyncRepository<Contract>
     Task<ListResult<object>> ListAsync(ContractFilterOptions filterOptions);
     Task DeleteInvoicesAsync(Guid id);
     Task<List<ContractExportResult>> GetExportDataAsync(ContractFilterOptions filterOptions);
-    Task<TResult> DeleteGiftContractAsync(ContractGiftArgs args);
-    Task<ListResult<object>> GetGiftsAsync(ContractGiftFilterOptions filterOptions);
-    Task<TResult> GiftContractAsync(ContractGiftArgs args);
-    Task DeleteGiftsAsync(Guid id);
     Task<object?> GetLeadOptionsAsync(ContactLeadSelectOptions selectOptions);
     Task<TResult> AddEvidencesAsync(List<Evidence> evidences);
     Task<object> GetEvidenceTypeOptionsAsync();

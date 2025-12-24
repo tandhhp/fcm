@@ -62,22 +62,6 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
         return TResult.Success;
     }
 
-    public async Task<TResult> DeleteGiftContractAsync(ContractGiftArgs args)
-    {
-        var gift = await _context.ContractGifts.FirstOrDefaultAsync(g => g.ContractId == args.ContractId && g.GiftId == args.GiftId);
-        if (gift is null) return TResult.Failed("Không tìm thấy quà tặng trong hợp đồng!");
-        _context.ContractGifts.Remove(gift);
-        await _context.SaveChangesAsync();
-        return TResult.Success;
-    }
-
-    public async Task DeleteGiftsAsync(Guid id)
-    {
-        var gifts = await _context.ContractGifts.Where(g => g.ContractId == id).ToListAsync();
-        if (gifts.Count == 0) return;
-        _context.ContractGifts.RemoveRange(gifts);
-    }
-
     public async Task DeleteInvoicesAsync(Guid id)
     {
         var invoices = await _context.Invoices.Where(i => i.ContractId == id).ToListAsync();
@@ -198,24 +182,6 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
         return await query.ToListAsync();
     }
 
-    public async Task<ListResult<object>> GetGiftsAsync(ContractGiftFilterOptions filterOptions)
-    {
-        var query = from g in _context.ContractGifts
-                    join gift in _context.Gifts on g.GiftId equals gift.Id
-                    join u in _context.Users on g.CreatedBy equals u.Id
-                    where g.ContractId == filterOptions.ContractId
-                    select new
-                    {
-                        gift.Id,
-                        gift.Name,
-                        g.CreatedAt,
-                        CreatedByName = u.Name,
-                        g.CreatedBy
-                    };
-        query = query.OrderByDescending(g => g.CreatedAt);
-        return await ListResult<object>.Success(query, filterOptions);
-    }
-
     public async Task<ListResult<object>> GetInvoicesAsync(ContractInvoiceFilterOptions filterOptions)
     {
         var query = from i in _context.Invoices
@@ -259,22 +225,6 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
 
     public async Task<decimal> GetTotalAmountPaidAsync(Guid contractId) => await _context.Invoices.Where(x => x.ContractId == contractId && x.Status != InvoiceStatus.Rejected && x.Status != InvoiceStatus.Cancelled).SumAsync(x => x.Amount);
 
-    public async Task<TResult> GiftContractAsync(ContractGiftArgs args)
-    {
-        var exists = await _context.ContractGifts.AnyAsync(g => g.ContractId == args.ContractId && g.GiftId == args.GiftId);
-        if (exists) return TResult.Failed("Quà tặng đã tồn tại trong hợp đồng!");
-        var gift = new ContractGift
-        {
-            ContractId = args.ContractId,
-            GiftId = args.GiftId,
-            CreatedBy = _hcaService.GetUserId(),
-            CreatedAt = DateTime.Now
-        };
-        await _context.ContractGifts.AddAsync(gift);
-        await _context.SaveChangesAsync();
-        return TResult.Success;
-    }
-
     public async Task<ListResult<object>> ListAsync(ContractFilterOptions filterOptions)
     {
         var userId = _hcaService.GetUserId();
@@ -302,7 +252,7 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
                         PendingAmount = _context.Invoices.Where(i => i.ContractId == c.Id && (i.Status == InvoiceStatus.Pending || i.Status == InvoiceStatus.SAConfirmed)).Sum(i => i.Amount),
                         c.SalesId,
                         SalesManagerId = sales.SmId,
-                        GiftCount = _context.ContractGifts.Count(g => g.ContractId == c.Id),
+                        GiftCount = _context.Gifts.Count(g => g.ContractId == c.Id),
                         Discount = _context.Coupons.Where(cp => cp.ContractId == c.Id).Sum(cp => cp.Discount),
                         c.LeadId,
                         SourceName = s.Name,

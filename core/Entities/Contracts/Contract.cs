@@ -19,11 +19,11 @@ public class Contract : AuditEntity
     public Guid? KeyInId { get; set; }
     public Guid LeadId { get; set; }
 
-    public virtual Gift? Gift { get; set; }
     public virtual Card? Card { get; set; }
 
     public virtual ICollection<Invoice>? Invoices { get; set; }
     public virtual ICollection<Bill>? Bills { get; set; }
     public virtual ICollection<Coupon>? Coupons { get; set; }
     public virtual ICollection<Evidence>? Evidences { get; set; }
+    public virtual ICollection<Gift>? Gifts { get; set; }
 }

@@ -69,7 +69,6 @@ public class ContractService(IContractRepository _contractRepository, IWebHostEn
         var contract = await _contractRepository.FindAsync(id);
         if (contract is null) return TResult.Failed("Không tìm thấy hợp đồng!");
         await _contractRepository.DeleteInvoicesAsync(id);
-        await _contractRepository.DeleteGiftsAsync(id);
         await _logService.AddAsync($"Hợp đồng {contract.Code} đã bị xóa");
         await _contractRepository.DeleteAsync(contract);
         return TResult.Success;
@@ -77,7 +76,10 @@ public class ContractService(IContractRepository _contractRepository, IWebHostEn
 
     public Task<TResult> DeleteEvidenceAsync(Guid id) => _contractRepository.DeleteEvidenceAsync(id);
 
-    public Task<TResult> DeleteGiftContractAsync(ContractGiftArgs args) => _contractRepository.DeleteGiftContractAsync(args);
+    public Task<TResult> DeleteGiftContractAsync(ContractGiftArgs args)
+    {
+        throw new NotImplementedException();
+    }
 
     public async Task<TResult<object>> DetailAsync(Guid id)
     {
@@ -196,13 +198,19 @@ public class ContractService(IContractRepository _contractRepository, IWebHostEn
 
     public Task<object> GetEvidenceTypeOptionsAsync() => _contractRepository.GetEvidenceTypeOptionsAsync();
 
-    public Task<ListResult<object>> GetGiftsAsync(ContractGiftFilterOptions filterOptions) => _contractRepository.GetGiftsAsync(filterOptions);
+    public Task<ListResult<object>> GetGiftsAsync(ContractGiftFilterOptions filterOptions)
+    {
+        throw new NotImplementedException();
+    }
 
     public Task<ListResult<object>> GetInvoicesAsync(ContractInvoiceFilterOptions filterOptions) => _contractRepository.GetInvoicesAsync(filterOptions);
 
     public Task<object?> GetLeadOptionsAsync(ContactLeadSelectOptions selectOptions) => _contractRepository.GetLeadOptionsAsync(selectOptions);
 
-    public Task<TResult> GiftContractAsync(ContractGiftArgs args) => _contractRepository.GiftContractAsync(args);
+    public Task<TResult> GiftContractAsync(ContractGiftArgs args)
+    {
+        throw new NotImplementedException();
+    }
 
     public Task<ListResult<object>> ListAsync(ContractFilterOptions filterOptions) => _contractRepository.ListAsync(filterOptions);
 
