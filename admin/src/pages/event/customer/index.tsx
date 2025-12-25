@@ -1,4 +1,4 @@
-import { apiLeadAllowDuplicate, apiLeadCheckinList } from "@/services/users/lead";
+import { apiLeadAllowDuplicate, apiLeadNoDupsList } from "@/services/users/lead";
 import { EditOutlined, EyeOutlined, ManOutlined, MoreOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { Button, Dropdown, message, Switch } from "antd";
@@ -18,7 +18,7 @@ const Index: React.FC = () => {
             <ProTable
                 actionRef={actionRef}
                 rowKey={"id"}
-                request={apiLeadCheckinList}
+                request={apiLeadNoDupsList}
                 scroll={{
                     x: true
                 }}
@@ -35,7 +35,7 @@ const Index: React.FC = () => {
                         width: 70,
                         render: (_, entity) => (
                             <Switch size="small" checked={!entity.duplicated} onClick={async () => {
-                                await apiLeadAllowDuplicate(entity.id);
+                                await apiLeadAllowDuplicate(entity.key);
                                 message.success('Cập nhật thành công');
                                 actionRef.current?.reload();
                             }} />
@@ -54,8 +54,8 @@ const Index: React.FC = () => {
                             }}
                             >{entity.gender === false && (<ManOutlined className='text-blue-500' />)}{entity.gender === true && (<WomanOutlined className='text-red-500' />)} {dom}</div>
                         ),
-                        minWidth: 180,
-                        width: 180
+                        minWidth: 200,
+                        width: 200
                     },
                     {
                         title: 'Điện thoại',
@@ -64,7 +64,7 @@ const Index: React.FC = () => {
                     },
                     {
                         title: 'Số CCCD',
-                        dataIndex: 'identityNumber',
+                        dataIndex: 'key',
                         width: 100
                     },
                     {
@@ -75,11 +75,10 @@ const Index: React.FC = () => {
                         search: false
                     },
                     {
-                        title: 'Ngày tạo',
-                        dataIndex: 'createdDate',
-                        valueType: 'date',
+                        dataIndex: 'count',
+                        title: 'Số sự kiện',
                         width: 100,
-                        search: false
+                        search: false,
                     },
                     {
                         title: 'Ghi chú',

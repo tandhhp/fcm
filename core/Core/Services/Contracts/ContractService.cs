@@ -76,11 +76,6 @@ public class ContractService(IContractRepository _contractRepository, IWebHostEn
 
     public Task<TResult> DeleteEvidenceAsync(Guid id) => _contractRepository.DeleteEvidenceAsync(id);
 
-    public Task<TResult> DeleteGiftContractAsync(ContractGiftArgs args)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<TResult<object>> DetailAsync(Guid id)
     {
         var contract = await _contractRepository.FindAsync(id);
@@ -198,19 +193,11 @@ public class ContractService(IContractRepository _contractRepository, IWebHostEn
 
     public Task<object> GetEvidenceTypeOptionsAsync() => _contractRepository.GetEvidenceTypeOptionsAsync();
 
-    public Task<ListResult<object>> GetGiftsAsync(ContractGiftFilterOptions filterOptions)
-    {
-        throw new NotImplementedException();
-    }
-
     public Task<ListResult<object>> GetInvoicesAsync(ContractInvoiceFilterOptions filterOptions) => _contractRepository.GetInvoicesAsync(filterOptions);
 
     public Task<object?> GetLeadOptionsAsync(ContactLeadSelectOptions selectOptions) => _contractRepository.GetLeadOptionsAsync(selectOptions);
 
-    public Task<TResult> GiftContractAsync(ContractGiftArgs args)
-    {
-        throw new NotImplementedException();
-    }
+    public Task<TResult> GiftContractAsync(ContractGiftArgs args) => _contractRepository.GiftContractAsync(args);
 
     public Task<ListResult<object>> ListAsync(ContractFilterOptions filterOptions) => _contractRepository.ListAsync(filterOptions);
 

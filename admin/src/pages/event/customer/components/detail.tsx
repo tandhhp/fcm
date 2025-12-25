@@ -33,13 +33,12 @@ export const LeadDetail: React.FC<Props> = (props) => {
                 className="mb-4"
                 request={apiLeadCheckinList}
                 params={{
-                    phoneNumber: data?.phoneNumber
+                    identityNumber: data?.identityNumber
                 }}
                 rowKey="id"
                 search={false}
                 size="small"
                 ghost
-                rowClassName={(record) => (record.id === props.data?.id ? 'hidden' : '')}
                 headerTitle="Danh sách sự kiện đã tham gia"
                 columns={[
                     {

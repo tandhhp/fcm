@@ -391,7 +391,7 @@ export default [
     icon: 'TeamOutlined',
     name: 'Người dùng',
     path: '/user',
-    access: 'hr',
+    access: 'canHR',
     routes: [
       {
         name: 'Hoạt động',
@@ -402,8 +402,7 @@ export default [
       {
         name: 'Nhân viên',
         path: '/user/roles',
-        component: './users/roles',
-        access: 'canHR',
+        component: './users/roles'
       },
       {
         name: 'Chức vụ',
@@ -470,7 +469,8 @@ export default [
       {
         name: 'Quà tặng',
         path: '/finance/gift',
-        component: './gift'
+        component: './gift',
+        access: 'salesAdmin'
       }
     ]
   },

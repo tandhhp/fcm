@@ -30,18 +30,20 @@ const HomePage: React.FC = () => {
       </ProForm>
     )}>
       <AmountReport />
-      <ProCard title="Doanh thu" className="mb-4" headerBordered extra={(
-        <ProForm submitter={false}>
-          <ProFormDatePicker.Year name="year" initialValue={dayjs()} className="w-32" fieldProps={{
-            variant: 'filled',
-            onChange: (date) => setYear(date),
-            autoFocus: false,
-            allowClear: false
-          }} formItemProps={{
-            className: 'mb-0'
-          }} />
-        </ProForm>
-      )}>
+      <ProCard title="Doanh thu" className="mb-4"
+        hidden={!access.accountant && !access.canAdmin && !access.sm && !access.dos}
+        headerBordered extra={(
+          <ProForm submitter={false}>
+            <ProFormDatePicker.Year name="year" initialValue={dayjs()} className="w-32" fieldProps={{
+              variant: 'filled',
+              onChange: (date) => setYear(date),
+              autoFocus: false,
+              allowClear: false
+            }} formItemProps={{
+              className: 'mb-0'
+            }} />
+          </ProForm>
+        )}>
         <Row>
           <LineBranch branchId={branchId} year={year} />
           <Col xs={24} md={6}>

@@ -225,6 +225,21 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
 
     public async Task<decimal> GetTotalAmountPaidAsync(Guid contractId) => await _context.Invoices.Where(x => x.ContractId == contractId && x.Status != InvoiceStatus.Rejected && x.Status != InvoiceStatus.Cancelled).SumAsync(x => x.Amount);
 
+    public async Task<TResult> GiftContractAsync(ContractGiftArgs args)
+    {
+        await _context.Gifts.AddAsync(new Gift
+        {
+            Name = args.Name,
+            ContractId = args.ContractId,
+            Amount = args.Amount,
+            ExpiredDate = args.ExpiredDate,
+            CreatedAt = DateTime.UtcNow,
+            UserId = _hcaService.GetUserId()
+        });
+        await _context.SaveChangesAsync();
+        return TResult.Success;
+    }
+
     public async Task<ListResult<object>> ListAsync(ContractFilterOptions filterOptions)
     {
         var userId = _hcaService.GetUserId();

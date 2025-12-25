@@ -12,9 +12,7 @@ export default (initialState: { currentUser?: API.User }) => {
   const cx = currentUser && currentUser.roles.includes('cx');
 
   // Quản lý nhân viên
-  const canHR = currentUser && (currentUser.roles.includes('hr') 
-  || currentUser.roles.includes('dos')
-  || currentUser.roles.includes('admin'));
+  const canHR = currentUser && (currentUser.roles.includes('hr') || currentUser.roles.includes('admin'));
 
   const canComment = currentUser && (currentUser.roles.includes('cx') 
   || currentUser.roles.includes('cxtp')
@@ -76,7 +74,7 @@ export default (initialState: { currentUser?: API.User }) => {
   const telesale = currentUser && (currentUser.roles.includes('Telesale'));
   const telesaleManager = currentUser && (currentUser.roles.includes('TelesaleManager'));
   const dot = currentUser && currentUser.roles.includes('dot');
-  const hr = currentUser && (currentUser.roles.includes('hr') || currentUser.roles.includes('admin'));
+  const hr = currentUser && currentUser.roles.includes('hr');
   const accountant = currentUser && (currentUser.roles.includes('accountant') || currentUser.roles.includes('ChiefAccountant'));
   const chiefAccountant = currentUser && currentUser.roles.includes('ChiefAccountant');
   const adminData = currentUser && currentUser.roles.includes('admindata');

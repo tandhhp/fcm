@@ -52,5 +52,8 @@ public class LeadController(ILeadService _leadService) : BaseController
     public async Task<IActionResult> UpdateFeedbackAsync([FromBody] LeadUpdateFeedbackArgs args) => Ok(await _leadService.UpdateFeedbackAsync(args));
 
     [HttpPost("allowed-duplicate/{id}")]
-    public async Task<IActionResult> AllowedDuplicateAsync([FromRoute] Guid id) => Ok(await _leadService.AllowedDuplicateAsync(id));
+    public async Task<IActionResult> AllowedDuplicateAsync([FromRoute] string id) => Ok(await _leadService.AllowedDuplicateAsync(id));
+
+    [HttpGet("no-dup")]
+    public async Task<IActionResult> NoDupsAsync([FromQuery] LeadCheckinListFilterOptions filterOptions) => Ok(await _leadService.NoDupsAsync(filterOptions));
 }

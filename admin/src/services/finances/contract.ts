@@ -44,12 +44,6 @@ export async function apiContractGiftAdd(data: any) {
   });
 }
 
-export async function apiContractGiftList(params: any) {
-  return request('contract/gifts', {
-    params
-  });
-}
-
 export async function apiContractGiftDelete(data: any) {
   return request(`contract/delete-gift`, {
     method: 'POST',

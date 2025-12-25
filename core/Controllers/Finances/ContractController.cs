@@ -35,12 +35,6 @@ public class ContractController(IContractService _contractService) : BaseControl
     [HttpPost("add-gift")]
     public async Task<IActionResult> GiftContractAsync([FromBody] ContractGiftArgs args) => Ok(await _contractService.GiftContractAsync(args));
 
-    [HttpPost("delete-gift")]
-    public async Task<IActionResult> DeleteGiftContractAsync([FromBody] ContractGiftArgs args) => Ok(await _contractService.DeleteGiftContractAsync(args));
-
-    [HttpGet("gifts")]
-    public async Task<IActionResult> GetGiftsAsync([FromQuery] ContractGiftFilterOptions filterOptions) => Ok(await _contractService.GetGiftsAsync(filterOptions));
-
     [HttpGet("lead-options")]
     public async Task<IActionResult> GetLeadOptionsAsync([FromQuery] ContactLeadSelectOptions selectOptions) => Ok(await _contractService.GetLeadOptionsAsync(selectOptions));
 

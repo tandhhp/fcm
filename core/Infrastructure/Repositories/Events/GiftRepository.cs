@@ -19,14 +19,25 @@ public class GiftRepository(ApplicationDbContext context) : EfRepository<Gift>(c
     public async Task<ListResult<object>> ListAsync(GiftFilterOptions filterOptions)
     {
         var query = from a in _context.Gifts
+                    join b in _context.Users on a.UserId equals b.Id
                     select new
                     {
                         a.Id,
-                        a.Name
+                        a.Name,
+                        a.CreatedAt,
+                        a.ExpiredDate,
+                        a.Amount,
+                        a.UserId,
+                        UserName = b.Name,
+                        a.ContractId
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {
             query = query.Where(x => x.Name.ToLower().Contains(filterOptions.Name.ToLower()));
+        }
+        if (filterOptions.ContractId.HasValue)
+        {
+            query = query.Where(x => x.ContractId == filterOptions.ContractId);
         }
         query = query.OrderByDescending(x => x.Name);
         return await ListResult<object>.Success(query, filterOptions);

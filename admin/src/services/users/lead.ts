@@ -34,6 +34,12 @@ export async function apiLeadCheckinList(params?: any) {
   });
 }
 
+export async function apiLeadNoDupsList(params?: any) {
+  return request(`lead/no-dup`, {
+    params
+  });
+}
+
 export async function apiLeadExportCheckin(params?: any) {
   return request(`lead/export-checkin`, {
     params,

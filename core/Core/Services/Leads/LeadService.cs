@@ -79,13 +79,15 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
         return TResult.Success;
     }
 
-    public async Task<TResult> AllowedDuplicateAsync(Guid id)
+    public async Task<TResult> AllowedDuplicateAsync(string citizenId)
     {
-        var lead = await _leadRepository.FindAsync(id);
-        if (lead == null) return TResult.Failed("Không tìm thấy khách hàng!");
-        lead.Duplicated = !lead.Duplicated;
-        await _logService.AddAsync(lead.Duplicated ? "Cho phép trùng số ĐDCN" : "Không cho phép trùng số ĐDCN");
-        await _leadRepository.UpdateAsync(lead);
+        var leads = await _leadRepository.ListByCitizenIdAsync(citizenId);
+        if (leads.Count == 0) return TResult.Failed("Không tìm thấy khách hàng!");
+        foreach (var lead in leads)
+        {
+            lead.Duplicated = !lead.Duplicated;
+            await _leadRepository.UpdateAsync(lead);
+        }
         return TResult.Success;
     }
 
@@ -244,6 +246,8 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
     public Task<ListResult<object>> GetCheckinListAsync(LeadCheckinListFilterOptions filterOptions) => _leadRepository.GetCheckinListAsync(filterOptions);
 
     public Task<ListResult<object>> GetWaitingListAsync(LeadWaittingListFilterOptions filterOptions) => _leadRepository.GetWaitingListAsync(filterOptions);
+
+    public Task<ListResult<object>> NoDupsAsync(LeadCheckinListFilterOptions filterOptions) => _leadRepository.NoDupsAsync(filterOptions);
 
     public async Task<TResult> RejectAsync(LeadRejectArgs args)
     {

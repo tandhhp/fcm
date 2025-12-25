@@ -268,7 +268,7 @@ const RoleCenter: React.FC = () => {
                                 setUser(entity);
                                 setOpen(true);
                             },
-                            disabled: !access.hr
+                            disabled: !access.hr && !access.canAdmin
                         },
                         {
                             key: 'change-password',

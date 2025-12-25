@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import GiftForm from "./components/form";
 import { Button, Dropdown, message, Popconfirm } from "antd";
 import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
+import { FormattedNumber } from "@umijs/max";
 
 const Index: React.FC = () => {
 
@@ -33,6 +34,31 @@ const Index: React.FC = () => {
                     {
                         title: 'Tên quà tặng',
                         dataIndex: 'name',
+                    },
+                    {
+                        title: 'Giá trị (VND)',
+                        dataIndex: 'amount',
+                        render: (_, record) => (
+                            <FormattedNumber value={record.amount} style="currency" currency="VND" />
+                        ),
+                        search: false
+                    },
+                    {
+                        title: 'Hạn sử dụng',
+                        dataIndex: 'expiredDate',
+                        valueType: 'date',
+                        search: false
+                    },
+                    {
+                        title: 'Ngày tạo',
+                        dataIndex: 'createdAt',
+                        valueType: 'dateTime',
+                        search: false
+                    },
+                    {
+                        title: 'Người tạo',
+                        dataIndex: 'userName',
+                        search: false
                     },
                     {
                         title: <SettingOutlined />,

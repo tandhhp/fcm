@@ -5,4 +5,5 @@ namespace Waffle.Core.Services.Events.Models;
 public class GiftFilterOptions : FilterOptions
 {
     public string? Name { get; set; }
+    public Guid? ContractId { get; set; }
 }

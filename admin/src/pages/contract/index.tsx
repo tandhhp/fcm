@@ -6,7 +6,6 @@ import ContractInvoice from "./components/invoice";
 import { Button, Dropdown, message, Popconfirm, Tag } from "antd";
 import { FormattedNumber, useAccess } from "@umijs/max";
 import { apiContractDelete } from "@/services/contact";
-import GiftForm from "./components/gift-form";
 import GiftList from "./components/gift-list";
 import ContractForm from "@/components/form/contract";
 import BillForm from "./components/bill-form";
@@ -25,7 +24,6 @@ const Index: React.FC = () => {
     const [openBillForm, setOpenBillForm] = useState<boolean>(false);
     const [contract, setContract] = useState<any>(null);
     const [loadingExport, setLoadingExport] = useState<boolean>(false);
-    const [giftFormOpen, setGiftFormOpen] = useState<boolean>(false);
     const [giftListOpen, setGiftListOpen] = useState<boolean>(false);
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [couponFormOpen, setCouponFormOpen] = useState<boolean>(false);
@@ -226,13 +224,13 @@ const Index: React.FC = () => {
                                     },
                                     {
                                         key: 'gift',
-                                        label: 'Tặng quà',
+                                        label: 'Quà tặng',
                                         onClick: () => {
                                             setContract(record);
-                                            setGiftFormOpen(true);
+                                            setGiftListOpen(true);
                                         },
                                         icon: <GiftOutlined />,
-                                        disabled: !access.canCX
+                                        disabled: !access.salesAdmin
                                     },
                                     {
                                         title: 'Thư viện ảnh',
@@ -243,15 +241,6 @@ const Index: React.FC = () => {
                                             setOpenEvidence(true);
                                         },
                                         icon: <PictureOutlined />
-                                    },
-                                    {
-                                        key: 'gift-list',
-                                        label: 'Danh sách quà tặng',
-                                        onClick: () => {
-                                            setContract(record);
-                                            setGiftListOpen(true);
-                                        },
-                                        icon: <TableOutlined />
                                     },
                                     {
                                         key: 'coupon',
@@ -298,7 +287,6 @@ const Index: React.FC = () => {
             />
             <ContractEvidence contractId={contract?.id} onOpenChange={setOpenEvidence} open={openEvidence} />
             <ContractInvoice open={openInvoice} onOpenChange={setOpenInvoice} data={contract} />
-            <GiftForm open={giftFormOpen} onOpenChange={setGiftFormOpen} data={contract} reload={() => actionRef.current?.reload()} />
             <GiftList open={giftListOpen} onOpenChange={setGiftListOpen} data={contract} />
             <ContractForm open={openForm} onOpenChange={setOpenForm} reload={() => actionRef.current?.reload()} />
             <BillForm open={openBillForm} onOpenChange={setOpenBillForm} data={contract} reload={() => actionRef.current?.reload()} />

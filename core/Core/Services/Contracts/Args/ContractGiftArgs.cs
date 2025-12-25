@@ -2,6 +2,8 @@
 
 public class ContractGiftArgs
 {
-    public Guid GiftId { get; set; }
+    public string Name { get; set; } = default!;
     public Guid ContractId { get; set; }
+    public decimal Amount { get; set; }
+    public DateOnly ExpiredDate { get; set; }
 }

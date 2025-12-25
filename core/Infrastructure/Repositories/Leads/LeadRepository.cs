@@ -350,6 +350,51 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
         return await _context.Leads.AnyAsync(x => x.IdentityNumber == citizenId && leadId != x.Id);
     }
 
+    public async Task<List<Lead>> ListByCitizenIdAsync(string citizenId)
+    {
+        return await _context.Leads.Where(x => x.IdentityNumber == citizenId).ToListAsync();
+    }
+
+    public async Task<ListResult<object>> NoDupsAsync(LeadCheckinListFilterOptions filterOptions)
+    {
+        var query = from l in _context.Leads
+                    select new
+                    {
+                        l.Id,
+                        l.Name,
+                        l.PhoneNumber,
+                        l.IdentityNumber,
+                        l.DateOfBirth,
+                        l.Note,
+                        l.Duplicated
+                    };
+        if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
+        {
+            query = query.Where(x => x.PhoneNumber != null && x.PhoneNumber.Contains(filterOptions.PhoneNumber));
+        }
+        if (!string.IsNullOrWhiteSpace(filterOptions.IdentityNumber))
+        {
+            query = query.Where(x => x.IdentityNumber != null && x.IdentityNumber.Contains(filterOptions.IdentityNumber));
+        }
+        if (!string.IsNullOrWhiteSpace(filterOptions.Name))
+        {
+            query = query.Where(x => x.Name.ToLower().Contains(filterOptions.Name.ToLower()));
+        }
+        var data = query.GroupBy(x => x.IdentityNumber)
+            .Select(x => new
+            {
+                x.Key,
+                x.First().Id,
+                x.First().Name,
+                x.First().PhoneNumber,
+                x.First().DateOfBirth,
+                x.First().Note,
+                Count = x.Count(),
+                x.First().Duplicated
+            });
+        return await ListResult<object>.Success(data, filterOptions);
+    }
+
     public async Task<LeadFeedback> SaveFeedbackAsync(Guid leadId, int? tableId)
     {
         var feedback = await _context.LeadFeedbacks.FirstOrDefaultAsync(x => x.LeadId == leadId);

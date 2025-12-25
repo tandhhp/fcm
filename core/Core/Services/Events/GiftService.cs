@@ -35,7 +35,9 @@ public class GiftService(IGiftRepository _giftRepository, ILogService _logServic
         return TResult<object>.Ok(new
         {
             gift.Id,
-            gift.Name
+            gift.Name,
+            gift.ExpiredDate,
+            gift.Amount
         });
     }
 
@@ -48,6 +50,8 @@ public class GiftService(IGiftRepository _giftRepository, ILogService _logServic
         var gift = await _giftRepository.FindAsync(args.Id);
         if (gift is null) return TResult.Failed("Không tìm thấy quà tặng!");
         gift.Name = args.Name;
+        gift.ExpiredDate = args.ExpiredDate;
+        gift.Amount = args.Amount;
         await _logService.AddAsync($"Cập nhật quà tặng: {gift.Name}");
         await _giftRepository.UpdateAsync(gift);
         return TResult.Success;

@@ -9,7 +9,7 @@ const AmountReport: React.FC = () => {
     const { data } = useRequest(apiAmountReport);
 
     return (
-        <div className="mb-4" hidden={access.telesale || access.cx || access.hr || access.telesaleManager}>
+        <div className="mb-4" hidden={!access.accountant && !access.canAdmin && !access.sm && !access.dos}>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 <ProCard>
                     <Statistic title="Tổng doanh thu" value={data?.total} />
