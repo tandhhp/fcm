@@ -245,6 +245,12 @@ const RoleCenter: React.FC = () => {
             width: 120
         },
         {
+            title: 'Team',
+            dataIndex: 'teamName',
+            search: false,
+            width: 150
+        },
+        {
             title: 'Trạng thái',
             dataIndex: 'status',
             search: false,

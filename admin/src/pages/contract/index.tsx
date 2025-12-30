@@ -230,7 +230,7 @@ const Index: React.FC = () => {
                                             setGiftListOpen(true);
                                         },
                                         icon: <GiftOutlined />,
-                                        disabled: !access.salesAdmin
+                                        disabled: !access.salesAdmin && !access.cx
                                     },
                                     {
                                         title: 'Thư viện ảnh',

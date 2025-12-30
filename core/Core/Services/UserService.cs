@@ -80,46 +80,66 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
 
     public async Task<dynamic> GetUsersInRoleAsync(string roleName, UserFilterOptions filterOptions)
     {
-        var data = await _userManager.GetUsersInRoleAsync(roleName);
+        var query = from a in _context.Users
+                    join b in _context.UserRoles on a.Id equals b.UserId
+                    join c in _context.Roles on b.RoleId equals c.Id
+                    where c.Name == roleName
+                    select new
+                    {
+                        a.Id,
+                        a.UserName,
+                        a.Name,
+                        a.PhoneNumber,
+                        a.Email,
+                        a.Status,
+                        a.BranchId,
+                        a.SmId,
+                        a.TmId,
+                        a.DateOfBirth,
+                        a.Position,
+                        a.Address,
+                        a.ContractDate,
+                        TeamName = a.TeamId != null ? _context.Teams.First(t => t.Id == a.TeamId).Name : null,
+                        a.TeamId,
+                        a.DosId,
+                        a.DotId,
+                        a.Gender,
+                        a.Avatar,
+                        a.ContractCode,
+                        a.CreatedDate,
+                        a.DistrictId,
+                        a.IdentityNumber,
+                        a.LineCode,
+                    };
         if (filterOptions.Status != null)
         {
-            data = data.Where(x => x.Status == filterOptions.Status).ToList();
+            query = query.Where(x => x.Status == filterOptions.Status);
         }
         if (filterOptions.SmId != null)
         {
-            data = data.Where(x => x.SmId == filterOptions.SmId).ToList();
+            query = query.Where(x => x.SmId == filterOptions.SmId);
         }
         if (filterOptions.TmId != null)
         {
-            data = data.Where(x => x.TmId == filterOptions.TmId).ToList();
-        }
-        var user = await _userManager.FindByIdAsync(_hcaService.GetUserId().ToString());
-        if (user is null) return default!;
-        if (!filterOptions.IsAdmin)
-        {
-            data = data.Where(x => x.BranchId == user.BranchId).ToList();
+            query = query.Where(x => x.TmId == filterOptions.TmId);
         }
         if (!string.IsNullOrWhiteSpace(filterOptions.UserName))
         {
-            data = data.Where(x => x.UserName != null && x.UserName.ToLower().Contains(filterOptions.UserName.ToLower())).ToList();
+            query = query.Where(x => x.UserName != null && x.UserName.ToLower().Contains(filterOptions.UserName.ToLower()));
         }
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {
-            data = data.Where(x => !string.IsNullOrEmpty(x.Name) && x.Name.ToLower().Contains(filterOptions.Name.ToLower())).ToList();
+            query = query.Where(x => !string.IsNullOrEmpty(x.Name) && x.Name.ToLower().Contains(filterOptions.Name.ToLower()));
         }
         if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
         {
-            data = data.Where(x => !string.IsNullOrEmpty(x.PhoneNumber) && x.PhoneNumber.ToLower().Contains(filterOptions.PhoneNumber)).ToList();
+            query = query.Where(x => !string.IsNullOrEmpty(x.PhoneNumber) && x.PhoneNumber.ToLower().Contains(filterOptions.PhoneNumber));
         }
         if (!string.IsNullOrWhiteSpace(filterOptions.Email))
         {
-            data = data.Where(x => !string.IsNullOrEmpty(x.Email) && x.Email.ToLower().Contains(filterOptions.Email.ToLower())).ToList();
+            query = query.Where(x => !string.IsNullOrEmpty(x.Email) && x.Email.ToLower().Contains(filterOptions.Email.ToLower()));
         }
-        return new
-        {
-            data,
-            total = data.Count,
-        };
+        return await ListResult<object>.Success(query, filterOptions);
     }
     public async Task<IdentityResult> RemoveFromRoleAsync(RemoveFromRoleModel args)
     {

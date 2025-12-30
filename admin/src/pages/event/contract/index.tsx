@@ -2,12 +2,13 @@ import { apiContractExport, apiContractList } from "@/services/finances/contract
 import { EditOutlined, ExportOutlined, ManOutlined, MoneyCollectOutlined, MoreOutlined, PictureOutlined, PlusOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { useRef, useState } from "react";
-import { Button, Dropdown } from "antd";
+import { Button, Dropdown, Tag } from "antd";
 import ContractPayment from "./components/payment";
 import ContractInvoice from "./components/invoice";
 import { useAccess } from "@umijs/max";
 import ContractForm from "@/components/form/contract";
 import ContractEvidence from "@/components/contract-evidence";
+import dayjs from "dayjs";
 
 const Index: React.FC = () => {
 
@@ -65,8 +66,15 @@ const Index: React.FC = () => {
                     {
                         title: 'Số hợp đồng',
                         dataIndex: 'contractCode',
-                        width: 120,
-                        minWidth: 120
+                        width: 200,
+                        minWidth: 200,
+                        render: (dom, record) => (
+                            <div>
+                                <div className="font-semibold">{dom}</div>
+                                <div className="text-gray-500">Ngày tạo: {dayjs(record.createdDate).format('DD-MM-YYYY')}</div>
+                                <div className="text-gray-500">Nguồn: <span className="text-red-500 font-semibold">{record.sourceName}</span></div>
+                            </div>
+                        )
                     },
                     {
                         title: 'Họ và tên',
@@ -105,32 +113,47 @@ const Index: React.FC = () => {
                         minWidth: 100
                     },
                     {
-                        title: 'Sales',
+                        title: 'Nhân sự',
                         dataIndex: 'salesName',
-                        search: false,
-                        width: 150,
-                        minWidth: 150
+                        render: (_, record) => (
+                            <div>
+                                <div>Sales: {record.salesName}</div>
+                                <div>SM: {record.smName}</div>
+                                <div>DOS: {record.dos}</div>
+                            </div>
+                        ),
+                        minWidth: 180
                     },
                     {
                         title: 'GTHĐ',
                         dataIndex: 'amount',
                         valueType: 'digit',
-                        search: false
+                        search: false,
+                        tip: 'Giá trị hợp đồng',
+                        render: (dom) => (
+                            <Tag color="blue" className="w-full text-center font-semibold border-0 text-sm">{dom}₫</Tag>
+                        ),
                     },
                     {
                         title: 'Đã thanh toán',
                         dataIndex: 'paidAmount',
                         valueType: 'digit',
-                        search: false
+                        search: false,
+                        render: (dom) => (
+                            <Tag color="success" className="w-full text-center font-semibold border-0 text-sm">{dom}₫</Tag>
+                        ),
                     },
                     {
                         title: 'Chờ duyệt',
                         dataIndex: 'pendingAmount',
                         valueType: 'digit',
-                        search: false
+                        search: false,
+                        render: (dom) => (
+                            <Tag color="orange" className="w-full text-center font-semibold border-0 text-sm">{dom}₫</Tag>
+                        ),
                     },
                     {
-                        title: 'SL phiếu thu',
+                        title: 'SL phiếu',
                         dataIndex: 'invoiceCount',
                         valueType: 'digit',
                         search: false
