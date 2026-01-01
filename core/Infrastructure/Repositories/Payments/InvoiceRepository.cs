@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.IO;
 using Waffle.Core.Constants;
 using Waffle.Core.Foundations;
 using Waffle.Core.Interfaces.IRepository.Finances;
@@ -18,6 +17,8 @@ public class InvoiceRepository(ApplicationDbContext context, IHCAService _hcaSer
     {
         await _context.InvoiceHistories.AddAsync(history);
     }
+
+    public async Task<TResult> GetEvidencesAsync(Guid invoiceId) => TResult.Ok(await _context.Evidences.Where(x => x.InvoiceId == invoiceId).AsNoTracking().ToListAsync());
 
     public async Task<List<InvoiceExportListItem>> GetExportListAsync(InvoiceExportFilterOptions filterOptions)
     {

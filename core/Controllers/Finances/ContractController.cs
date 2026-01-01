@@ -59,4 +59,7 @@ public class ContractController(IContractService _contractService) : BaseControl
 
     [HttpDelete("evidence/{id}")]
     public async Task<IActionResult> DeleteEvidenceAsync([FromRoute] Guid id) => Ok(await _contractService.DeleteEvidenceAsync(id));
+
+    [HttpGet("invoice-options")]
+    public async Task<IActionResult> GetInvoiceOptionsAsync([FromQuery] Guid contractId) => Ok(await _contractService.GetInvoiceOptionsAsync(contractId));
 }

@@ -8,6 +8,7 @@ namespace Waffle.Core.Interfaces.IRepository.Finances;
 public interface IInvoiceRepository : IAsyncRepository<Invoice>
 {
     Task AddHistoryAsync(InvoiceHistory history);
+    Task<TResult> GetEvidencesAsync(Guid invoiceId);
     Task<List<InvoiceExportListItem>> GetExportListAsync(InvoiceExportFilterOptions args);
     Task<string?> GetLastInvoiceNumberAsync();
     Task<ListResult<InvoiceListItem>> ListAsync(InvoiceFilterOptions filterOptions);

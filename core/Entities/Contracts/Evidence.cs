@@ -15,6 +15,7 @@ public class Evidence : BaseEntity
     public Guid UploaderId { get; set; }
     [ForeignKey(nameof(EvidenceType))]
     public int? EvidenceTypeId { get; set; }
+    public Guid? InvoiceId { get; set; }
 
     public virtual EvidenceType? EvidenceType { get; set; }
     public virtual Contract? Contract { get; set; }

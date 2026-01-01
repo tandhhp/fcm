@@ -211,4 +211,6 @@ public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<A
         await _invoiceRepository.UpdateAsync(invoice);
         return TResult.Success;
     }
+
+    public Task<TResult> GetEvidencesAsync(Guid invoiceId) => _invoiceRepository.GetEvidencesAsync(invoiceId);
 }

@@ -193,6 +193,8 @@ public class ContractService(IContractRepository _contractRepository, IWebHostEn
 
     public Task<object> GetEvidenceTypeOptionsAsync() => _contractRepository.GetEvidenceTypeOptionsAsync();
 
+    public Task<object> GetInvoiceOptionsAsync(Guid contractId) => _contractRepository.GetInvoiceOptionsAsync(contractId);
+
     public Task<ListResult<object>> GetInvoicesAsync(ContractInvoiceFilterOptions filterOptions) => _contractRepository.GetInvoicesAsync(filterOptions);
 
     public Task<object?> GetLeadOptionsAsync(ContactLeadSelectOptions selectOptions) => _contractRepository.GetLeadOptionsAsync(selectOptions);
@@ -244,7 +246,8 @@ public class ContractService(IContractRepository _contractRepository, IWebHostEn
                 Url = $"{host}/uploads/evidences/{fileName}",
                 UploaderId = _hcaService.GetUserId(),
                 EvidenceTypeId = args.EvidenceTypeId,
-                UploadAt = DateTime.Now
+                UploadAt = DateTime.Now,
+                InvoiceId = args.InvoiceId
             };
             evidences.Add(evidence);
         }

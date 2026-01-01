@@ -21,4 +21,5 @@ public interface IContractRepository : IAsyncRepository<Contract>
     Task<TResult<object>> GetEvidencesAsync(Guid contractId);
     Task<TResult> DeleteEvidenceAsync(Guid id);
     Task<TResult> GiftContractAsync(ContractGiftArgs args);
+    Task<object> GetInvoiceOptionsAsync(Guid contractId);
 }

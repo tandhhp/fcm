@@ -17,6 +17,7 @@ public interface IContractService
     Task<Contract?> FindAsync(Guid contractId);
     Task<TResult<object>> GetEvidencesAsync(Guid contractId);
     Task<object> GetEvidenceTypeOptionsAsync();
+    Task<object> GetInvoiceOptionsAsync(Guid contractId);
     Task<ListResult<object>> GetInvoicesAsync(ContractInvoiceFilterOptions filterOptions);
     Task<object?> GetLeadOptionsAsync(ContactLeadSelectOptions selectOptions);
     Task<TResult> GiftContractAsync(ContractGiftArgs args);

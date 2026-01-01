@@ -100,3 +100,9 @@ export async function apiContractEvidenceTypeOptions(params: any) {
     params
   });
 }
+
+export async function apiContractInvoiceOptions(params: any) {
+  return request('contract/invoice-options', {
+    params
+  });
+}

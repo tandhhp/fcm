@@ -182,6 +182,15 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
         return await query.ToListAsync();
     }
 
+    public async Task<object> GetInvoiceOptionsAsync(Guid contractId)
+    {
+        return await _context.Invoices.Where(i => i.ContractId == contractId).Select(i => new
+        {
+            Label = $"{i.InvoiceNumber} - {i.Amount:N0} VND",
+            Value = i.Id
+        }).ToListAsync();
+    }
+
     public async Task<ListResult<object>> GetInvoicesAsync(ContractInvoiceFilterOptions filterOptions)
     {
         var query = from i in _context.Invoices

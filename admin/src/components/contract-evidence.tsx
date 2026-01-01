@@ -1,9 +1,9 @@
-import { apiContractEvidenceDelete, apiContractEvidenceList, apiContractEvidenceTypeOptions, apiContractEvidenceUpload } from "@/services/finances/contract";
+import { apiContractEvidenceDelete, apiContractEvidenceList, apiContractEvidenceTypeOptions, apiContractEvidenceUpload, apiContractInvoiceOptions } from "@/services/finances/contract";
 import { DeleteOutlined, DownloadOutlined } from "@ant-design/icons";
-import { DrawerForm, DrawerFormProps, ProFormSelect, ProFormUploadButton } from "@ant-design/pro-components"
+import { DrawerForm, DrawerFormProps, ProFormInstance, ProFormSelect, ProFormUploadButton } from "@ant-design/pro-components"
 import { Button, Empty, Image, message, Popconfirm } from "antd";
 import { RcFile } from "antd/lib/upload";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Props = DrawerFormProps & {
     contractId?: string;
@@ -22,6 +22,8 @@ const ContractEvidence: React.FC<Props> = ({ contractId, ...rest }) => {
     }[]>([]);
 
     const [evidenceTypeId, setEvidenceTypeId] = useState<number>();
+    const [invoiceId, setInvoiceId] = useState<string>();
+    const formRef = useRef<ProFormInstance>(null);
 
     const fetchData = () => {
         if (!contractId) {
@@ -54,17 +56,22 @@ const ContractEvidence: React.FC<Props> = ({ contractId, ...rest }) => {
         const formData = new FormData();
         formData.append('contractId', contractId);
         formData.append('evidenceTypeId', evidenceTypeId.toString());
+        if (invoiceId) {
+            formData.append('invoiceId', invoiceId);
+        }
         fileList.forEach((file) => {
             formData.append('files', file);
         });
         await apiContractEvidenceUpload(formData);
         message.success('Tải lên thành công');
+        setEvidenceTypeId(undefined);
+        setInvoiceId(undefined);
         fetchData();
         return false;
     }
 
     return (
-        <DrawerForm
+        <DrawerForm formRef={formRef}
             {...rest}
             title="Thư viện ảnh hợp đồng"
             drawerProps={{
@@ -75,12 +82,26 @@ const ContractEvidence: React.FC<Props> = ({ contractId, ...rest }) => {
             <div className="mb-4 flex gap-4">
                 <div className="flex-1">
                     <ProFormSelect
-                        onChange={(value: number) => setEvidenceTypeId(value)}
+                        onChange={(value: number) => {
+                            setEvidenceTypeId(value);
+                            setInvoiceId(undefined);
+                            formRef.current?.setFieldValue('invoiceId', undefined);
+                        }}
                         name="evidenceTypeId" label="Loại chứng từ" request={apiContractEvidenceTypeOptions} allowClear={false} rules={[
                             {
                                 required: true
                             }
                         ]} />
+                </div>
+                <div className="flex-1">
+                    <ProFormSelect
+                        disabled={evidenceTypeId !== 3}
+                        onChange={(value: string) => setInvoiceId(value)}
+                        name="invoiceId" label="Chứng từ liên quan" request={apiContractInvoiceOptions}
+                        params={{
+                            contractId
+                        }}
+                        showSearch />
                 </div>
                 <ProFormUploadButton
                     disabled={!evidenceTypeId}

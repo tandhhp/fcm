@@ -44,4 +44,7 @@ public class InvoiceController(IInvoiceService _invoiceService) : BaseController
 
     [HttpGet("histories/{invoiceId}")]
     public async Task<IActionResult> GetHistoriesAsync([FromRoute] Guid invoiceId, [FromQuery] FilterOptions filterOptions) => Ok(await _invoiceService.GetHistoriesAsync(invoiceId, filterOptions));
+
+    [HttpGet("evidences")]
+    public async Task<IActionResult> GetEvidencesAsync([FromQuery] Guid invoiceId) => Ok(await _invoiceService.GetEvidencesAsync(invoiceId));
 }
