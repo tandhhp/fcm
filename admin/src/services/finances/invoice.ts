@@ -64,3 +64,9 @@ export async function apiInvoiceDelete(id: string) {
         method: 'DELETE'
     });
 }
+
+export async function apiInvoiceEvidences(invoiceId: string) {
+    return request(`invoice/evidences`, {
+        params: { invoiceId }
+    });
+}

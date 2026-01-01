@@ -168,7 +168,7 @@ public class ReportController(ApplicationDbContext _context, UserManager<Applica
     public async Task<IActionResult> SalesAsync([FromQuery] int year)
     {
         var userId = _hcaService.GetUserId();
-        var query = from a in _context.Users.Where(x => x.Status == UserStatus.Working)
+        var query = from a in _context.Users //.Where(x => x.Status == UserStatus.Working)
                     join b in _context.Invoices on a.Id equals b.SalesId
                     where b.Amount > 0 && b.Status == InvoiceStatus.Approved && b.CreatedAt.Year == year
                     select new

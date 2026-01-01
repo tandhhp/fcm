@@ -21,10 +21,10 @@ public class ContractLeaveVoucherUsageController(ApplicationDbContext db) : Base
         return Ok(await ListResult<object>.Success(data, filterOptions));
     }
 
-    public record CreateArgs(Guid ContractId, string VoucherName, DateTime UsedDate, int PeopleCount, decimal Amount);
+    public record CreateArgs1(Guid ContractId, string VoucherName, DateTime UsedDate, int PeopleCount, decimal Amount);
 
     [HttpPost]
-    public async Task<IActionResult> CreateAsync([FromBody] CreateArgs args)
+    public async Task<IActionResult> CreateAsync([FromBody] CreateArgs1 args)
     {
         if (args.ContractId == Guid.Empty) return BadRequest("ContractId không hợp lệ!");
         if (string.IsNullOrWhiteSpace(args.VoucherName)) return BadRequest("Tên phiếu là bắt buộc!");
@@ -52,10 +52,10 @@ public class ContractLeaveVoucherUsageController(ApplicationDbContext db) : Base
         return Ok(TResult.Success);
     }
 
-    public record UpdateArgs(Guid Id, string VoucherName, DateTime UsedDate, int PeopleCount, decimal Amount);
+    public record UpdateArgs1(Guid Id, string VoucherName, DateTime UsedDate, int PeopleCount, decimal Amount);
 
     [HttpPut]
-    public async Task<IActionResult> UpdateAsync([FromBody] UpdateArgs args)
+    public async Task<IActionResult> UpdateAsync([FromBody] UpdateArgs1 args)
     {
         if (args.Id == Guid.Empty) return BadRequest("Id không hợp lệ!");
         if (string.IsNullOrWhiteSpace(args.VoucherName)) return BadRequest("Tên phiếu là bắt buộc!");

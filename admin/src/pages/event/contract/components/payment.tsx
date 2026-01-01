@@ -1,9 +1,9 @@
 import { apiContractPaymentCreate } from "@/services/finances/contract";
-import { apiFileUpload } from "@/services/file-service";
+import { apiFileUpload, apiFileUploadMultiple } from "@/services/file-service";
 import { PaymentMethod } from "@/utils/enum";
 import { ModalForm, ModalFormProps, ProFormDatePicker, ProFormDigit, ProFormInstance, ProFormSelect, ProFormText, ProFormUploadDragger } from "@ant-design/pro-components";
 import { Col, message, Row } from "antd";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import dayjs from "dayjs";
 
 type Props = ModalFormProps & {
@@ -14,6 +14,7 @@ type Props = ModalFormProps & {
 const ContractPayment: React.FC<Props> = (props) => {
 
     const formRef = useRef<ProFormInstance>();
+    const [fileUrlList, setFileUrlList] = useState<any[]>([]);
 
     const onFinish = async (values: any) => {
         if (!props.data) {
@@ -25,7 +26,7 @@ const ContractPayment: React.FC<Props> = (props) => {
             contractId: props.data.id,
             amount: values.amount,
             paymentMethod: values.paymentMethod,
-            evidenceUrl: values.evidenceUrl,
+            evidenceUrls: fileUrlList?.map(item => item) ?? [],
             invoiceNumber: values.invoiceNumber,
             createdDate: values.createdDate ? dayjs(values.createdDate).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
         });
@@ -70,19 +71,20 @@ const ContractPayment: React.FC<Props> = (props) => {
                 title="Tải lên chứng từ"
                 description="Hỗ trợ tải lên file .png .jpg .jpeg"
                 accept=".png,.jpg,.jpeg"
-                name="evidence" label="Chứng từ" max={1} fieldProps={{
+                name="evidence" label="Chứng từ" max={10} fieldProps={{
                     listType: 'picture',
-                    beforeUpload: async (file) => {
-                        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg';
-                        if (!isJpgOrPng) {
-                            message.error('Bạn chỉ có thể tải lên file JPG/PNG!');
-                        }
+                    beforeUpload: async (_, fileList) => {
                         const formData = new FormData();
-                        formData.append('file', file);
-                        const response = await apiFileUpload(formData);
-                        formRef.current?.setFieldValue('evidenceUrl', response.data.url);
+                        fileList.forEach(file => {
+                            formData.append('files', file);
+                        });
+                        const response = await apiFileUploadMultiple(formData);
+                        message.success('Tải lên thành công');
+                        const urls = response.data.map((item: any) => (item.url));
+                        setFileUrlList(urls);
                         return false;
-                    }
+                    },
+                    multiple: true
                 }} />
             <ProFormText name={"evidenceUrl"} hidden />
         </ModalForm>

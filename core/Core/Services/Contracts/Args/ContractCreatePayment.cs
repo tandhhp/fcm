@@ -6,7 +6,7 @@ public class ContractCreatePayment
 {
     public Guid ContractId { get; set; }
     public decimal Amount { get; set; }
-    public string EvidenceUrl { get; set; } = default!;
+    public List<string>? EvidenceUrls { get; set; }
     public string? Note { get; set; }
     public PaymentMethod PaymentMethod { get; set; }
     public string InvoiceNumber { get; set; } = default!;

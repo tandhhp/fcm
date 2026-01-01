@@ -18,6 +18,6 @@ public class FileContent : BaseEntity
     [JsonPropertyName("url")]
     [StringLength(2048)]
     public string Url { get; set; } = default!;
-    public DateTime UploadDate { get; set; }
+    public DateTime UploadDate { get; set; } = DateTime.UtcNow;
     public Guid UploadBy { get; set; }
 }

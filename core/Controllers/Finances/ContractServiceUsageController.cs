@@ -18,8 +18,6 @@ public class ContractServiceUsageController(ApplicationDbContext db) : BaseContr
         return Ok(await ListResult<object>.Success(data, filterOptions));
     }
 
-    public record CreateArgs(Guid ContractId, string ServiceName, DateTime UsedDate, int PeopleCount, decimal Amount);
-
     [HttpPost]
     public async Task<IActionResult> CreateAsync([FromBody] CreateArgs args)
     {
@@ -35,10 +33,8 @@ public class ContractServiceUsageController(ApplicationDbContext db) : BaseContr
         };
         db.ContractServiceUsages.Add(entity);
         await db.SaveChangesAsync();
-        return Ok(entity);
+        return Ok();
     }
-
-    public record UpdateArgs(Guid Id, string ServiceName, DateTime UsedDate, int PeopleCount, decimal Amount);
 
     [HttpPut]
     public async Task<IActionResult> UpdateAsync([FromBody] UpdateArgs args)
@@ -53,7 +49,7 @@ public class ContractServiceUsageController(ApplicationDbContext db) : BaseContr
         entity.ModifiedDate = DateTime.UtcNow;
 
         await db.SaveChangesAsync();
-        return Ok(entity);
+        return Ok();
     }
 
     [HttpDelete("{id:guid}")]
@@ -65,4 +61,22 @@ public class ContractServiceUsageController(ApplicationDbContext db) : BaseContr
         await db.SaveChangesAsync();
         return Ok();
     }
+}
+
+public class UpdateArgs
+{
+    public Guid Id { get; set; }
+    public string ServiceName { get; set; } = default!;
+    public DateTime UsedDate { get; set; }
+    public int PeopleCount { get; set; }
+    public decimal Amount { get; set; }
+}
+
+public class CreateArgs
+{
+    public Guid ContractId { get; set; }
+    public string ServiceName { get; set; } = default!;
+    public DateTime UsedDate { get; set; }
+    public int PeopleCount { get; set; }
+    public decimal Amount { get; set; }
 }

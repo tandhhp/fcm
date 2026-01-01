@@ -29,17 +29,31 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
     {
         var invoice = new Invoice
         {
+            Id = Guid.NewGuid(),
             ContractId = args.ContractId,
             Amount = args.Amount,
             Note = args.Note,
             CreatedBy = _hcaService.GetUserId(),
             CreatedAt = args.CreatedDate,
             Status = InvoiceStatus.Pending,
-            EvidenceUrl = args.EvidenceUrl,
             InvoiceNumber = args.InvoiceNumber,
             SalesId = salesId,
             PaymentMethod = args.PaymentMethod
         };
+        if (args.EvidenceUrls != null && args.EvidenceUrls.Count > 0)
+        {
+            await _context.Evidences.AddRangeAsync(args.EvidenceUrls.Select(url => new Evidence
+            {
+                Id = Guid.NewGuid(),
+                ContractId = args.ContractId,
+                Url = url,
+                FileName = System.IO.Path.GetFileName(url),
+                UploadAt = DateTime.UtcNow,
+                UploaderId = _hcaService.GetUserId(),
+                EvidenceTypeId = 3,
+                InvoiceId = invoice.Id
+            }));
+        }
         await _context.Invoices.AddAsync(invoice);
         await _context.SaveChangesAsync();
         return TResult.Success;

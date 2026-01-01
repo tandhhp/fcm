@@ -73,3 +73,13 @@ export async function countFile() {
 export async function totalFileSize() {
   return request(`file/total-size`);
 }
+
+export async function apiFileUploadMultiple(data: FormData) {
+  return request(`file/upload-multiple`, {
+    method: 'POST',
+    data,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+}

@@ -53,11 +53,46 @@ public class FileController(IWebHostEnvironment webHostEnvironment, ApplicationD
             Name = file.FileName,
             Size = file.Length,
             Type = file.ContentType,
-            Url = url
+            Url = url,
+            UploadBy = _hcaService.GetUserId(),
+            UploadDate = DateTime.UtcNow
         };
         await _context.FileContents.AddAsync(fileC);
         await _context.SaveChangesAsync();
         return Ok(TResult<object>.Ok(fileC));
+    }
+
+    [HttpPost("upload-multiple")]
+    public async Task<IActionResult> UploadMultipleAsync([FromForm] FileUploadMultipleArgs args)
+    {
+        if (args is null || args.Files is null || args.Files.Count == 0) return BadRequest("Files not found!");
+        var uploadedFiles = new List<FileContent>();
+        var folderPath = _hcaService.GetUserId().ToString();
+        var uploadPath = Path.Combine(_webHostEnvironment.WebRootPath, "files", folderPath);
+        if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+        foreach (var file in args.Files)
+        {
+            if (file.Length == 0 || file.Length > 10485760) continue; // Skip empty files or files larger than 10MB
+            var filePath = Path.Combine(uploadPath, file.FileName);
+            using (var stream = System.IO.File.Create(filePath))
+            {
+                await file.CopyToAsync(stream);
+            }
+            var url = $"{Request.Scheme}://{Request.Host}/files/{folderPath}/{file.FileName}";
+            var fileC = new FileContent
+            {
+                Name = file.FileName,
+                Size = file.Length,
+                Type = file.ContentType,
+                Url = url,
+                UploadBy = _hcaService.GetUserId(),
+                UploadDate = DateTime.UtcNow
+            };
+            uploadedFiles.Add(fileC);
+            await _context.FileContents.AddAsync(fileC);
+        }
+        await _context.SaveChangesAsync();
+        return Ok(TResult<object>.Ok(uploadedFiles));
     }
 
     [HttpGet("{id}")]

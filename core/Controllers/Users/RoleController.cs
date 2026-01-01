@@ -57,7 +57,9 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
         var users = await _userManager.GetUsersInRoleAsync(name);
         var user = await _userManager.FindByIdAsync(User.GetClaimId());
         if (user == null) return Unauthorized();
-        users = users.Where(x => x.Status == UserStatus.Working).Where(x => x.BranchId == user.BranchId).ToList();
+        users = users
+            //.Where(x => x.Status == UserStatus.Working)
+            .Where(x => x.BranchId == user.BranchId).ToList();
         return Ok(users.Select(x => new
         {
             label = $"{x.Name} - {x.UserName}",
@@ -82,7 +84,7 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
         var query = from a in _context.Users
                     join b in _context.UserRoles on a.Id equals b.UserId
                     join c in _context.Roles on b.RoleId equals c.Id
-                    where c.Name == RoleName.SalesManager && a.Status == UserStatus.Working
+                    where c.Name == RoleName.SalesManager //&& a.Status == UserStatus.Working
                     select new
                     {
                         a.Name,
@@ -116,7 +118,7 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
         var query = from a in _context.Users
                     join b in _context.UserRoles on a.Id equals b.UserId
                     join c in _context.Roles on b.RoleId equals c.Id
-                    where c.Name == RoleName.Dot && a.Status == UserStatus.Working
+                    where c.Name == RoleName.Dot //&& a.Status == UserStatus.Working
                     select new
                     {
                         a.Name,
@@ -139,7 +141,7 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
         var query = from a in _context.Users
                     join b in _context.UserRoles on a.Id equals b.UserId
                     join c in _context.Roles on b.RoleId equals c.Id
-                    where c.Name == RoleName.TelesaleManager && a.Status == UserStatus.Working
+                    where c.Name == RoleName.TelesaleManager //&& a.Status == UserStatus.Working
                     select new
                     {
                         a.Name,
@@ -163,7 +165,7 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
         var query = from a in _context.Users
                     join b in _context.UserRoles on a.Id equals b.UserId
                     join c in _context.Roles on b.RoleId equals c.Id
-                    where c.Name == RoleName.Telesale && a.Status == UserStatus.Working
+                    where c.Name == RoleName.Telesale //&& a.Status == UserStatus.Working
                     select new
                     {
                         a.Name,
@@ -246,7 +248,7 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
         var query = from a in _context.Users
                     join b in _context.UserRoles on a.Id equals b.UserId
                     join c in _context.Roles on b.RoleId equals c.Id
-                    where (c.Name == RoleName.SalesManager || c.Name == RoleName.TelesaleManager) && a.Status == UserStatus.Working
+                    where (c.Name == RoleName.SalesManager || c.Name == RoleName.TelesaleManager) //&& a.Status == UserStatus.Working
                     select new
                     {
                         a.Name,
@@ -279,7 +281,7 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
         var query = from a in _context.Users
                     join b in _context.UserRoles on a.Id equals b.UserId
                     join c in _context.Roles on b.RoleId equals c.Id
-                    where c.Name == roleName && a.Status == UserStatus.Working
+                    where c.Name == roleName //&& a.Status == UserStatus.Working
                     select new
                     {
                         a.Name,

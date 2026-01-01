@@ -986,7 +986,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
     public async Task<IActionResult> GetOptionsAsync([FromQuery] Guid? telesalesManagerId)
     {
         var query = from a in _context.Users
-                    where a.Status == UserStatus.Working
+                    //where a.Status == UserStatus.Working
                     select new
                     {
                         a.TmId,
@@ -1012,7 +1012,9 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
         var user = await _userManager.FindByIdAsync(User.GetId().ToString());
         if (user is null) return Unauthorized();
 
-        query = query.Where(x => x.BranchId == user.BranchId && x.Status == UserStatus.Working).ToList();
+        query = query.Where(x => x.BranchId == user.BranchId)
+            //.Where(x => x.Status == UserStatus.Working)
+            .ToList();
 
         return Ok(query.Select(x => new
         {
@@ -1052,7 +1054,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
         var query = from a in _context.Users
                     join b in _context.UserRoles on a.Id equals b.UserId
                     join c in _context.Roles on b.RoleId equals c.Id
-                    where c.Name == RoleName.TelesaleManager && a.Status == UserStatus.Working
+                    where c.Name == RoleName.TelesaleManager //&& a.Status == UserStatus.Working
                     select new
                     {
                         a.Id,
@@ -1111,7 +1113,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                     join c in _context.Roles on b.RoleId equals c.Id
                     join d in _context.Users on a.SmId equals d.Id into ad
                     from d in ad.DefaultIfEmpty()
-                    where c.Name == RoleName.Sales && a.SmId != null && a.Status == UserStatus.Working
+                    where c.Name == RoleName.Sales && a.SmId != null// && a.Status == UserStatus.Working
                     select new
                     {
                         label = $"{a.Name} - {a.UserName}",
@@ -1151,7 +1153,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                     join c in _context.Roles on b.RoleId equals c.Id
                     join d in _context.Users on a.TmId equals d.Id into ad
                     from d in ad.DefaultIfEmpty()
-                    where c.Name == RoleName.Telesale && a.TmId != null && a.Status == UserStatus.Working
+                    where c.Name == RoleName.Telesale && a.TmId != null //&& a.Status == UserStatus.Working
                     select new
                     {
                         label = $"{a.Name} - {a.UserName}",
@@ -1227,7 +1229,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
         var query = from a in _context.Users
                     join b in _context.UserRoles on a.Id equals b.UserId
                     join c in _context.Roles on b.RoleId equals c.Id
-                    where c.Name == RoleName.Sales && a.Status == UserStatus.Working
+                    where c.Name == RoleName.Sales //&& a.Status == UserStatus.Working
                     select new
                     {
                         label = $"{a.Name} - {a.UserName}",
@@ -1604,9 +1606,9 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
     public async Task<IActionResult> GetSmDosOptionsAsync()
     {
         var dos = await _userManager.GetUsersInRoleAsync(RoleName.Dos);
-        dos = [.. dos.Where(x => x.Status == UserStatus.Working)];
+        //dos = [.. dos.Where(x => x.Status == UserStatus.Working)];
         var sm = await _userManager.GetUsersInRoleAsync(RoleName.SalesManager);
-        sm = [.. sm.Where(x => x.Status == UserStatus.Working)];
+        //sm = [.. sm.Where(x => x.Status == UserStatus.Working)];
         return Ok(new[]
         {
             new {
