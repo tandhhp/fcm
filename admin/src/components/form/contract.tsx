@@ -7,6 +7,7 @@ import { ModalForm, ModalFormProps, ProFormDatePicker, ProFormDigit, ProFormInst
 import { Col, message, Row } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { apiSourceOptions } from "@/services/settings/source";
+import { SOURCE_CONTRACT_OPTIONS } from "@/utils/constants";
 
 type Props = ModalFormProps & {
     reload?: () => void;
@@ -152,7 +153,7 @@ const ContractForm: React.FC<Props> = (props) => {
                     <Col md={6} xs={24}>
                         <ProFormSelect name={"sourceId"}
                             showSearch
-                            label="Nguồn" rules={[{ required: true }]} request={apiSourceOptions} />
+                            label="Nguồn" rules={[{ required: true }]} options={SOURCE_CONTRACT_OPTIONS} allowClear={false} />
                     </Col>
                     <Col md={6} xs={24}>
                         <ProFormText name="code" label="Số hợp đồng" rules={[

@@ -1,5 +1,6 @@
 import { apiCloseDeal } from "@/services/event";
 import { apiCardOptions } from "@/services/settings/card";
+import { SOURCE_CONTRACT_OPTIONS } from "@/utils/constants";
 import { ModalForm, ModalFormProps, ProDescriptions, ProFormDigit, ProFormInstance, ProFormSelect, ProFormText } from "@ant-design/pro-components";
 import { Col, message, Row } from "antd";
 import { useRef } from "react";
@@ -50,24 +51,7 @@ const CloseDealForm: React.FC<Props> = (props) => {
                             }
                         ]}
                         allowClear={false}
-                        options={[
-                            {
-                                label: 'PRIVATE',
-                                value: 1
-                            },
-                            {
-                                label: 'OUTSIDE',
-                                value: 5
-                            },
-                            {
-                                label: 'TELE INHOUSE',
-                                value: 3
-                            },
-                            {
-                                label: 'TELE Đại lý',
-                                value: 4
-                            }
-                        ]}
+                        options={SOURCE_CONTRACT_OPTIONS}
                     />
                 </Col>
                 <Col md={12} xs={24}>

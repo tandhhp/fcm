@@ -34,11 +34,10 @@ export enum UserStatus {
   Leave
 }
 
-export enum TransactionType
-{
-    Default,
-    Bonus,
-    Loan
+export enum TransactionType {
+  Default,
+  Bonus,
+  Loan
 }
 
 export const SETTING_NAME = {
@@ -55,3 +54,22 @@ export const GENDER_OPTIONS = [
     value: true
   }
 ];
+
+export const SOURCE_CONTRACT_OPTIONS = [
+  {
+    label: 'PRIVATE',
+    value: 1
+  },
+  {
+    label: 'OUTSIDE',
+    value: 5
+  },
+  {
+    label: 'TELE INHOUSE',
+    value: 3
+  },
+  {
+    label: 'TELE Đại lý',
+    value: 4
+  }
+]

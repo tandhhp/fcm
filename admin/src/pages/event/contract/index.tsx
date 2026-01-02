@@ -66,7 +66,6 @@ const Index: React.FC = () => {
                     {
                         title: 'Số hợp đồng',
                         dataIndex: 'contractCode',
-                        width: 200,
                         minWidth: 200,
                         render: (dom, record) => (
                             <div>
@@ -85,16 +84,15 @@ const Index: React.FC = () => {
                             }
                             return <><ManOutlined className="text-blue-500" /> {record.customerName}</>
                         },
-                        width: 200,
-                        minWidth: 150
+                        minWidth: 200
                     },
                     {
                         title: 'Năm sinh',
                         dataIndex: 'dateOfBirth',
                         valueType: 'dateYear',
                         search: false,
-                        width: 100,
-                        minWidth: 100
+                        width: 80,
+                        minWidth: 80
                     },
                     {
                         title: 'SDT',
@@ -109,20 +107,20 @@ const Index: React.FC = () => {
                         dataIndex: 'createdDate',
                         valueType: 'date',
                         search: false,
-                        width: 100,
-                        minWidth: 100
+                        width: 90,
+                        minWidth: 90
                     },
                     {
                         title: 'Nhân sự',
                         dataIndex: 'salesName',
                         render: (_, record) => (
                             <div>
-                                <div>Sales: {record.salesName}</div>
-                                <div>SM: {record.smName}</div>
-                                <div>DOS: {record.dos}</div>
+                                <div><span className="text-sky-500">Sales</span>: {record.salesName}</div>
+                                <div><span className="text-blue-500">SM</span>: {record.smName}</div>
+                                <div><span className="text-green-500">DOS</span>: {record.dos}</div>
                             </div>
                         ),
-                        minWidth: 180
+                        minWidth: 200
                     },
                     {
                         title: 'GTHĐ',
@@ -135,7 +133,7 @@ const Index: React.FC = () => {
                         ),
                     },
                     {
-                        title: 'Đã thanh toán',
+                        title: 'Đã TT',
                         dataIndex: 'paidAmount',
                         valueType: 'digit',
                         search: false,
