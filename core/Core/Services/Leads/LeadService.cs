@@ -139,7 +139,6 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
         }
         var feedback = await _leadRepository.GetFeedbackAsync(lead.Id);
         var creator = await _userManager.FindByIdAsync(lead.CreatedBy.ToString());
-        if (creator == null) return TResult<object>.Failed("Không tìm thấy người tạo khách hàng!");
         return TResult<object>.Ok(new
         {
             lead.Id,
@@ -166,7 +165,7 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
             sales.DosId,
             feedback?.TableId,
             SubLeads = await _leadRepository.GetSubLeadsAsync(lead.Id),
-            CreatorLeaderId = creator.SmId,
+            CreatorLeaderId = creator?.SmId,
             lead.Voucher1Id,
             lead.Voucher2Id
         });
