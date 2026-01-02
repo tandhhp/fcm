@@ -31,7 +31,7 @@ public class EventService(ApplicationDbContext _context, IEventRepository _event
             if (args.ContractAmount <= 0) return TResult.Failed("Số tiền hợp đồng không hợp lệ!");
             if (await _contractService.AnyAsync(args.ContractCode)) return TResult.Failed("Mã hợp đồng đã tồn tại!");
             if (lead.SalesId is null) return TResult.Failed("Bạn chưa chọn Rep!");
-            await _eventRepository.CreateContractAsync(lead, args.ContractCode, args.ContractAmount, args.CardId);
+            await _eventRepository.CreateContractAsync(lead, args.ContractCode, args.ContractAmount, args.CardId, args.SourceId);
             lead.Status = LeadStatus.LeadAccept;
             _context.Leads.Update(lead);
             await _context.SaveChangesAsync();

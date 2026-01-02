@@ -11,7 +11,7 @@ namespace Waffle.Core.Interfaces.IRepository.Events;
 
 public interface IEventRepository : IAsyncRepository<Event>
 {
-    Task<TResult> CreateContractAsync(Lead lead, string contractCode, decimal amount, Guid? cardId);
+    Task<TResult> CreateContractAsync(Lead lead, string contractCode, decimal amount, Guid? cardId, int sourceId);
     Task<ListResult<object>> GetListAsync(EventFilterOptions filterOptions);
     Task<object> KeyInOptionsAsync(KeyInSelectOptions selectOptions);
     Task<object> OptionsAsync();

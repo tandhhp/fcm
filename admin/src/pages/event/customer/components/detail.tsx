@@ -33,7 +33,7 @@ export const LeadDetail: React.FC<Props> = (props) => {
                 className="mb-4"
                 request={apiLeadCheckinList}
                 params={{
-                    identityNumber: data?.identityNumber
+                    identityNumber: data?.identityNumber || 'none',
                 }}
                 rowKey="id"
                 search={false}

@@ -16,6 +16,7 @@ const Index: React.FC = () => {
     return (
         <PageContainer>
             <ProTable
+                headerTitle="Danh sách khách hàng"
                 actionRef={actionRef}
                 rowKey={"id"}
                 request={apiLeadNoDupsList}
@@ -64,7 +65,7 @@ const Index: React.FC = () => {
                     },
                     {
                         title: 'Số CCCD',
-                        dataIndex: 'key',
+                        dataIndex: 'identityNumber',
                         width: 100
                     },
                     {

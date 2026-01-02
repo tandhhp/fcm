@@ -6,4 +6,5 @@ public class CloseDealArgs
     public string? ContractCode { get; set; }
     public Guid? CardId { get; set; }
     public decimal ContractAmount { get; set; }
+    public int SourceId { get; set; }
 }

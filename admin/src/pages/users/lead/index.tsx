@@ -181,8 +181,8 @@ const LeadPage: React.FC = () => {
                         dataIndex: 'dateOfBirth',
                         valueType: 'dateYear',
                         search: false,
-                        width: 90,
-                        minWidth: 90
+                        width: 80,
+                        minWidth: 80
                     },
                     {
                         title: 'Số CCCD',
@@ -237,10 +237,19 @@ const LeadPage: React.FC = () => {
                     {
                         title: 'Khung giờ',
                         dataIndex: 'eventId',
-                        width: 100,
+                        width: 90,
                         valueType: 'select',
                         request: apiEventOptions,
-                        minWidth: 100
+                        minWidth: 90,
+                        render: (_, entity) => {
+                            if (entity.eventName === '18:00') {
+                                return <Tag color="red" className="w-full text-center">18:00</Tag>
+                            }
+                            if (entity.eventName === '14:00') {
+                                return <Tag color="orange" className="w-full text-center">14:00</Tag>
+                            }
+                            return <Tag color="yellow" className="w-full text-center">10:00</Tag>
+                        }
                     },
                     {
                         title: 'Chi nhánh',

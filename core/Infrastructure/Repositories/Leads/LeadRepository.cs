@@ -133,7 +133,11 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
             }
             if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
             {
-                query = query.Where(x => x.PhoneNumber != null && x.PhoneNumber.Contains(filterOptions.PhoneNumber));
+                query = from q in query
+                        join sub in _context.SubLeads on q.Id equals sub.LeadId into subJoin
+                        where q.PhoneNumber != null && q.PhoneNumber.Contains(filterOptions.PhoneNumber) ||
+                              subJoin.Any(s => s.PhoneNumber != null && s.PhoneNumber.Contains(filterOptions.PhoneNumber))
+                        select q;
             }
             if (!string.IsNullOrWhiteSpace(filterOptions.Name))
             {
@@ -383,13 +387,13 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
         var data = query.GroupBy(x => x.IdentityNumber)
             .Select(x => new
             {
-                x.Key,
+                IdentityNumber = x.Key,
                 x.First().Id,
                 x.First().Name,
                 x.First().PhoneNumber,
                 x.First().DateOfBirth,
                 x.First().Note,
-                Count = x.Count(),
+                Count = x.Count(g => !string.IsNullOrEmpty(x.Key)),
                 x.First().Duplicated
             });
         return await ListResult<object>.Success(data, filterOptions);

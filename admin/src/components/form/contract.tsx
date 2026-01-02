@@ -150,7 +150,9 @@ const ContractForm: React.FC<Props> = (props) => {
                         <ProFormSelect name={"toById"} label="T.O" rules={[{ required: true }]} request={apiEventToOptions} showSearch />
                     </Col>
                     <Col md={6} xs={24}>
-                        <ProFormSelect name={"sourceId"} label="Nguồn" rules={[{ required: true }]} request={apiSourceOptions} />
+                        <ProFormSelect name={"sourceId"}
+                            showSearch
+                            label="Nguồn" rules={[{ required: true }]} request={apiSourceOptions} />
                     </Col>
                     <Col md={6} xs={24}>
                         <ProFormText name="code" label="Số hợp đồng" rules={[

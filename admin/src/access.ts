@@ -68,7 +68,7 @@ export default (initialState: { currentUser?: API.User }) => {
   || currentUser.roles.includes('admin'));
 
   const dos = currentUser && currentUser.roles.includes('dos');
-  const sm = currentUser && (currentUser.roles.includes('sm') || canAdmin);
+  const sm = currentUser && (currentUser.roles.includes('sm'));
   const sales = currentUser && (currentUser.roles.includes('sales'));
   const event = currentUser && (currentUser.roles.includes('event') || canAdmin);
   const telesale = currentUser && (currentUser.roles.includes('Telesale'));

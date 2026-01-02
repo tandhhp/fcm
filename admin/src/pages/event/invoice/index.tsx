@@ -122,7 +122,7 @@ const Index: React.FC = () => {
                                             setInvoice(record);
                                             setOpenForm(true);
                                         },
-                                        disabled: !access.event && !access.accountant || record.status !== 0
+                                        disabled: (!access.event && !access.accountant && !access.canAdmin) || record.status !== 0
                                     }
                                 ]
                             }}>

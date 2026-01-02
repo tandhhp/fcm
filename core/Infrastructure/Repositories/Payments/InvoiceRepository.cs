@@ -78,7 +78,8 @@ public class InvoiceRepository(ApplicationDbContext context, IHCAService _hcaSer
         var userId = _hcaService.GetUserId();
         var query = from i in _context.Invoices
                     join c in _context.Contracts on i.ContractId equals c.Id
-                    join s in _context.Users on i.SalesId equals s.Id
+                    join s in _context.Users on i.SalesId equals s.Id into sc
+                    from s in sc.DefaultIfEmpty()
                     select new InvoiceListItem
                     {
                         Id = i.Id,

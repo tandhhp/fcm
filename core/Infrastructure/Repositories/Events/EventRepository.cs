@@ -18,11 +18,12 @@ namespace Waffle.Infrastructure.Repositories.Events;
 
 public class EventRepository(ApplicationDbContext context, IHCAService _hcaService) : EfRepository<Event>(context), IEventRepository
 {
-    public async Task<TResult> CreateContractAsync(Lead lead, string contractCode, decimal amount, Guid? cardId)
+    public async Task<TResult> CreateContractAsync(Lead lead, string contractCode, decimal amount, Guid? cardId, int sourceId)
     {
         var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == lead.CreatedBy);
         if (user is null) return TResult.Failed("Người tạo không hợp lệ!");
         if (lead.SalesId is null) return TResult.Failed("Nhân viên kinh doanh không hợp lệ!");
+        if (!await _context.Sources.AnyAsync(x => x.Id == sourceId)) return TResult.Failed("Nguồn không hợp lệ!");
         await _context.Contracts.AddAsync(new Contract
         {
             Amount = amount,
@@ -32,9 +33,9 @@ public class EventRepository(ApplicationDbContext context, IHCAService _hcaServi
             CreatedDate = DateTime.Now,
             SalesId = lead.SalesId,
             ToById = lead.ToById,
-            SourceId = lead.SourceId,
+            SourceId = sourceId,
             KeyInId = lead.CreatedBy,
-            TeamKeyInId = user.TmId ?? user.SmId,
+            TeamKeyInId = user.ManagerId,
             LeadId = lead.Id
         });
         return TResult.Success;

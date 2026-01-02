@@ -37,15 +37,43 @@ const CloseDealForm: React.FC<Props> = (props) => {
                 <ProDescriptions.Item label="T.O">{props.data?.toName}</ProDescriptions.Item>
             </ProDescriptions>
             <Row gutter={16}>
-                <Col md={8} xs={24}>
+                <Col md={12} xs={24}>
                     <ProFormText name="contractCode" label="Số hợp đồng" rules={[
                         { required: true, message: 'Vui lòng nhập số hợp đồng' }
                     ]} />
                 </Col>
-                <Col md={8} xs={24}>
+                <Col md={12} xs={24}>
+                    <ProFormSelect name="sourceId" label="Nguồn hợp đồng"
+                        rules={[
+                            {
+                                required: true
+                            }
+                        ]}
+                        allowClear={false}
+                        options={[
+                            {
+                                label: 'PRIVATE',
+                                value: 1
+                            },
+                            {
+                                label: 'OUTSIDE',
+                                value: 5
+                            },
+                            {
+                                label: 'TELE INHOUSE',
+                                value: 3
+                            },
+                            {
+                                label: 'TELE Đại lý',
+                                value: 4
+                            }
+                        ]}
+                    />
+                </Col>
+                <Col md={12} xs={24}>
                     <ProFormSelect name="cardId" label="Thẻ" request={apiCardOptions} />
                 </Col>
-                <Col md={8} xs={24}>
+                <Col md={12} xs={24}>
                     <ProFormDigit name="contractAmount" label="GTHĐ" fieldProps={{
                         formatter: (value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ','),
                         parser: (value) => value?.replace(/(,*)/g, '') as unknown as number
