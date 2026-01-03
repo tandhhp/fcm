@@ -360,6 +360,7 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
         feedback.InterestLevel = args.InterestLevel;
         feedback.FinancialSituation = args.FinancialSituation;
         feedback.JobKindId = args.JobKindId;
+        await _logService.AddAsync($"Cập nhật feedback khách hàng {lead.Name} - {lead.PhoneNumber}");
         await _leadRepository.UpdateFeedbackAsync(lead, feedback);
         return TResult.Success;
     }
