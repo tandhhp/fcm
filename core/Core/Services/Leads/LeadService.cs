@@ -276,7 +276,7 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
         lead.EventDate = args.EventDate;
         lead.EventId = args.EventId;
         lead.Note = args.Note;
-        lead.CreatedBy = args.CreatedBy;
+        lead.CreatedBy = creator.Id;
         lead.IdentityNumber = args.IdentityNumber;
         if (args.SubLeads != null && args.SubLeads.Count > 0)
         {
@@ -354,7 +354,7 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
         lead.AttendanceId = args.AttendanceId;
         lead.Voucher1Id = args.Voucher1Id;
         lead.Voucher2Id = args.Voucher2Id;
-        lead.CreatedBy = args.CreatedBy;
+        lead.CreatedBy = creator.Id;
         feedback.TransportId = args.TransportId;
         feedback.TableId = args.TableId;
         feedback.InterestLevel = args.InterestLevel;
