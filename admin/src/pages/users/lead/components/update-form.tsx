@@ -7,7 +7,7 @@ import { apiTransportOptions } from "@/services/settings/transport";
 import { apiDosOptions, apiSalesOptions, apiSmOptions, apiUserOptions } from "@/services/user";
 import { apiLeadDetail, apiLeadUpdateFeedback } from "@/services/users/lead";
 import { GENDER_OPTIONS } from "@/utils/constants";
-import { DrawerForm, DrawerFormProps, ProFormDatePicker, ProFormInstance, ProFormSelect, ProFormText, ProFormTextArea } from "@ant-design/pro-components";
+import { DrawerForm, DrawerFormProps, ProFormDatePicker, ProFormInstance, ProFormList, ProFormSelect, ProFormText, ProFormTextArea } from "@ant-design/pro-components";
 import { useAccess } from "@umijs/max";
 import { Col, message, Row } from "antd";
 import dayjs from "dayjs";
@@ -141,6 +141,10 @@ const LeadFeedbackUpdateForm: React.FC<Props> = (props) => {
                     {
                         name: 'identityNumber',
                         value: data.identityNumber
+                    },
+                    {
+                        name: 'subLeads',
+                        value: data.subLeads
                     }
                 ]);
                 setDosId(data.dosId);
@@ -284,6 +288,23 @@ const LeadFeedbackUpdateForm: React.FC<Props> = (props) => {
                 </Col>
             </Row>
             <ProFormTextArea name={"note"} label="Ghi chú" />
+            <ProFormList name="subLeads" label="Khách phụ" copyIconProps={{
+                tooltipText: 'Thêm khách phụ'
+            }} deleteIconProps={{
+                tooltipText: 'Xóa khách phụ'
+            }}>
+                <div className="flex gap-4">
+                    <ProFormText name="name" label="Họ và tên" rules={[{ required: true, message: 'Vui lòng nhập họ và tên' }]} />
+                    <ProFormText name="identityNumber" label="Số CCCD"
+                    />
+                    <ProFormText name="phoneNumber" label="Số điện thoại" rules={[
+                        { required: true, message: 'Vui lòng nhập số điện thoại' },
+                        {
+                            pattern: /((09|03|07|08|05)+([0-9]{8})\b)/,
+                            message: 'Số điện thoại không hợp lệ'
+                        }]} />
+                </div>
+            </ProFormList>
         </DrawerForm>
     )
 }

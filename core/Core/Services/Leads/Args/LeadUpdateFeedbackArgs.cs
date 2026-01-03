@@ -1,4 +1,5 @@
 ﻿using Waffle.Entities;
+using Waffle.Entities.Contacts;
 
 namespace Waffle.Core.Services.Leads.Args;
 
@@ -23,4 +24,6 @@ public class LeadUpdateFeedbackArgs : BaseEntity
     public Guid? Voucher1Id { get; set; }
     public Guid? Voucher2Id { get; set; }
     public string? IdentityNumber { get; set; }
+
+    public List<SubLeadUpdateArgs>? SubLeads { get; set; }
 }

@@ -360,6 +360,17 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
         feedback.InterestLevel = args.InterestLevel;
         feedback.FinancialSituation = args.FinancialSituation;
         feedback.JobKindId = args.JobKindId;
+        if (args.SubLeads != null && args.SubLeads.Count > 0)
+        {
+            foreach (var subLead in args.SubLeads)
+            {
+                if (!string.IsNullOrWhiteSpace(subLead.IdentityNumber))
+                {
+                    if (await _leadRepository.IsCitizenIdExistAsync(subLead.IdentityNumber, lead.Id)) return TResult.Failed($"CCCD {subLead.IdentityNumber} của khách phụ đã tồn tại!");
+                }
+                await _leadRepository.UpdateSubLeadsAsync(lead.Id, args.SubLeads);
+            }
+        }
         await _logService.AddAsync($"Cập nhật feedback khách hàng {lead.Name} - {lead.PhoneNumber}");
         await _leadRepository.UpdateFeedbackAsync(lead, feedback);
         return TResult.Success;

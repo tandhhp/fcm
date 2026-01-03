@@ -260,7 +260,9 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
     {
         x.Id,
         x.Name,
-        x.PhoneNumber
+        x.PhoneNumber,
+        x.Gender,
+        x.IdentityNumber
     }).ToListAsync();
 
     public async Task<ListResult<object>> GetWaitingListAsync(LeadWaittingListFilterOptions filterOptions)
