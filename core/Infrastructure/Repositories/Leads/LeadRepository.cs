@@ -349,11 +349,14 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
 
     public async Task<bool> IsCitizenIdExistAsync(string citizenId, Guid leadId)
     {
-        if (string.IsNullOrWhiteSpace(citizenId))
-        {
-            return false;
-        }
+        if (string.IsNullOrWhiteSpace(citizenId)) return false;
         return await _context.Leads.AnyAsync(x => x.IdentityNumber == citizenId && leadId != x.Id);
+    }
+
+    public Task<bool> IsPhoneExistAsync(string phoneNumber, Guid id)
+    {
+        if (string.IsNullOrWhiteSpace(phoneNumber)) return Task.FromResult(false);
+        return _context.Leads.AnyAsync(x => x.PhoneNumber == phoneNumber && id != x.Id);
     }
 
     public async Task<List<Lead>> ListByCitizenIdAsync(string citizenId)

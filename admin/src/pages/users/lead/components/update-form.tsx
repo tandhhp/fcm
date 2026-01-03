@@ -296,6 +296,7 @@ const LeadFeedbackUpdateForm: React.FC<Props> = (props) => {
                 <div className="flex gap-4">
                     <ProFormText name="name" label="Họ và tên" rules={[{ required: true, message: 'Vui lòng nhập họ và tên' }]} />
                     <ProFormText name="identityNumber" label="Số CCCD"
+                        rules={[{ required: true, message: 'Vui lòng nhập số CCCD' }]}
                     />
                     <ProFormText name="phoneNumber" label="Số điện thoại" rules={[
                         { required: true, message: 'Vui lòng nhập số điện thoại' },
