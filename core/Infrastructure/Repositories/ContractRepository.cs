@@ -270,7 +270,7 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
                     join l in _context.Leads on c.LeadId equals l.Id
                     join sales in _context.Users on c.SalesId equals sales.Id into salesJoin
                     from sales in salesJoin.DefaultIfEmpty()
-                    join s in _context.Sources on l.SourceId equals s.Id into sourceJoin
+                    join s in _context.Sources on c.SourceId equals s.Id into sourceJoin
                     from s in sourceJoin.DefaultIfEmpty()
                     select new
                     {
