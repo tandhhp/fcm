@@ -174,7 +174,7 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
                         DOS = sales != null && sales.DosId != null ? _context.Users.First(x => x.Id == sales.Id).Name : string.Empty,
                         SM = sales != null && sales.SmId != null ? _context.Users.First(x => x.Id == sales.SmId).Name : string.Empty,
                         KeyIn = creator.Name,
-                        TeamKeyIn = c.TeamKeyInId != null ? _context.Users.First(x => x.Id == c.TeamKeyInId).Name : string.Empty,
+                        TeamKeyIn = creator.ManagerId != null ? _context.Users.First(x => x.Id == creator.ManagerId).Name : string.Empty,
                         Discount = _context.Coupons.Where(cp => cp.ContractId == c.Id).Sum(cp => cp.Discount),
                     };
         if (filterOptions.FromDate.HasValue && filterOptions.ToDate.HasValue)

@@ -1,5 +1,5 @@
 import { apiInvoiceDelete, apiInvoiceList } from "@/services/finances/invoice";
-import { DeleteOutlined, EditOutlined, MoreOutlined, PictureOutlined, SettingOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, HistoryOutlined, MoreOutlined, PictureOutlined, SettingOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components";
 import { Button, Dropdown, message, Popconfirm } from "antd";
 import { useRef, useState } from "react";
@@ -7,6 +7,8 @@ import InvoiceEvidence from "@/components/invoices/evidence";
 import InvoiceExportForm from "@/components/form/invoice-export-form";
 import InvoiceForm from "@/components/form/invoice";
 import { useAccess } from "@umijs/max";
+import { InvoiceStatus } from "@/utils/enum";
+import InvoiceHistories from "@/pages/finance/invoice/components/histories";
 
 const Index: React.FC = () => {
 
@@ -15,6 +17,7 @@ const Index: React.FC = () => {
     const [openEvidence, setOpenEvidence] = useState<boolean>(false);
     const [filterOptions, setFilterOptions] = useState<any>({});
     const [openForm, setOpenForm] = useState<boolean>(false);
+    const [openHistories, setOpenHistories] = useState<boolean>(false);
     const access = useAccess();
 
     const onDelete = async (id: string) => {
@@ -115,6 +118,15 @@ const Index: React.FC = () => {
                                         }
                                     },
                                     {
+                                        key: 'histories',
+                                        label: 'Lịch sử phiếu thu',
+                                        icon: <HistoryOutlined />,
+                                        onClick: () => {
+                                            setInvoice(record);
+                                            setOpenHistories(true);
+                                        }
+                                    },
+                                    {
                                         key: 'edit',
                                         label: 'Cập nhật',
                                         icon: <EditOutlined />,
@@ -122,13 +134,13 @@ const Index: React.FC = () => {
                                             setInvoice(record);
                                             setOpenForm(true);
                                         },
-                                        disabled: (!access.event && !access.accountant && !access.canAdmin) || record.status !== 0
+                                        disabled: (!access.event && !access.accountant && !access.canAdmin) || record.status === InvoiceStatus.Approved || record.status === InvoiceStatus.SAConfirmed
                                     }
                                 ]
                             }}>
                                 <Button type="dashed" icon={<MoreOutlined />} size="small" />
                             </Dropdown>,
-                            <Popconfirm title="Bạn có chắc chắn muốn xóa?" onConfirm={() => onDelete(record.id)}>
+                            <Popconfirm key={"delete"} title="Bạn có chắc chắn muốn xóa?" onConfirm={() => onDelete(record.id)}>
                                 <Button key={"delete"} type="primary" icon={<DeleteOutlined />} danger size="small" disabled={!access.event || record.status !== 0}></Button>
                             </Popconfirm>
                         ]
@@ -137,6 +149,7 @@ const Index: React.FC = () => {
             />
             <InvoiceEvidence open={openEvidence} onOpenChange={setOpenEvidence} data={invoice} />
             <InvoiceForm open={openForm} onOpenChange={setOpenForm} data={invoice} reload={() => actionRef.current?.reload()} />
+            <InvoiceHistories open={openHistories} onOpenChange={setOpenHistories} invoice={invoice} />
         </PageContainer>
     )
 }

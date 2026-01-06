@@ -1,12 +1,13 @@
 import InvoiceEvidence from "@/components/invoices/evidence";
 import { apiInvoiceList, apiInvoiceApprove } from "@/services/finances/invoice";
 import { InvoiceStatus } from "@/utils/enum";
-import { SettingOutlined, CheckOutlined, PictureOutlined, CloseOutlined, MoreOutlined } from "@ant-design/icons";
+import { SettingOutlined, CheckOutlined, PictureOutlined, CloseOutlined, MoreOutlined, HistoryOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { useAccess } from "@umijs/max";
 import { Popconfirm, message, Button, Dropdown } from "antd";
 import { useRef, useState } from "react";
 import InvoiceRejectForm from "../invoice/components/reject";
+import InvoiceHistories from "../invoice/components/histories";
 
 const Index: React.FC = () => {
 
@@ -15,6 +16,7 @@ const Index: React.FC = () => {
     const [invoice, setInvoice] = useState<any>(null);
     const [openReject, setOpenReject] = useState<boolean>(false);
     const [openEvidence, setOpenEvidence] = useState<boolean>(false);
+    const [openHistories, setOpenHistories] = useState<boolean>(false);
 
     return (
         <PageContainer>
@@ -119,10 +121,19 @@ const Index: React.FC = () => {
                                         }
                                     },
                                     {
+                                        key: 'histories',
+                                        label: 'Lịch sử phiếu thu',
+                                        icon: <HistoryOutlined />,
+                                        onClick: () => {
+                                            setInvoice(record);
+                                            setOpenHistories(true);
+                                        }
+                                    },
+                                    {
                                         key: 'reject',
                                         label: 'Từ chối',
                                         icon: <CloseOutlined />,
-                                        disabled: record.status !== InvoiceStatus.Pending,
+                                        disabled: record.status === InvoiceStatus.Approved || record.status === InvoiceStatus.SAConfirmed,
                                         onClick: () => {
                                             setInvoice(record);
                                             setOpenReject(true);
@@ -136,6 +147,7 @@ const Index: React.FC = () => {
                     }
                 ]}
             />
+            <InvoiceHistories open={openHistories} onOpenChange={setOpenHistories} invoice={invoice} />
             <InvoiceEvidence open={openEvidence} onOpenChange={setOpenEvidence} data={invoice} />
             <InvoiceRejectForm open={openReject} onOpenChange={setOpenReject} data={invoice} reload={() => actionRef.current?.reload()} />
         </PageContainer>

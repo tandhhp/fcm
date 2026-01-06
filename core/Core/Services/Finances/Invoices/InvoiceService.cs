@@ -36,7 +36,7 @@ public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<A
         if (_hcaService.IsUserInRole(RoleName.SalesAdmin))
         {
             invoice.Status = InvoiceStatus.SAConfirmed;
-            await CreateHistoryAsync(invoice.Status, "Xác nhận phiếu thu");
+            await CreateHistoryAsync(invoice.Status, "SA Xác nhận phiếu thu");
         }
         else
         {
@@ -177,10 +177,7 @@ public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<A
         return newInvoiceNumber;
     }
 
-    public Task<ListResult<object>> GetHistoriesAsync(Guid invoiceId, FilterOptions filterOptions)
-    {
-        throw new NotImplementedException();
-    }
+    public Task<ListResult<object>> GetHistoriesAsync(Guid invoiceId, FilterOptions filterOptions) => _invoiceRepository.GetHistoriesAsync(invoiceId, filterOptions);
 
     public Task<ListResult<InvoiceListItem>> ListAsync(InvoiceFilterOptions filterOptions) => _invoiceRepository.ListAsync(filterOptions);
 
@@ -191,6 +188,7 @@ public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<A
         invoice.Status = InvoiceStatus.Rejected;
         invoice.Note = args.Note;
         await _logService.AddAsync($"Hóa đơn {invoice.InvoiceNumber} đã bị từ chối. Lý do: {args.Note}");
+        await CreateHistoryAsync(invoice.Status, args.Note);
         await _invoiceRepository.UpdateAsync(invoice);
         return TResult.Success;
     }
@@ -208,6 +206,7 @@ public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<A
         invoice.InvoiceNumber = args.InvoiceNumber;
         invoice.CreatedAt = args.CreatedAt;
         await _logService.AddAsync($"Hóa đơn {invoice.InvoiceNumber} đã được cập nhật.");
+        await CreateHistoryAsync(invoice.Status, "Cập nhật thông tin hóa đơn");
         await _invoiceRepository.UpdateAsync(invoice);
         return TResult.Success;
     }

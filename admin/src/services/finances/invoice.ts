@@ -70,3 +70,9 @@ export async function apiInvoiceEvidences(invoiceId: string) {
         params: { invoiceId }
     });
 }
+
+export async function apiInvoiceHistories(params: { invoiceId: string }) {
+    return request(`invoice/histories/${params.invoiceId}`, {
+        params
+    });
+}

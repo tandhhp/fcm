@@ -8,6 +8,7 @@ using Waffle.Core.Services.Finances.Invoices.Results;
 using Waffle.Data;
 using Waffle.Entities.Payments;
 using Waffle.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Waffle.Infrastructure.Repositories.Payments;
 
@@ -66,6 +67,25 @@ public class InvoiceRepository(ApplicationDbContext context, IHCAService _hcaSer
         }
         query = query.OrderByDescending(i => i.CreatedAt);
         return await query.ToListAsync();
+    }
+
+    public async Task<ListResult<object>> GetHistoriesAsync(Guid invoiceId, FilterOptions filterOptions)
+    {
+        var query = _context.InvoiceHistories
+            .Where(x => x.InvoiceId == invoiceId)
+            .OrderByDescending(x => x.CreatedAt)
+            .AsNoTracking()
+            .Select(x => new
+            {
+                x.Id,
+                x.Note,
+                x.Status,
+                x.UserId,
+                x.CreatedAt,
+                x.InvoiceId,
+                UserName = _context.Users.Where(u => u.Id == x.UserId).Select(u => u.Name).FirstOrDefault()
+            });
+        return await ListResult<object>.Success(query, filterOptions);
     }
 
     public async Task<string?> GetLastInvoiceNumberAsync() => await _context.Invoices

@@ -1,5 +1,5 @@
 import { apiInvoiceApprove, apiInvoiceList } from "@/services/finances/invoice";
-import { CheckOutlined, CloseOutlined, EditOutlined, MoreOutlined, PictureOutlined, SettingOutlined } from "@ant-design/icons";
+import { CheckOutlined, CloseOutlined, EditOutlined, HistoryOutlined, MoreOutlined, PictureOutlined, SettingOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components";
 import { Button, Dropdown, message, Popconfirm, Tag } from "antd";
 import { useRef, useState } from "react";
@@ -11,6 +11,7 @@ import InvoiceExportForm from "@/components/form/invoice-export-form";
 import InvoiceForm from "@/components/form/invoice";
 import { useAccess } from "@umijs/max";
 import dayjs from "dayjs";
+import InvoiceHistories from "./components/histories";
 
 const Index: React.FC = () => {
 
@@ -20,6 +21,7 @@ const Index: React.FC = () => {
     const [openEvidence, setOpenEvidence] = useState<boolean>(false);
     const [openReject, setOpenReject] = useState<boolean>(false);
     const [openForm, setOpenForm] = useState<boolean>(false);
+    const [openHistories, setOpenHistories] = useState<boolean>(false);
 
     const canApprove = (status: InvoiceStatus) => {
         if (!access.accountant && !access.salesAdmin && !access.canAdmin) {
@@ -133,8 +135,8 @@ const Index: React.FC = () => {
                                 message.success('Duyệt hóa đơn thành công');
                                 actionRef.current?.reload();
                             }} okText="Duyệt" cancelText="Hủy">
-                                <Button type="primary" icon={<CheckOutlined />} size="small" 
-                                disabled={!canApprove(record.status)}></Button>
+                                <Button type="primary" icon={<CheckOutlined />} size="small"
+                                    disabled={!canApprove(record.status)}></Button>
                             </Popconfirm>,
                             <Dropdown key={"more"} menu={{
                                 items: [
@@ -148,6 +150,15 @@ const Index: React.FC = () => {
                                         }
                                     },
                                     {
+                                        key: 'histories',
+                                        label: 'Lịch sử phiếu thu',
+                                        icon: <HistoryOutlined />,
+                                        onClick: () => {
+                                            setInvoice(record);
+                                            setOpenHistories(true);
+                                        }
+                                    },
+                                    {
                                         key: 'edit',
                                         label: 'Cập nhật',
                                         icon: <EditOutlined />,
@@ -155,7 +166,7 @@ const Index: React.FC = () => {
                                             setInvoice(record);
                                             setOpenForm(true);
                                         },
-                                        disabled: !access.event && !access.accountant || record.status !== 0
+                                        disabled: !access.event && !access.accountant || record.status === InvoiceStatus.Approved || record.status === InvoiceStatus.SAConfirmed
                                     },
                                     {
                                         key: 'reject',
@@ -178,7 +189,7 @@ const Index: React.FC = () => {
             <InvoiceEvidence open={openEvidence} onOpenChange={setOpenEvidence} data={invoice} />
             <InvoiceRejectForm open={openReject} onOpenChange={setOpenReject} data={invoice} reload={() => actionRef.current?.reload()} />
             <InvoiceForm open={openForm} onOpenChange={setOpenForm} data={invoice} reload={() => actionRef.current?.reload()} />
-
+            <InvoiceHistories open={openHistories} onOpenChange={setOpenHistories} invoice={invoice} />
         </PageContainer>
     )
 }

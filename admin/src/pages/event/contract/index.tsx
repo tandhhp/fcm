@@ -20,10 +20,16 @@ const Index: React.FC = () => {
     const [loadingExport, setLoadingExport] = useState<boolean>(false);
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [openEvidence, setOpenEvidence] = useState<boolean>(false);
+    const [filteredInfo, setFilteredInfo] = useState<any>({});
 
     const onExport = async () => {
         setLoadingExport(true);
-        const response = await apiContractExport();
+        const response = await apiContractExport({
+            ...filteredInfo,
+            fromDate: filteredInfo.dateRange ? filteredInfo.dateRange[0] : undefined,
+            toDate: filteredInfo.dateRange ? filteredInfo.dateRange[1] : undefined,
+            dateRange: undefined
+        });
         const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -48,7 +54,10 @@ const Index: React.FC = () => {
                     disabled={access.sales || access.telesale || access.telesaleManager || access.sm}
                 >Tạo hợp đồng</Button>}
                 actionRef={actionRef}
-                request={apiContractList}
+                request={(params, sort, filter) => {
+                    setFilteredInfo(params);
+                    return apiContractList({ ...params, sort, filter });
+                }}
                 rowKey="id"
                 search={{
                     layout: 'vertical'
