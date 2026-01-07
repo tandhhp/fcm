@@ -199,7 +199,15 @@ public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<A
     {
         var invoice = await _invoiceRepository.FindAsync(args.Id);
         if (invoice is null) return TResult.Failed("Không tìm thấy hóa đơn!");
-        if (invoice.Status != InvoiceStatus.Pending) return TResult.Failed("Chỉ có thể cập nhật các hóa đơn ở trạng thái Chờ duyệt.");
+        if (invoice.Status == InvoiceStatus.Approved) return TResult.Failed("Không thể cập nhật khi trạng thái đã duyệt.");
+        if (invoice.Status == InvoiceStatus.Rejected)
+        {
+            invoice.Status = InvoiceStatus.Pending;
+        }
+        if (_hcaService.IsUserInRole(RoleName.SalesAdmin) && invoice.Status == InvoiceStatus.Rejected)
+        {
+            invoice.Status = InvoiceStatus.SAConfirmed;
+        }
         invoice.Amount = args.Amount;
         invoice.PaymentMethod = args.PaymentMethod;
         invoice.Note = args.Note;
