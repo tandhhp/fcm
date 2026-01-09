@@ -215,6 +215,9 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
             if (!PhoneNumberValidator.IsValidVietnamPhoneNumber(phoneNumber)) return BadRequest("Số điện thoại không hợp lệ");
             var lead = await _leadService.FindByPhoneNumberAsync(phoneNumber);
             if (lead != null && !lead.Duplicated) return BadRequest($"Khách hàng {lead.Name} với SDT {args.PhoneNumber} đã tồn tại, ngày tham gia {lead.EventDate:dd-MM-yyyy}!");
+            if (await _context.SubLeads.AnyAsync(x => !string.IsNullOrEmpty(args.PhoneNumber) && x.PhoneNumber == args.PhoneNumber)) return BadRequest($"Khách hàng đi cùng với số điện thoại {args.PhoneNumber} đã tồn tại!");
+            if (await _context.SubLeads.AnyAsync(x => !string.IsNullOrEmpty(args.IdentityNumber) && x.IdentityNumber == args.IdentityNumber)) return BadRequest($"Khách hàng đi cùng với CCCD {args.IdentityNumber} đã tồn tại!");
+
             var status = LeadStatus.Pending;
             if (_hcaService.IsUserInAnyRole(RoleName.Admin, RoleName.SalesManager, RoleName.Dos, RoleName.Event, RoleName.TelesaleManager))
             {

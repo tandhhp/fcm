@@ -82,6 +82,21 @@ const Index: React.FC = () => {
                         search: false,
                     },
                     {
+                        title: 'Khách phụ',
+                        dataIndex: 'subLeads',
+                        search: false,
+                        minWidth: 200,
+                        render: (_, entity) => (
+                            <div>
+                                {entity.subLeads?.map((sub: any) => (
+                                    <div key={sub.key} className="mb-1">
+                                        {sub.gender === false && (<ManOutlined className='text-blue-500' />)}{sub.gender === true && (<WomanOutlined className='text-red-500' />)} {sub.name} - {sub.phoneNumber} - {sub.identityNumber}
+                                    </div>
+                                ))}
+                            </div>
+                        )
+                    },
+                    {
                         title: 'Ghi chú',
                         dataIndex: 'note',
                         search: false,

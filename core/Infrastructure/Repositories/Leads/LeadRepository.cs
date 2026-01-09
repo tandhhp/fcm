@@ -367,6 +367,7 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
     public async Task<ListResult<object>> NoDupsAsync(LeadCheckinListFilterOptions filterOptions)
     {
         var query = from l in _context.Leads
+                    orderby l.CreatedDate descending
                     select new
                     {
                         l.Id,
@@ -379,17 +380,27 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
         {
+            query = from l in query
+                    join sub in _context.SubLeads on l.Id equals sub.LeadId into subJoin
+                    where l.PhoneNumber != null && l.PhoneNumber.Contains(filterOptions.PhoneNumber) ||
+                          subJoin.Any(s => s.PhoneNumber != null && s.PhoneNumber.Contains(filterOptions.PhoneNumber))
+                    select l;
             query = query.Where(x => x.PhoneNumber != null && x.PhoneNumber.Contains(filterOptions.PhoneNumber));
         }
         if (!string.IsNullOrWhiteSpace(filterOptions.IdentityNumber))
         {
+            query = from l in query
+                    join sub in _context.SubLeads on l.Id equals sub.LeadId into subJoin
+                    where l.IdentityNumber != null && l.IdentityNumber.Contains(filterOptions.IdentityNumber) ||
+                          subJoin.Any(s => s.IdentityNumber != null && s.IdentityNumber.Contains(filterOptions.IdentityNumber))
+                    select l;
             query = query.Where(x => x.IdentityNumber != null && x.IdentityNumber.Contains(filterOptions.IdentityNumber));
         }
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {
             query = query.Where(x => x.Name.ToLower().Contains(filterOptions.Name.ToLower()));
         }
-        var data = query.GroupBy(x => x.IdentityNumber)
+        var groups = await query.GroupBy(x => x.IdentityNumber).Skip((filterOptions.Current - 1) * filterOptions.PageSize).Take(filterOptions.PageSize)
             .Select(x => new
             {
                 IdentityNumber = x.Key,
@@ -400,8 +411,33 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
                 x.First().Note,
                 Count = x.Count(g => !string.IsNullOrEmpty(x.Key)),
                 x.First().Duplicated
+            }).ToListAsync();
+        var leadIds = groups.Select(x => x.Id).ToList();
+        var subLeads = await _context.SubLeads.Where(x => leadIds.Contains(x.LeadId)).ToListAsync();
+        var data = new List<LeadCustomer>();
+        foreach (var item in groups)
+        {
+            data.Add(new LeadCustomer
+            {
+                Id = item.Id,
+                IdentityNumber = item.IdentityNumber,
+                Name = item.Name,
+                PhoneNumber = item.PhoneNumber,
+                DateOfBirth = item.DateOfBirth,
+                Note = item.Note,
+                Count = item.Count,
+                Duplicated = item.Duplicated,
+                SubLeads = subLeads.Where(x => x.LeadId == item.Id).Select(sub => new SubLeadCustomer
+                {
+                    Id = sub.Id,
+                    Name = sub.Name,
+                    PhoneNumber = sub.PhoneNumber,
+                    Gender = sub.Gender,
+                    IdentityNumber = sub.IdentityNumber
+                })
             });
-        return await ListResult<object>.Success(data, filterOptions);
+        }
+        return new ListResult<object>(data, await query.CountAsync(), filterOptions);
     }
 
     public async Task<LeadFeedback> SaveFeedbackAsync(Guid leadId, int? tableId)
