@@ -52,7 +52,7 @@ const LeadPage: React.FC = () => {
 
     return (
         <PageContainer extra={<Button type="primary" icon={<ExportOutlined />} onClick={onExport}
-            disabled={access.sales || access.telesale || access.telesaleManager || access.sm}
+            disabled={!access.em && !access.canAdmin && !access.dos}
             loading={loadingExport}>Xuất dữ liệu</Button>}>
             <ProTable
                 actionRef={actionRef}

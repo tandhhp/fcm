@@ -55,7 +55,7 @@ const Index: React.FC = () => {
 
     return (
         <PageContainer extra={<Button icon={<ExportOutlined />}
-            disabled={access.sales || access.telesale || access.telesaleManager || access.sm || access.salesAdmin}
+            disabled={!access.em && !access.canAdmin && !access.dos}
             type="primary" onClick={onExport} loading={loadingExport}>Xuất dữ liệu</Button>}>
             <ProTable
                 headerTitle={<Button type="primary" onClick={() => setOpenForm(true)} icon={<PlusOutlined />}

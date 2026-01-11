@@ -71,6 +71,7 @@ export default (initialState: { currentUser?: API.User }) => {
   const sm = currentUser && (currentUser.roles.includes('sm'));
   const sales = currentUser && (currentUser.roles.includes('sales'));
   const event = currentUser && (currentUser.roles.includes('event') || canAdmin);
+  const em = currentUser && (currentUser.roles.includes('em') || canAdmin);
   const telesale = currentUser && (currentUser.roles.includes('Telesale'));
   const telesaleManager = currentUser && (currentUser.roles.includes('TelesaleManager'));
   const dot = currentUser && currentUser.roles.includes('dot');
@@ -134,6 +135,7 @@ export default (initialState: { currentUser?: API.User }) => {
     canEvent,
     sales,
     event,
+    em,
     canCardHolderQueue,
     cx,
     cxm,

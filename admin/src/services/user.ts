@@ -86,6 +86,13 @@ export async function addToRole(data: any) {
   });
 }
 
+export async function removeFromRole(data: any) {
+  return request(`user/remove-from-role`, {
+    method: 'POST',
+    data
+  });
+}
+
 export async function getUserInRoles(params: any, roleName?: string | string[]) {
   return request(`user/users-in-role/${roleName}`, { params });
 }

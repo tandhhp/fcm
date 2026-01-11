@@ -67,7 +67,7 @@ public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<A
 
     public async Task<TResult> DeleteAsync(Guid id)
     {
-        if (!_hcaService.IsUserInAnyRole(RoleName.Event, RoleName.Admin)) return TResult.Failed("Không có quyền xóa hóa đơn.");
+        if (!_hcaService.IsUserInAnyRole(RoleName.Event, RoleName.Admin, RoleName.EM)) return TResult.Failed("Không có quyền xóa hóa đơn.");
         var invoice = await _invoiceRepository.FindAsync(id);
         if (invoice is null) return TResult.Failed("Không tìm thấy hóa đơn!");
         if (invoice.Status != InvoiceStatus.Pending) return TResult.Failed("Chỉ có thể xóa các hóa đơn ở trạng thái Chờ duyệt.");

@@ -2,7 +2,7 @@ import { apiCampaignOptions } from "@/services/event/campaign";
 import { apiVoucherDelete, apiVoucherExport, apiVoucherList } from "@/services/event/voucher";
 import { DeleteOutlined, EditOutlined, ExportOutlined, ImportOutlined, MoreOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
-import { useParams } from "@umijs/max";
+import { useAccess, useParams } from "@umijs/max";
 import { Button, Dropdown, message, Popconfirm, Space } from "antd";
 import { useRef, useState } from "react";
 import VoucherForm from "./components/form";
@@ -11,6 +11,7 @@ import VoucherImport from "./components/import";
 const Index: React.FC = () => {
 
     const { id } = useParams();
+    const access = useAccess();
     const actionRef = useRef<ActionType>(null);
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [selectedRow, setSelectedRow] = useState<any>(null);
@@ -40,7 +41,9 @@ const Index: React.FC = () => {
 
     return (
         <PageContainer
-            extra={<Button icon={<ExportOutlined />} type="primary" onClick={onExport} loading={loadingExport}>Xuất dữ liệu</Button>}>
+            extra={<Button icon={<ExportOutlined />} type="primary" onClick={onExport} 
+            disabled={!access.em && !access.canAdmin && !access.dos}
+            loading={loadingExport}>Xuất dữ liệu</Button>}>
             <ProTable
                 headerTitle={(
                     <Space>

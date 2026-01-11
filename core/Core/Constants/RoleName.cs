@@ -45,4 +45,8 @@ public class RoleName
     /// Nhân viên pháp lý
     /// </summary>
     public const string LegalExecutive = "legalexecutive";
+    /// <summary>
+    /// Event Manager
+    /// </summary>
+    public const string EM = "em";
 }

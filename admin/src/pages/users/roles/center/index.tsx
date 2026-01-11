@@ -1,7 +1,7 @@
 import { apiRoleDetail, apiTelesalesManagerOptions } from "@/services/role";
 import { apiBranchOptions } from "@/services/settings/branch";
 import { apiSourceOptions } from "@/services/settings/source";
-import { apiDosOptions, apiLockUser, apiRoleOptions, apiSetPassword, apiSmOptions, apiUnLockUser, apiUserByRoleOptions, apiUserUpdate, createEmployee, deleteUser, getUserInRoles } from "@/services/user";
+import { addToRole, apiDosOptions, apiLockUser, apiRoleOptions, apiSetPassword, apiSmOptions, apiUnLockUser, apiUserByRoleOptions, apiUserOptions, apiUserUpdate, createEmployee, deleteUser, getUserInRoles, removeFromRole } from "@/services/user";
 import { GENDER_OPTIONS, UserStatus } from "@/utils/constants";
 import { DeleteOutlined, EditOutlined, LockOutlined, ManOutlined, MoreOutlined, SettingOutlined, UserAddOutlined, UserOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, DrawerForm, ModalForm, PageContainer, ProColumns, ProFormDatePicker, ProFormInstance, ProFormSelect, ProFormText, ProTable } from "@ant-design/pro-components"
@@ -23,6 +23,7 @@ const RoleCenter: React.FC = () => {
     const [openChangePassword, setOpenChangePassword] = useState<boolean>(false);
     const [status, setStatus] = useState<number>(UserStatus.Working);
     const [openClaim, setOpenClaim] = useState<boolean>(false);
+    const [openAddToRole, setOpenAddToRole] = useState<boolean>(false);
     const { data } = useRequest(() => apiRoleDetail(id!));
 
     useEffect(() => {
@@ -177,6 +178,16 @@ const RoleCenter: React.FC = () => {
         actionRef.current?.reload();
     }
 
+    const onAddToRole = async (values: any) => {
+        await addToRole({
+            id: values.id,
+            roleName: id
+        });
+        message.success('Thành công!');
+        actionRef.current?.reload();
+        return true;
+    }
+
     const columns: ProColumns<any>[] = [
         {
             title: '#',
@@ -290,6 +301,20 @@ const RoleCenter: React.FC = () => {
                                 setUser(entity);
                                 setOpenClaim(true);
                             }
+                        },
+                        {
+                            key: 'remove-role',
+                            label: 'Xóa khỏi chức vụ',
+                            icon: <DeleteOutlined />,
+                            disabled: !access.canAdmin && !access.hr,
+                            onClick: async () => {
+                                await removeFromRole({
+                                    id: entity.id,
+                                    roleName: id
+                                });
+                                message.success('Thành công!');
+                                actionRef.current?.reload();
+                            }
                         }
                     ],
                     onClick: (info) => {
@@ -318,8 +343,8 @@ const RoleCenter: React.FC = () => {
 
     return (
         <PageContainer
-        title={data?.displayName}
-        extra={<Button type='primary' icon={<UserAddOutlined />} onClick={() => setOpen(true)} hidden={!access.canCreateEmployee}>Thêm nhân viên</Button>}>
+            title={data?.displayName}
+            extra={<Button type='primary' icon={<UserAddOutlined />} onClick={() => setOpen(true)} hidden={!access.canCreateEmployee}>Thêm nhân viên</Button>}>
             <ProTable
                 headerTitle={(
                     <Space>
@@ -337,6 +362,9 @@ const RoleCenter: React.FC = () => {
                                 value: UserStatus.Leave
                             }
                         ]} />
+                        <Button type="primary" onClick={() => setOpenAddToRole(true)} hidden={!access.hr && !access.canAdmin}
+                            icon={<UserAddOutlined />}
+                        >Thêm vào chức vụ</Button>
                     </Space>
                 )}
                 scroll={{
@@ -485,6 +513,17 @@ const RoleCenter: React.FC = () => {
                 ]} />
             </ModalForm>
             <ClaimForm open={openClaim} onOpenChange={setOpenClaim} title="Claims" data={user} />
+            <ModalForm open={openAddToRole} onOpenChange={setOpenAddToRole} title="Thêm vào chức vụ" onFinish={onAddToRole}>
+                <ProFormSelect name="id" label="Nhân viên"
+                    showSearch
+                    request={apiUserOptions}
+                    rules={[
+                        {
+                            required: true
+                        }
+                    ]}
+                />
+            </ModalForm>
         </PageContainer>
     )
 }

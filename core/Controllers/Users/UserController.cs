@@ -1092,11 +1092,6 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
         var user = await _userManager.FindByIdAsync(User.GetId().ToString());
         if (user is null) return Unauthorized();
 
-        if (!User.IsInRole(RoleName.Admin) && !User.IsInRole(RoleName.Event))
-        {
-            query = query.Where(x => x.BranchId == user.BranchId);
-        }
-
         return Ok(await query.Select(x => new
         {
             label = $"{x.Name} - {x.UserName}",

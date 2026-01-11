@@ -30,7 +30,7 @@ export const InvoiceExportForm: React.FC<Props> = ({ exportOptions }) => {
         <>
             <Button type="primary" icon={<ExportOutlined />}
                 loading={loading}
-                onClick={handleExport} disabled={access.sales || access.telesale || access.sm || access.telesaleManager}>
+                onClick={handleExport} disabled={!access.em && !access.canAdmin && !access.dos}>
                 Xuất phiếu thu
             </Button>
         </>

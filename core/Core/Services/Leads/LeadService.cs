@@ -34,7 +34,7 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
             TelesaleId = args.TelesalesId,
             Gender = args.Gender
         };
-        if (_hcaService.IsUserInAnyRole(RoleName.Sales, RoleName.Event))
+        if (_hcaService.IsUserInAnyRole(RoleName.Sales, RoleName.Event, RoleName.EM))
         {
             lead.SourceId = SourceConstant.PRIVATE;
         }

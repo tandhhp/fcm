@@ -44,7 +44,7 @@ const Index: React.FC = () => {
 
     return (
         <PageContainer extra={<Button icon={<ExportOutlined />} type="primary"
-            disabled={access.sales || access.telesale || access.telesaleManager || access.sm}
+            disabled={!access.em && !access.canAdmin && !access.dos}
             onClick={onExport} loading={loadingExport}>Xuất dữ liệu</Button>}>
             <ProTable
                 headerTitle={<Button type="primary" onClick={() => {

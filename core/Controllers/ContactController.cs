@@ -219,7 +219,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
             if (await _context.SubLeads.AnyAsync(x => !string.IsNullOrEmpty(args.IdentityNumber) && x.IdentityNumber == args.IdentityNumber)) return BadRequest($"Khách hàng đi cùng với CCCD {args.IdentityNumber} đã tồn tại!");
 
             var status = LeadStatus.Pending;
-            if (_hcaService.IsUserInAnyRole(RoleName.Admin, RoleName.SalesManager, RoleName.Dos, RoleName.Event, RoleName.TelesaleManager))
+            if (_hcaService.IsUserInAnyRole(RoleName.Admin, RoleName.SalesManager, RoleName.Dos, RoleName.Event, RoleName.TelesaleManager, RoleName.EM))
             {
                 status = LeadStatus.Approved;
             }
@@ -402,7 +402,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
     {
         var lead = await _context.Leads.FindAsync(id);
         if (lead == null) return BadRequest();
-        if (!_hcaService.IsUserInAnyRole(RoleName.Admin, RoleName.Event)) return BadRequest("Bạn không có quyền!");
+        if (!_hcaService.IsUserInAnyRole(RoleName.Admin, RoleName.Event, RoleName.EM)) return BadRequest("Bạn không có quyền!");
         if (await _context.Contracts.AnyAsync(x => x.LeadId == lead.Id))
         {
             return BadRequest("Khách hàng đã phát sinh hợp đồng, không thể xóa!");
@@ -793,7 +793,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
         {
             query = query.Where(x => !string.IsNullOrEmpty(x.Name) && x.Name.ToLower().Contains(filterOptions.Name.ToLower()));
         }
-        if (!User.IsInRole(RoleName.Event))
+        if (!_hcaService.IsUserInAnyRole(RoleName.Event, RoleName.EM))
         {
             query = query.Where(x => x.TelesaleId == userId || x.SalesId == userId);
         }

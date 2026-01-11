@@ -207,6 +207,7 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
             new() { Name = RoleName.Cx, DisplayName = "Nhân viên chăm sóc khách hàng", Description = "Nhân viên chăm sóc khách hàng" },
             new() { Name = RoleName.Hr, DisplayName = "Nhân sự", Description = "Nhân sự" },
             new() { Name = RoleName.Event, DisplayName = "Sự kiện", Description = "Sự kiện" },
+            new() { Name = RoleName.EM, DisplayName = "Quản lý sự kiện", Description = "Quản lý sự kiện" },
             new() { Name = RoleName.Telesale, DisplayName = "Telesale", Description = "Telesale" },
             new() { Name = RoleName.TelesaleManager, DisplayName = "Trưởng nhóm Telesale", Description = "Trưởng nhóm Telesale" },
             new() { Name = RoleName.Dot, DisplayName = "Giám đốc Telesale", Description = "Giám đốc Telesale" },
