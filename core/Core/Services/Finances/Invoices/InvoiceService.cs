@@ -15,15 +15,15 @@ namespace Waffle.Core.Services.Finances.Invoices;
 
 public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<ApplicationUser> _userManager, ILogService _logService, IHCAService _hcaService, INotificationService _notificationService) : IInvoiceService
 {
-    private async Task CreateHistoryAsync(InvoiceStatus status, string? note)
+    private async Task CreateHistoryAsync(Invoice invoice, string? note)
     {
         var history = new InvoiceHistory
         {
             Id = Guid.NewGuid(),
-            InvoiceId = Guid.Empty,
+            InvoiceId = invoice.Id,
             CreatedAt = DateTime.UtcNow,
             UserId = _hcaService.GetUserId(),
-            Status = status,
+            Status = invoice.Status,
             Note = note
         };
         await _invoiceRepository.AddHistoryAsync(history);
@@ -31,21 +31,28 @@ public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<A
 
     public async Task<TResult> ApproveAsync(Guid id)
     {
-        var invoice = await _invoiceRepository.FindAsync(id);
-        if (invoice is null) return TResult.Failed("Không tìm thấy hóa đơn!");
-        if (_hcaService.IsUserInRole(RoleName.SalesAdmin))
+        try
         {
-            invoice.Status = InvoiceStatus.SAConfirmed;
-            await CreateHistoryAsync(invoice.Status, "SA Xác nhận phiếu thu");
+            var invoice = await _invoiceRepository.FindAsync(id);
+            if (invoice is null) return TResult.Failed("Không tìm thấy hóa đơn!");
+            if (_hcaService.IsUserInRole(RoleName.SalesAdmin))
+            {
+                invoice.Status = InvoiceStatus.SAConfirmed;
+                await CreateHistoryAsync(invoice, "SA Xác nhận phiếu thu");
+            }
+            else
+            {
+                invoice.Status = InvoiceStatus.Approved;
+                await CreateHistoryAsync(invoice, "Xác nhận phiếu thu");
+            }
+            await _logService.AddAsync($"Hóa đơn {invoice.InvoiceNumber} đã được duyệt.");
+            await _invoiceRepository.UpdateAsync(invoice);
+            return TResult.Success;
         }
-        else
+        catch (Exception ex)
         {
-            invoice.Status = InvoiceStatus.Approved;
-            await CreateHistoryAsync(invoice.Status, "Xác nhận phiếu thu");
+            return TResult.Failed(ex.ToString());
         }
-        await _logService.AddAsync($"Hóa đơn {invoice.InvoiceNumber} đã được duyệt.");
-        await _invoiceRepository.UpdateAsync(invoice);
-        return TResult.Success;
     }
 
     public async Task<TResult> CancelAsync(InvoiceCancelArgs args)
@@ -60,7 +67,7 @@ public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<A
                 $"Chứng từ {invoice.InvoiceNumber} đã bị hủy",
                 $"Chứng từ {invoice.InvoiceNumber} đã bị hủy. Lý do: {args.Note}",
                 [.. events.Select(x => x.Id)]);
-        await CreateHistoryAsync(invoice.Status, args.Note);
+        await CreateHistoryAsync(invoice, args.Note);
         await _invoiceRepository.UpdateAsync(invoice);
         return TResult.Success;
     }
@@ -188,7 +195,7 @@ public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<A
         invoice.Status = InvoiceStatus.Rejected;
         invoice.Note = args.Note;
         await _logService.AddAsync($"Hóa đơn {invoice.InvoiceNumber} đã bị từ chối. Lý do: {args.Note}");
-        await CreateHistoryAsync(invoice.Status, args.Note);
+        await CreateHistoryAsync(invoice, args.Note);
         await _invoiceRepository.UpdateAsync(invoice);
         return TResult.Success;
     }
@@ -214,7 +221,7 @@ public class InvoiceService(IInvoiceRepository _invoiceRepository, UserManager<A
         invoice.InvoiceNumber = args.InvoiceNumber;
         invoice.CreatedAt = args.CreatedAt;
         await _logService.AddAsync($"Hóa đơn {invoice.InvoiceNumber} đã được cập nhật.");
-        await CreateHistoryAsync(invoice.Status, "Cập nhật thông tin hóa đơn");
+        await CreateHistoryAsync(invoice, "Cập nhật thông tin hóa đơn");
         await _invoiceRepository.UpdateAsync(invoice);
         return TResult.Success;
     }
