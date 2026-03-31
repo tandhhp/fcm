@@ -405,6 +405,12 @@ export default [
         component: './users/roles'
       },
       {
+        name: 'Nhân viên đã nghỉ',
+        path: '/user/resigned',
+        component: './users/resigned',
+        hideInMenu: true
+      },
+      {
         name: 'Chức vụ',
         path: '/user/roles/:id',
         component: './users/roles/center',

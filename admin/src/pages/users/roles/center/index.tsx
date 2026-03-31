@@ -21,7 +21,6 @@ const RoleCenter: React.FC = () => {
     const [sm, setSm] = useState<any[]>([]);
     const access = useAccess();
     const [openChangePassword, setOpenChangePassword] = useState<boolean>(false);
-    const [status, setStatus] = useState<number>(UserStatus.Working);
     const [openClaim, setOpenClaim] = useState<boolean>(false);
     const [openAddToRole, setOpenAddToRole] = useState<boolean>(false);
     const { data } = useRequest(() => apiRoleDetail(id!));
@@ -348,20 +347,6 @@ const RoleCenter: React.FC = () => {
             <ProTable
                 headerTitle={(
                     <Space>
-                        Trạng thái
-                        <Select defaultValue={UserStatus.Working} onChange={(value) => {
-                            setStatus(value);
-                            actionRef.current?.reload();
-                        }} options={[
-                            {
-                                label: 'Đang làm',
-                                value: UserStatus.Working
-                            },
-                            {
-                                label: 'Đã nghỉ',
-                                value: UserStatus.Leave
-                            }
-                        ]} />
                         <Button type="primary" onClick={() => setOpenAddToRole(true)} hidden={!access.hr && !access.canAdmin}
                             icon={<UserAddOutlined />}
                         >Thêm vào chức vụ</Button>
@@ -374,9 +359,11 @@ const RoleCenter: React.FC = () => {
                     layout: 'vertical'
                 }}
                 request={(params) => getUserInRoles({
-                    ...params,
-                    status: status
+                    ...params
                 }, id)} columns={columns}
+                params={{
+                    status: 0
+                }}
                 actionRef={actionRef} />
             <DrawerForm
                 formRef={formRef}

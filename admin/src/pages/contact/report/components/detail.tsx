@@ -2,7 +2,10 @@ import { apiCallStatusDetails } from "@/services/call";
 import { DrawerForm, DrawerFormProps, ProTable } from "@ant-design/pro-components"
 
 type Props = DrawerFormProps & {
-    data?: any;
+    data?: {
+        teleId: string;
+        callStatusId: number;
+    };
 }
 
 const ReportDetail: React.FC<Props> = ({ data, ...rest }) => {

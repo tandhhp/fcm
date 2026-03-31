@@ -1,7 +1,7 @@
 import { apiRoleInit, listRole } from "@/services/role"
-import { EditOutlined, ExportOutlined, MoreOutlined, ReloadOutlined, UserAddOutlined } from "@ant-design/icons"
+import { EditOutlined, ExportOutlined, MoreOutlined, ReloadOutlined, UserAddOutlined, UserDeleteOutlined } from "@ant-design/icons"
 import { ActionType, PageContainer, ProColumns, ProTable } from "@ant-design/pro-components"
-import { history } from "@umijs/max"
+import { history, Link, useAccess } from "@umijs/max"
 import { Button, Dropdown, Space } from "antd"
 import UserImport from "./components/import"
 import { useRef, useState } from "react"
@@ -10,6 +10,7 @@ import { apiUserExport } from "@/services/user"
 
 const RolePage: React.FC = () => {
 
+    const access = useAccess();
     const actionRef = useRef<ActionType>(null);
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [role, setRole] = useState<API.Role>();
@@ -89,7 +90,11 @@ const RolePage: React.FC = () => {
         <PageContainer extra={(
             <Space>
                 <UserImport reload={() => actionRef.current?.reload()} />
-                <Button icon={<ReloadOutlined />} onClick={onInit}></Button>
+                <Link to="/user/resigned">
+                    <Button icon={<UserDeleteOutlined />} disabled={!access.canAdmin && !access.hr}>
+                        Đã nghỉ
+                    </Button>
+                </Link>
             </Space>
         )}>
             <ProTable request={listRole}

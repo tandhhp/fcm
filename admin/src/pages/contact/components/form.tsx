@@ -125,7 +125,11 @@ const ContactForm: React.FC<Props> = (props) => {
     }
 
     return (
-        <DrawerForm {...props} title={`Liên hệ ${props.data ? props.data.name : ''}`} formRef={formRef} onFinish={onFinish}>
+        <DrawerForm {...props} title={`Liên hệ ${props.data ? props.data.name : ''}`} formRef={formRef} 
+        drawerProps={{
+            destroyOnHidden: true
+        }}
+        onFinish={onFinish}>
             <ProFormText name={"id"} hidden />
             <Row gutter={[16, 16]}>
                 <Col xs={24} md={12}>

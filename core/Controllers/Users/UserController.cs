@@ -122,7 +122,36 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
         {
             return BadRequest(ex.ToString());
         }
+    }
 
+    [HttpGet("resigned-list")]
+    public async Task<IActionResult> GetResignedListAsync([FromQuery] UserFilterOptions filterOptions)
+    {
+        var query = from u in _context.Users
+                    join ur in _context.UserRoles on u.Id equals ur.UserId
+                    join r in _context.Roles on ur.RoleId equals r.Id
+                    where r.Name != RoleName.CardHolder && u.Status == UserStatus.Leave
+                    select new
+                    {
+                        u.Id,
+                        u.Name,
+                        u.UserName,
+                        u.Email,
+                        u.PhoneNumber,
+                        u.Avatar,
+                        u.DateOfBirth,
+                        u.EmailConfirmed,
+                        u.BranchId,
+                        u.ContractCode,
+                        u.CreatedDate,
+                        u.ContractDate
+                    };
+        if (!string.IsNullOrWhiteSpace(filterOptions.Name))
+        {
+            query = query.Where(x => !string.IsNullOrEmpty(x.Name) && x.Name.ToLower().Contains(filterOptions.Name.ToLower()));
+        }
+        await query.OrderByDescending(x => x.CreatedDate).ToListAsync();
+        return Ok(await ListResult<object>.Success(query, filterOptions));
     }
 
     [HttpGet("{id}")]

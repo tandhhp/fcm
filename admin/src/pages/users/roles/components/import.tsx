@@ -28,7 +28,7 @@ const UserImport: React.FC<Props> = ({ reload }) => {
 
     return (
         <>
-            <Button type="primary" icon={<UserAddOutlined />} onClick={() => setOpen(true)}>Import người dùng</Button>
+            <Button type="primary" icon={<UserAddOutlined />} onClick={() => setOpen(true)}>Import</Button>
             <ModalForm
                 formRef={formRef}
                 onFinish={onFinish}

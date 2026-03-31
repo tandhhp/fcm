@@ -1,6 +1,6 @@
 import { apiCallReportTele } from "@/services/call";
 import { EyeOutlined, SettingOutlined, TableOutlined, AppstoreOutlined } from "@ant-design/icons";
-import { PageContainer, ProCard, ProForm, ProFormDateRangePicker } from "@ant-design/pro-components";
+import { PageContainer, ProCard, ProColumnType, ProForm, ProFormDateRangePicker } from "@ant-design/pro-components";
 import { Table, Spin, Empty, Button, Segmented } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
@@ -16,6 +16,8 @@ type ReportResponse = {
 type CallStatusCount = {
     callStatus: string;
     count: number;
+    callStatusId: number;
+    teleId: string;
 };
 
 const TeleReportPage: React.FC = () => {
@@ -33,8 +35,8 @@ const TeleReportPage: React.FC = () => {
         const fetchData = async () => {
             setLoading(true);
             const response = await apiCallReportTele({
-                startDate: dateRange[0],
-                endDate: dateRange[1],
+                fromDate: dateRange[0],
+                toDate: dateRange[1],
             });
             setData(response.data || []);
             setLoading(false);
@@ -59,6 +61,7 @@ const TeleReportPage: React.FC = () => {
             render: (record: any) => (
                 <Button type="primary" icon={<EyeOutlined />} size="small" onClick={() => {
                     setSelectedRecord(record);
+                    console.log(record);
                     setOpenDetail(true);
                 }}>Xem</Button>
             ),
@@ -96,38 +99,38 @@ const TeleReportPage: React.FC = () => {
                 align: 'center' as const,
                 render: (record: ReportResponse) => {
                     const statusCount = record.callStatusCounts.find(c => c.callStatus === status);
-                    return statusCount ? statusCount.count : 0;
+                    if (statusCount?.count === 0 || !statusCount) {
+                        return <Button type="dashed" size="small" disabled>0</Button>;
+                    }
+                    
+                    return (
+                        <Button 
+                            type="dashed"
+                            size="small" 
+                            onClick={() => {
+                                setSelectedRecord({
+                                    teleId: statusCount?.teleId,
+                                    callStatusId: statusCount?.callStatusId
+                                });
+                                setOpenDetail(true);
+                            }}
+                        >{statusCount?.count}</Button>
+                    );
                 }
             }))
             : []),
-        {
-            title: <SettingOutlined />,
-            key: "action",
-            fixed: 'right' as const,
-            width: 80,
-            render: (record: ReportResponse) => (
-                <Button 
-                    type="primary" 
-                    icon={<EyeOutlined />} 
-                    size="small" 
-                    onClick={() => {
-                        setSelectedRecord(record);
-                        setOpenDetail(true);
-                    }}
-                >
-                    Xem
-                </Button>
-            ),
-        }
     ];
 
     return (
         <PageContainer>
             <ProCard title="Báo cáo Tele" headerBordered>
-                <ProForm layout="inline" submitter={false}>
+                
+                
+                <div style={{ marginTop: 16, marginBottom: 16 }} className="flex justify-between">
+                    <ProForm layout="inline" submitter={false}>
                     <ProFormDateRangePicker
                         name="dateRange"
-                        label="Chọn khoảng thời gian"
+                        label="Khoảng thời gian"
                         initialValue={[dayjs(dateRange[0]), dayjs(dateRange[1])]
                         }
                         fieldProps={{
@@ -138,8 +141,6 @@ const TeleReportPage: React.FC = () => {
                         }}
                     />
                 </ProForm>
-                
-                <div style={{ marginTop: 16, marginBottom: 16 }}>
                     <Segmented
                         value={viewMode}
                         onChange={(value) => setViewMode(value as 'card' | 'table')}

@@ -53,6 +53,10 @@ export async function listUser(params: any) {
   return request(`user/list`, { params });
 }
 
+export async function apiResignUserList(params: any) {
+  return request(`user/resigned-list`, { params });
+}
+
 export async function listTrainerUser(params: any) {
   return request(`user/trainer/list-user`, { params });
 }
