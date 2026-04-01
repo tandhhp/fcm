@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Waffle.Data;
 
@@ -11,9 +12,11 @@ using Waffle.Data;
 namespace Waffle.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260401162120_TypeOfDataTable")]
+    partial class TypeOfDataTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2044,9 +2047,6 @@ namespace Waffle.Migrations
                     b.Property<bool>("Protected")
                         .HasColumnType("bit");
 
-                    b.Property<int>("TeamId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("Sources");
@@ -2454,6 +2454,9 @@ namespace Waffle.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<int?>("SourceId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CallCenterId");
@@ -2461,6 +2464,8 @@ namespace Waffle.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("GroupDataId");
+
+                    b.HasIndex("SourceId");
 
                     b.ToTable("Teams");
                 });
@@ -3016,11 +3021,17 @@ namespace Waffle.Migrations
                         .WithMany("Teams")
                         .HasForeignKey("GroupDataId");
 
+                    b.HasOne("Waffle.Entities.Source", "Source")
+                        .WithMany("Teams")
+                        .HasForeignKey("SourceId");
+
                     b.Navigation("CallCenter");
 
                     b.Navigation("Department");
 
                     b.Navigation("GroupData");
+
+                    b.Navigation("Source");
                 });
 
             modelBuilder.Entity("Waffle.Entities.Branch", b =>
@@ -3123,6 +3134,8 @@ namespace Waffle.Migrations
                     b.Navigation("Contacts");
 
                     b.Navigation("Leads");
+
+                    b.Navigation("Teams");
 
                     b.Navigation("Users");
                 });
