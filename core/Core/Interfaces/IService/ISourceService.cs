@@ -17,5 +17,7 @@ public interface ISourceService
     Task<ListResult<object>> ListAsync(SourceFilterOptions filterOptions);
     Task<object> OptionsAsync(SelectOptions selectOptions);
     Task<ListResult<SourceReportResult>> ReportAsync(FilterOptions filterOptions);
+    Task<object?> TypeOfDataOptionsAsync(TypeOfDataSelectOptions selectOptions);
+    Task<object?> TypeOfDataSourcesAsync();
     Task<TResult> UpdateAsync(SourceUpdateArgs args);
 }

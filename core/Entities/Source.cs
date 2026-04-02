@@ -12,7 +12,10 @@ public class Source : BaseEntity<int>
     public bool Overwrite { get; set; }
     public bool Protected { get; set; }
     public int TeamId { get; set; }
+    [ForeignKey(nameof(TypeOfData))]
+    public int? TypeOfDataId { get; set; }
 
+    public TypeOfData? TypeOfData { get; set; }
     public virtual ICollection<Lead>? Leads { get; set; }
     public virtual ICollection<ApplicationUser>? Users { get; set; }
     public virtual ICollection<Contact>? Contacts { get; set; }

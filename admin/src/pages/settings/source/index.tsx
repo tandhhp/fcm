@@ -1,4 +1,4 @@
-import { apiSourceList } from "@/services/settings/source";
+import { apiSourceList, apiTypeOfDataOptions } from "@/services/settings/source";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { useRef, useState } from "react";
 import { EditOutlined, EyeOutlined, ImportOutlined, MoreOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
@@ -7,6 +7,7 @@ import SourceForm from "./components/form";
 import { history, useAccess } from "@umijs/max";
 import ContactImport from "@/pages/contact/components/import";
 import AssignForm from "./components/assign-form";
+import { apiTeamOptions } from "@/services/users/team";
 
 const Index: React.FC = () => {
 
@@ -43,44 +44,49 @@ const Index: React.FC = () => {
                         dataIndex: 'name'
                     },
                     {
-                        title: 'SL liên hệ',
+                        title: 'Source',
+                        dataIndex: 'sourceType',
+                        valueType: 'select',
+                        valueEnum: {
+                            1: 'Cold Data',
+                            2: 'Company',
+                            3: 'Private',
+                            4: 'Reference'
+                        }
+                    },
+                    {
+                        title: 'Type of Data',
+                        dataIndex: 'typeOfDataId',
+                        valueType: 'select',
+                        request: apiTypeOfDataOptions
+                    },
+                    {
+                        title: 'Group',
+                        valueType: 'select',
+                        dataIndex: 'teamId',
+                        request: apiTeamOptions
+                    },
+                    {
+                        title: 'Overwrite',
+                        dataIndex: 'overwrite',
+                        align: 'center',
+                        search: false,
+                        render: (_, entity) => {
+                            return entity.overwrite ? 'Có' : 'Không';
+                        }
+                    },
+                    {
+                        title: 'Protected',
+                        align: 'center',
+                        search: false,
+                        dataIndex: 'protected',
+                        render: (_, entity) => {
+                            return entity.protected ? 'Có' : 'Không';
+                        }
+                    },
+                    {
+                        title: 'Liên hệ',
                         dataIndex: 'contactCount',
-                        search: false,
-                        valueType: 'digit'
-                    },
-                    {
-                        title: 'Đã phân bổ',
-                        dataIndex: 'assignedCount',
-                        search: false,
-                        valueType: 'digit'
-                    },
-                    {
-                        title: 'Chưa phân bổ',
-                        search: false,
-                        valueType: 'digit',
-                        render: (_, entity) => {
-                            return entity.contactCount - entity.assignedCount;
-                        }
-                    },
-                    {
-                        title: 'Đã gọi',
-                        dataIndex: 'dialedCount',
-                        align: 'center',
-                        search: false,
-                        valueType: 'digit'
-                    },
-                    {
-                        title: 'Chưa gọi',
-                        align: 'center',
-                        search: false,
-                        valueType: 'digit',
-                        render: (_, entity) => {
-                            return entity.contactCount - entity.dialedCount;
-                        }
-                    },
-                    {
-                        title: 'SL cơ hội',
-                        dataIndex: 'leadCount',
                         search: false,
                         valueType: 'digit'
                     },

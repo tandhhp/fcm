@@ -1,9 +1,11 @@
-﻿using Waffle.Core.Interfaces.IRepository.Leads;
+﻿using Waffle.Core.Helpers;
+using Waffle.Core.Interfaces.IRepository.Leads;
 using Waffle.Core.Interfaces.IService;
 using Waffle.Core.Services.Sources.Args;
 using Waffle.Core.Services.Sources.Filters;
 using Waffle.Core.Services.Sources.Results;
 using Waffle.Entities;
+using Waffle.Entities.Contacts;
 using Waffle.Models;
 
 namespace Waffle.Core.Services.Contacts;
@@ -22,7 +24,11 @@ public class SourceService(ISourceRepository _sourceRepository, ILogService _log
             await _logService.AddAsync($"Tạo mới nguồn: {args.Name}");
             await _sourceRepository.AddAsync(new Source
             {
-                Name = args.Name
+                Name = args.Name,
+                Overwrite = args.Overwrite,
+                Protected = args.Protected,
+                TypeOfDataId = args.TypeOfDataId,
+                TeamId = args.TeamId
             });
             return TResult.Success;
         }
@@ -47,9 +53,20 @@ public class SourceService(ISourceRepository _sourceRepository, ILogService _log
     {
         var data = await _sourceRepository.FindAsync(id);
         if (data == null) return TResult<object>.Failed("Nguồn không tồn tại!");
+        SourceType? sourceType = null;
+        if (data.TypeOfDataId.HasValue)
+        {
+            var typeOfData = await _sourceRepository.GetTypeOfDataByIdAsync(data.TypeOfDataId);
+            sourceType = typeOfData?.Source;
+        }
         return TResult<object>.Ok(new {
             data.Id,
-            data.Name
+            data.Name,
+            data.TypeOfDataId,
+            data.TeamId,
+            data.Protected,
+            data.Overwrite,
+            sourceType
         });
     }
 
@@ -61,12 +78,28 @@ public class SourceService(ISourceRepository _sourceRepository, ILogService _log
 
     public Task<ListResult<SourceReportResult>> ReportAsync(FilterOptions filterOptions) => _sourceRepository.ReportAsync(filterOptions);
 
+    public Task<object?> TypeOfDataOptionsAsync(TypeOfDataSelectOptions selectOptions) => _sourceRepository.TypeOfDataOptionsAsync(selectOptions);
+
+    public async Task<object?> TypeOfDataSourcesAsync()
+    {
+        var data = Enum.GetValues<SourceType>().Cast<SourceType>().Select(x => new
+        {
+            Value = x,
+            Label = EnumHelper.GetDisplayName(x)
+        }).ToList();
+        return data;
+    }
+
     public async Task<TResult> UpdateAsync(SourceUpdateArgs args)
     {
         var data = await _sourceRepository.FindAsync(args.Id);
         if (data is null) return TResult.Failed("Nguồn không tồn tại!");
-        await _logService.AddAsync($"Cập nhật nguồn: {data.Name} => {args.Name}");
         data.Name = args.Name;
+        data.TeamId = args.TeamId;
+        data.TypeOfDataId = args.TypeOfDataId;
+        data.Protected = args.Protected;
+        data.Overwrite = args.Overwrite;
+        await _logService.AddAsync($"Cập nhật nguồn: {data.Name} => {args.Name}");
         await _sourceRepository.UpdateAsync(data);
         return TResult.Success;
     }

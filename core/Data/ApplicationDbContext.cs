@@ -70,6 +70,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<GroupData> GroupDatas { get; set; }
     public DbSet<ContractServiceUsage> ContractServiceUsages { get; set; }
     public DbSet<ContractLeaveVoucherUsage> ContractLeaveVoucherUsages { get; set; }
+    public DbSet<TypeOfData> TypeOfDatas { get; set; }
 
     #region Finances
     public DbSet<Coupon> Coupons { get; set; }

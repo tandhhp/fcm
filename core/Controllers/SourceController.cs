@@ -35,4 +35,10 @@ public class SourceController(ISourceService _sourceService) : BaseController
 
     [HttpPost("assign")]
     public async Task<IActionResult> AssignAsync([FromBody] SourceAssignArgs args) => Ok(await _sourceService.AssignAsync(args));
+
+    [HttpGet("type-of-data/options")]
+    public async Task<IActionResult> TypeOfDataOptionsAsync([FromQuery] TypeOfDataSelectOptions selectOptions) => Ok(await _sourceService.TypeOfDataOptionsAsync(selectOptions));
+
+    [HttpGet("type-of-data/sources")]
+    public async Task<IActionResult> TypeOfDataSourcesAsync() => Ok(await _sourceService.TypeOfDataSourcesAsync());
 }

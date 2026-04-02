@@ -1,7 +1,8 @@
-import { apiSourceCreate, apiSourceDetail, apiSourceUpdate } from "@/services/settings/source";
-import { ModalForm, ModalFormProps, ProFormInstance, ProFormText } from "@ant-design/pro-components";
-import { message } from "antd";
-import { useEffect, useRef } from "react";
+import { apiSourceCreate, apiSourceDetail, apiSourceUpdate, apiTypeOfDataOptions, apiTypeOfDataSources } from "@/services/settings/source";
+import { apiTeamOptions } from "@/services/users/team";
+import { ModalForm, ModalFormProps, ProFormInstance, ProFormSelect, ProFormText } from "@ant-design/pro-components";
+import { Col, message, Row } from "antd";
+import { useEffect, useRef, useState } from "react";
 
 type Props = ModalFormProps & {
     data?: any;
@@ -11,6 +12,17 @@ type Props = ModalFormProps & {
 const SourceForm: React.FC<Props> = (props) => {
 
     const formRef = useRef<ProFormInstance>(null);
+    const [sourceType, setSourceType] = useState<number>();
+
+    const [typeOfDataOptions, setTypeOfDataOptions] = useState([]);
+
+    useEffect(() => {
+        const fetchTypeOfDataOptions = async () => {
+            const res = await apiTypeOfDataOptions({ sourceType });
+            setTypeOfDataOptions(res);
+        };
+        fetchTypeOfDataOptions();
+    }, [sourceType]);
 
     useEffect(() => {
         if (props.data) {
@@ -24,6 +36,22 @@ const SourceForm: React.FC<Props> = (props) => {
                     {
                         name: 'name',
                         value: data.name
+                    },
+                    {
+                        name: 'sourceType',
+                        value: data.sourceType
+                    },
+                    {
+                        name: 'typeOfDataId',
+                        value: data.typeOfDataId
+                    },
+                    {
+                        name: 'overwrite',
+                        value: data.overwrite
+                    },
+                    {
+                        name: 'protected',
+                        value: data.protected
                     }
                 ])
             });
@@ -43,8 +71,43 @@ const SourceForm: React.FC<Props> = (props) => {
     }
 
     return (
-        <ModalForm {...props} title="Nguồn" formRef={formRef} onFinish={onFinish}>
+        <ModalForm {...props} title="Source Form" formRef={formRef} onFinish={onFinish}
+        modalProps={{
+            destroyOnHidden: true
+        }}
+        >
             <ProFormText name="id" hidden />
+            <Row gutter={16}>
+                <Col xs={24} md={12}>
+                    <ProFormSelect name="sourceType" label="Source" request={apiTypeOfDataSources} rules={[
+                        {
+                            required: true
+                        }
+                    ]} allowClear={false}
+                        onChange={(value: number) => setSourceType(value)}
+                    />
+                </Col>
+                <Col xs={24} md={12}>
+                    <ProFormSelect name="typeOfDataId" label="Type of Data" options={typeOfDataOptions} rules={[
+                        {
+                            required: true
+                        }
+                    ]} />
+                </Col>
+                <Col xs={24} md={12}>
+                    <ProFormSelect name="overwrite" label="Overwrite" options={[
+                        { label: 'Có', value: true },
+                        { label: 'Không', value: false }
+                    ]} />
+                </Col>
+                <Col xs={24} md={12}>
+                    <ProFormSelect name="protected" label="Protected" options={[
+                        { label: 'Có', value: true },
+                        { label: 'Không', value: false }
+                    ]} />
+                </Col>
+            </Row>
+            <ProFormSelect name="teamId" label="Group" request={apiTeamOptions} showSearch />
             <ProFormText name="name" label="Tên nguồn" rules={[{ required: true, message: 'Vui lòng nhập tên nguồn' }]} />
         </ModalForm>
     )

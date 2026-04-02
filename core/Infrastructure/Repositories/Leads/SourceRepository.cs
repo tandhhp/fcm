@@ -6,8 +6,8 @@ using Waffle.Core.Services.Sources.Filters;
 using Waffle.Core.Services.Sources.Results;
 using Waffle.Data;
 using Waffle.Entities;
+using Waffle.Entities.Contacts;
 using Waffle.Models;
-using System.Reflection;
 
 namespace Waffle.Infrastructure.Repositories.Leads;
 
@@ -67,6 +67,8 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
         return TResult<object>.Ok(data);
     }
 
+    public async Task<TypeOfData?> GetTypeOfDataByIdAsync(int? typeOfDataId) => await _context.TypeOfDatas.FindAsync(typeOfDataId);
+
     public async Task<bool> IsExistAsync(string name) => await _context.Sources.AnyAsync(x => x.Name == name);
 
     public Task<bool> IsUsedAsync(int id) => _context.Leads.AnyAsync(x => x.SourceId == id);
@@ -74,20 +76,38 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
     public async Task<ListResult<object>> ListAsync(SourceFilterOptions filterOptions)
     {
         var query = from s in _context.Sources
-                    select new
+                    join t in _context.TypeOfDatas on s.TypeOfDataId equals t.Id into st
+                    from t in st.DefaultIfEmpty()
+                    join g in _context.Teams on s.TeamId equals g.Id into sg
+                    from g in sg.DefaultIfEmpty()
+                    select new SourceListItem
                     {
-                        s.Id,
-                        s.Name,
-                        LeadCount = _context.Leads.Count(l => l.SourceId == s.Id),
+                        Id = s.Id,
+                        Name = s.Name,
+                        TypeOfData = t.Name,
+                        TypeOfDataId = s.TypeOfDataId,
+                        SourceType = t.Source,
+                        Overwrite = s.Overwrite,
+                        Protected = s.Protected,
                         ContactCount = _context.Contacts.Count(c => c.SourceId == s.Id),
-                        DialedCount = (from c in _context.Contacts.Where(c => c.SourceId == s.Id)
-                                       join h in _context.CallHistories on c.Id equals h.ContactId
-                                       select c.Id).Distinct().Count(),
-                        AssignedCount = _context.Contacts.Count(c => c.SourceId == s.Id && c.UserId != null)
+                        TeamName = g.Name,
+                        TeamId = s.TeamId
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {
             query = query.Where(x => x.Name.ToLower().Contains(filterOptions.Name.ToLower()));
+        }
+        if (filterOptions.SourceType.HasValue)
+        {
+            query = query.Where(x => x.SourceType == filterOptions.SourceType);
+        }
+        if (filterOptions.TypeOfDataId.HasValue)
+        {
+            query = query.Where(x => x.TypeOfDataId == filterOptions.TypeOfDataId);
+        }
+        if (filterOptions.TeamId.HasValue)
+        {
+            query = query.Where(x => x.TeamId == filterOptions.TeamId);
         }
         query = query.OrderByDescending(x => x.Id);
         return await ListResult<object>.Success(query, filterOptions);
@@ -116,11 +136,11 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
     public async Task<ListResult<SourceReportResult>> ReportAsync(FilterOptions filterOptions)
     {
         var query = from s in _context.Sources
-                      select new
-                      {
-                          s.Id,
-                          s.Name
-                      };
+                    select new
+                    {
+                        s.Id,
+                        s.Name
+                    };
         var data = await query.Skip((filterOptions.Current - 1) * filterOptions.PageSize).Take(filterOptions.PageSize).ToListAsync();
         var result = new List<SourceReportResult>();
         foreach (var item in data)
@@ -136,5 +156,29 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
             });
         }
         return new ListResult<SourceReportResult>(result, await query.CountAsync(), filterOptions);
+    }
+
+    public async Task<object?> TypeOfDataOptionsAsync(TypeOfDataSelectOptions selectOptions)
+    {
+        var query = from t in _context.TypeOfDatas
+                    select new
+                    {
+                        t.Id,
+                        t.Name,
+                        t.Source
+                    };
+        if (selectOptions.SourceType.HasValue)
+        {
+            query = query.Where(x => x.Source == selectOptions.SourceType);
+        }
+        if (!string.IsNullOrWhiteSpace(selectOptions.KeyWords))
+        {
+            query = query.Where(x => x.Name.ToLower().Contains(selectOptions.KeyWords.ToLower()));
+        }
+        return await query.OrderByDescending(x => x.Id).Select(x => new
+        {
+            Label = x.Name,
+            Value = x.Id
+        }).ToListAsync();
     }
 }

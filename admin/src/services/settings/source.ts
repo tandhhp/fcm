@@ -49,3 +49,15 @@ export async function apiSourceAssign(data: any) {
 export async function apiAvailableSource() {
     return request(`source/availables`);
 }
+
+export async function apiTypeOfDataSources(params?: any) {
+    return request(`source/type-of-data/sources`, {
+        params
+    });
+}
+
+export async function apiTypeOfDataOptions(params?: any) {
+    return request(`source/type-of-data/options`, {
+        params
+    });
+}

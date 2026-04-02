@@ -16,7 +16,7 @@ const Index: React.FC = () => {
     const [team, setTeam] = useState<any>();
 
     useEffect(() => {
-        if (open && team) {
+        if (team) {
             formRef.current?.setFields([
                 {
                     name: 'name',
@@ -40,7 +40,7 @@ const Index: React.FC = () => {
                 }
             ]);
         }
-    }, [open, team]);
+    }, [team]);
 
     const onFinish = async (values: any) => {
         values.departmentId = id;
