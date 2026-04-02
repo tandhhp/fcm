@@ -417,9 +417,9 @@ export default [
         hideInMenu: true
       },
       {
-        name: 'Phòng - Ban',
+        name: 'Group',
         path: '/user/department',
-        component: './department'
+        component: './department/team'
       },
       {
         name: 'Nhóm',
