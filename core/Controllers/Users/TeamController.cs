@@ -34,4 +34,7 @@ public class TeamController(ITeamService _teamService) : BaseController
 
     [HttpGet("{id}")]
     public async Task<IActionResult> DetailAsync([FromRoute] int id) => Ok(await _teamService.DetailAsync(id));
+
+    [HttpGet("unassigned-users")]
+    public async Task<IActionResult> UnassignedUsersAsync() => Ok(await _teamService.UnassignedUsersAsync());
 }

@@ -73,6 +73,24 @@ public class TeamRepository(ApplicationDbContext context) : EfRepository<Team>(c
         }).ToListAsync();
     }
 
+    public async Task<object?> UnassignedUsersAsync()
+    {
+        var query = from u in _context.Users
+                    where u.TeamId == null
+                    select new
+                    {
+                        u.Id,
+                        u.UserName,
+                        u.Email,
+                        u.Name,
+                    };
+        return await query.Select(x => new
+        {
+            Label = $"{x.Name} - {x.UserName}",
+            Value = x.Id
+        }).ToListAsync();
+    }
+
     public async Task<ListResult<object>> UsersAsync(UserTeamFilterOptions filterOptions)
     {
         var query = from u in _context.Users
@@ -86,7 +104,8 @@ public class TeamRepository(ApplicationDbContext context) : EfRepository<Team>(c
                         u.Name,
                         u.Gender,
                         u.PhoneNumber,
-                        u.Avatar
+                        u.Avatar,
+                        u.LineCode
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {

@@ -3,7 +3,7 @@ import { apiBranchOptions } from "@/services/settings/branch";
 import { apiUserOptions } from "@/services/user";
 import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined, UsergroupAddOutlined } from "@ant-design/icons";
 import { ActionType, ModalForm, PageContainer, ProFormInstance, ProFormSelect, ProFormText, ProTable } from "@ant-design/pro-components"
-import { history, useAccess } from "@umijs/max";
+import { history, Link, useAccess } from "@umijs/max";
 import { Button, Col, Dropdown, message, Popconfirm, Row } from "antd";
 import { useEffect, useRef, useState } from "react";
 
@@ -77,6 +77,9 @@ const Index: React.FC = () => {
                     {
                         title: 'Tên phòng ban',
                         dataIndex: 'name',
+                        render: (dom, record) => (
+                            <Link to={`/user/department/team/${record.id}`} className="text-orange-500 font-semibold">{dom}</Link>
+                        )
                     },
                     {
                         title: 'Chi nhánh',

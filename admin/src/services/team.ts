@@ -23,3 +23,25 @@ export async function apiTeamDelete(id: string) {
         method: 'POST'
     });
 }
+
+export async function apiRemoveUserFromTeam(userId: string) {
+    return request(`team/user/${userId}`, {
+        method: 'DELETE'
+    });
+}
+
+export async function apiAddUserToTeam(teamId: string, userId: string) {
+    return request(`team/user`, {
+        method: 'POST',
+        data: {
+            teamId,
+            userId
+        }
+    });
+}
+
+export async function apiUnassignTeamUsers(params: any) {
+    return request(`team/unassigned-users`, {
+        params
+    });
+}

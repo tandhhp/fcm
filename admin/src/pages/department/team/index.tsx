@@ -4,7 +4,7 @@ import { apiGroupDataOptions } from "@/services/users/group-data";
 import { apiTeamCreate, apiTeamDelete, apiTeamList, apiTeamUpdate } from "@/services/users/team";
 import { DeleteOutlined, EditOutlined, LeftOutlined, MoreOutlined, PlusOutlined, UsergroupAddOutlined } from "@ant-design/icons";
 import { ActionType, ModalForm, PageContainer, ProFormInstance, ProFormSelect, ProFormText, ProTable } from "@ant-design/pro-components"
-import { history, useParams } from "@umijs/max";
+import { history, Link, useParams } from "@umijs/max";
 import { Button, Dropdown, message, Popconfirm } from "antd";
 import { useEffect, useRef, useState } from "react";
 
@@ -43,6 +43,7 @@ const Index: React.FC = () => {
     }, [team]);
 
     const onFinish = async (values: any) => {
+        values.departmentId = id;
         if (values.id) {
             await apiTeamUpdate(values);
         } else {
@@ -58,7 +59,7 @@ const Index: React.FC = () => {
     return (
         <PageContainer extra={<Button icon={<LeftOutlined />} onClick={() => history.back()}>Quay lại</Button>}>
             <ProTable
-                headerTitle={<Button type="primary" onClick={() => setOpen(true)} icon={<PlusOutlined />}>Thêm nhóm</Button>}
+                headerTitle={<Button type="primary" onClick={() => setOpen(true)} icon={<PlusOutlined />}>Tạo nhóm</Button>}
                 request={apiTeamList} params={{ departmentId: id }}
                 actionRef={actionRef}
                 search={{
@@ -73,7 +74,10 @@ const Index: React.FC = () => {
                     },
                     {
                         title: 'Tên nhóm',
-                        dataIndex: 'name'
+                        dataIndex: 'name',
+                        render: (dom, record) => (
+                            <Link to={`/user/department/team/user/${record.id}`} className="text-orange-500 font-semibold">{dom}</Link>
+                        )
                     },
                     {
                         title: 'Trưởng nhóm',

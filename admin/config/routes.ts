@@ -403,7 +403,7 @@ export default [
         name: 'Nhân viên',
         path: '/user/roles',
         component: './users/roles',
-        access: 'canHr'
+        access: 'canHR'
       },
       {
         name: 'Nhân viên đã nghỉ',
@@ -421,7 +421,7 @@ export default [
         name: 'Phòng ban',
         path: '/user/department',
         component: './department',
-        access: 'canHr'
+        access: 'can_read_page_department'
       },
       {
         name: 'Nhóm',

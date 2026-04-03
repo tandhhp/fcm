@@ -9,5 +9,6 @@ public interface ITeamRepository : IAsyncRepository<Team>
     Task<bool> ExistsAsync(string name, int departmentId);
     Task<ListResult<object>> ListAsync(TeamFilterOptions filterOptions);
     Task<object?> OptionsAsync(TeamSelectOptions selectOptions);
+    Task<object?> UnassignedUsersAsync();
     Task<ListResult<object>> UsersAsync(UserTeamFilterOptions filterOptions);
 }

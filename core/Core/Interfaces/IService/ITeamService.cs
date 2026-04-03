@@ -17,4 +17,5 @@ public interface ITeamService
     Task<TResult> AddUserAsync(TeamUserAddArgs args);
     Task<TResult> RemoveUserAsync(Guid id);
     Task<TResult<object>> DetailAsync(int id);
+    Task<object?> UnassignedUsersAsync();
 }

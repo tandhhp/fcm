@@ -10,7 +10,7 @@ using Waffle.Models;
 
 namespace Waffle.Core.Services.Teams;
 
-public class TeamService(ITeamRepository _teamRepository, IDepartmentService _departmentService, UserManager<ApplicationUser> _userManager) : ITeamService
+public class TeamService(ITeamRepository _teamRepository, IDepartmentService _departmentService, UserManager<ApplicationUser> _userManager, ILogService _logService) : ITeamService
 {
     public async Task<TResult> AddUserAsync(TeamUserAddArgs args)
     {
@@ -19,7 +19,7 @@ public class TeamService(ITeamRepository _teamRepository, IDepartmentService _de
         var user = await _userManager.FindByIdAsync(args.UserId.ToString());
         if (user is null) return TResult.Failed("Không tìm thấy người dùng!");
         user.TeamId = args.TeamId;
-        user.ManagerId = team.LeaderId;
+        await _logService.AddAsync($"Đã thêm người dùng {user.Name} vào nhóm {team.Name}");
         var result = await _userManager.UpdateAsync(user);
         return result.Succeeded ? TResult.Success : TResult.Failed(result.Errors.FirstOrDefault()?.Description ?? "Có lỗi xảy ra!");
     }
@@ -38,6 +38,7 @@ public class TeamService(ITeamRepository _teamRepository, IDepartmentService _de
             CallCenterId = args.CallCenterId,
             GroupDataId = args.GroupDataId
         };
+        await _logService.AddAsync($"Đã tạo nhóm {team.Name}");
         await _teamRepository.AddAsync(team);
         return TResult.Success;
     }
@@ -50,6 +51,7 @@ public class TeamService(ITeamRepository _teamRepository, IDepartmentService _de
         {
             return TResult.Failed("Không thể xóa nhóm vì có người dùng đang thuộc nhóm này!");
         }
+        await _logService.AddAsync($"Đã xóa nhóm {team.Name} (ID: {team.Id})");
         await _teamRepository.DeleteAsync(team);
         return TResult.Success;
     }
@@ -83,9 +85,12 @@ public class TeamService(ITeamRepository _teamRepository, IDepartmentService _de
         if (user is null) return TResult.Failed("Không tìm thấy người dùng!");
         user.TeamId = null;
         user.ManagerId = null;
+        await _logService.AddAsync($"Đã xóa người dùng {user.Name} khỏi nhóm {user.TeamId}");
         var result = await _userManager.UpdateAsync(user);
         return result.Succeeded ? TResult.Success : TResult.Failed(result.Errors.FirstOrDefault()?.Description ?? "Có lỗi xảy ra!");
     }
+
+    public Task<object?> UnassignedUsersAsync() => _teamRepository.UnassignedUsersAsync();
 
     public async Task<TResult> UpdateAsync(UpdateTeamArgs args)
     {
@@ -103,6 +108,7 @@ public class TeamService(ITeamRepository _teamRepository, IDepartmentService _de
         team.DepartmentId = args.DepartmentId;
         team.CallCenterId = args.CallCenterId;
         team.GroupDataId = args.GroupDataId;
+        await _logService.AddAsync($"Đã cập nhật thông tin nhóm {team.Name} (ID: {team.Id})");
         await _teamRepository.UpdateAsync(team);
         return TResult.Success;
     }
