@@ -7,3 +7,8 @@ public class TypeOfDataSelectOptions : SelectOptions
 {
     public SourceType? SourceType { get; set; }
 }
+
+public class SourceSelectOptions : SelectOptions
+{
+    public int? TeamId { get; set; }
+}

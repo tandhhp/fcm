@@ -391,7 +391,7 @@ export default [
     icon: 'TeamOutlined',
     name: 'Người dùng',
     path: '/user',
-    access: 'canHR',
+    access: 'can_read_page_user',
     routes: [
       {
         name: 'Hoạt động',
@@ -402,7 +402,8 @@ export default [
       {
         name: 'Nhân viên',
         path: '/user/roles',
-        component: './users/roles'
+        component: './users/roles',
+        access: 'canHr'
       },
       {
         name: 'Nhân viên đã nghỉ',
@@ -417,9 +418,10 @@ export default [
         hideInMenu: true
       },
       {
-        name: 'Group',
+        name: 'Phòng ban',
         path: '/user/department',
-        component: './department/team'
+        component: './department',
+        access: 'canHr'
       },
       {
         name: 'Nhóm',

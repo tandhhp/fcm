@@ -69,6 +69,15 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
 
     public async Task<TypeOfData?> GetTypeOfDataByIdAsync(int? typeOfDataId) => await _context.TypeOfDatas.FindAsync(typeOfDataId);
 
+    public async Task<TResult> GetTypeOfDataBySourceIdAsync(int sourceId)
+    {
+        var query = from s in _context.Sources
+                    join t in _context.TypeOfDatas on s.TypeOfDataId equals t.Id
+                    where s.Id == sourceId
+                    select t;
+        return TResult.Ok(await query.FirstOrDefaultAsync());
+    }
+
     public async Task<bool> IsExistAsync(string name) => await _context.Sources.AnyAsync(x => x.Name == name);
 
     public Task<bool> IsUsedAsync(int id) => _context.Leads.AnyAsync(x => x.SourceId == id);
@@ -113,17 +122,22 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
         return await ListResult<object>.Success(query, filterOptions);
     }
 
-    public async Task<object> OptionsAsync(SelectOptions selectOptions)
+    public async Task<object> OptionsAsync(SourceSelectOptions selectOptions)
     {
         var query = from s in _context.Sources
                     select new
                     {
                         s.Id,
-                        s.Name
+                        s.Name,
+                        s.TeamId
                     };
         if (!string.IsNullOrWhiteSpace(selectOptions.KeyWords))
         {
             query = query.Where(x => x.Name.ToLower().Contains(selectOptions.KeyWords.ToLower()));
+        }
+        if (selectOptions.TeamId.HasValue)
+        {
+            query = query.Where(x => x.TeamId == selectOptions.TeamId);
         }
         query = query.OrderByDescending(x => x.Id);
         return await query.Select(x => new

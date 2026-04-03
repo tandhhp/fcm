@@ -44,7 +44,9 @@ public enum ContactStatus
     [Display(Name = "Mới")]
     New,
     [Display(Name = "Danh sách đen")]
-    Blacklisted
+    Blacklisted,
+    [Display(Name = "Đã liên hệ")]
+    Contacted
 }
 
 public enum Confirm2Status

@@ -12,7 +12,7 @@ export async function apiSourceCreate(data: any) {
         data
     });
 }
-
+ 
 export async function apiSourceUpdate(data: any) {
     return request('source', {
         method: 'PUT',
@@ -59,5 +59,13 @@ export async function apiTypeOfDataSources(params?: any) {
 export async function apiTypeOfDataOptions(params?: any) {
     return request(`source/type-of-data/options`, {
         params
+    });
+}
+
+export async function apiGetTypeOfDataBySource(sourceId: number) {
+    return request(`source/type-of-data-by-source-id`, {
+        params: {
+            sourceId
+        }
     });
 }

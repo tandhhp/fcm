@@ -43,7 +43,6 @@ const Index: React.FC = () => {
     }, [team]);
 
     const onFinish = async (values: any) => {
-        values.departmentId = id;
         if (values.id) {
             await apiTeamUpdate(values);
         } else {
@@ -143,7 +142,7 @@ const Index: React.FC = () => {
                     <ProFormSelect name={"callCenterId"} label="Call Center" request={apiCallCenterOptions} />
                     <ProFormSelect name="groupDataId" label="Group Data" request={apiGroupDataOptions} />
                 </div>
-                <ProFormSelect name="leaderId" label="Trưởng nhóm" request={apiUserOptions} showSearch rules={[{ required: true }]} />
+                <ProFormSelect name="leaderId" label="Trưởng nhóm" request={apiUserOptions} showSearch />
             </ModalForm>
         </PageContainer>
     )

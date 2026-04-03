@@ -4,4 +4,5 @@ public class ContactImportArgs
 {
     public int SourceId { get; set; }
     public IFormFile? File { get; set; }
+    public Guid? TeleId { get; set; }
 }

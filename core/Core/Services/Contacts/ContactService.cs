@@ -264,7 +264,8 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
                         "nữ" => true,
                         _ => null
                     },
-                    SourceId = source.Id
+                    SourceId = source.Id,
+                    UserId = args.TeleId
                 };
                 contacts.Add(contact);
             }

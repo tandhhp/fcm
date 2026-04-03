@@ -25,7 +25,7 @@ public class SourceController(ISourceService _sourceService) : BaseController
     public async Task<IActionResult> DeleteAsync([FromRoute] int id) => Ok(await _sourceService.DeleteAsync(id));
 
     [HttpGet("options")]
-    public async Task<IActionResult> OptionsAsync([FromQuery] SelectOptions selectOptions) => Ok(await _sourceService.OptionsAsync(selectOptions));
+    public async Task<IActionResult> OptionsAsync([FromQuery] SourceSelectOptions selectOptions) => Ok(await _sourceService.OptionsAsync(selectOptions));
 
     [HttpGet("report")]
     public async Task<IActionResult> ReportAsync([FromQuery] FilterOptions filterOptions) => Ok(await _sourceService.ReportAsync(filterOptions));
@@ -41,4 +41,7 @@ public class SourceController(ISourceService _sourceService) : BaseController
 
     [HttpGet("type-of-data/sources")]
     public async Task<IActionResult> TypeOfDataSourcesAsync() => Ok(await _sourceService.TypeOfDataSourcesAsync());
+
+    [HttpGet("type-of-data-by-source-id")]
+    public async Task<IActionResult> GetTypeOfDataBySourceIdAsync([FromQuery] int sourceId) => Ok(await _sourceService.GetTypeOfDataBySourceIdAsync(sourceId));
 }

@@ -10,7 +10,7 @@ public class Team : BaseEntity<int>
     [StringLength(256)]
     public string Name { get; set; } = default!;
     [ForeignKey(nameof(Department))]
-    public int DepartmentId { get; set; }
+    public int? DepartmentId { get; set; }
     [ForeignKey(nameof(CallCenter))]
     public int? CallCenterId { get; set; }
     [ForeignKey(nameof(GroupData))]

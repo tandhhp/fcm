@@ -113,6 +113,7 @@ export default (initialState: { currentUser?: API.User }) => {
   const can_read_page_event = event || sales || sm || dos || dot || telesaleManager || telesale || cx || canAdmin;
   const can_read_page_event_showup_report = event || canAdmin || dot || dos || sm || cx || sales;
   const can_confirm2 = currentUser && (currentUser.claims?.some((claim) => claim.type === 'ACCESS' && claim.value === 'CONFIRM2') || false) || canAdmin;
+  const can_read_page_user = canAdmin || hr || dot;
 
   return {
     canAdmin,
@@ -163,6 +164,7 @@ export default (initialState: { currentUser?: API.User }) => {
     can_read_page_event_customer,
     can_read_page_event_invoice,
     can_read_page_event_showup_report,
-    can_confirm2
+    can_confirm2,
+    can_read_page_user
   };
 };

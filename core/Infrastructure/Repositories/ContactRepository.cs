@@ -6,6 +6,7 @@ using Waffle.Core.Interfaces.IRepository;
 using Waffle.Core.Interfaces.IService;
 using Waffle.Core.Services.Contacts.Filters;
 using Waffle.Core.Services.Contacts.Models;
+using Waffle.Core.Services.Contacts.Results;
 using Waffle.Data;
 using Waffle.Entities;
 using Waffle.Entities.Contacts;
@@ -202,42 +203,41 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
 
     public async Task<ListResult<dynamic>> ListAsync(ContactFilterOptions filterOptions)
     {
-
         var userId = _hcaService.GetUserId();
         var query = from a in _context.Contacts
                     join b in _context.Users on a.UserId equals b.Id into ab
                     from b in ab.DefaultIfEmpty()
                     join s in _context.Sources on a.SourceId equals s.Id into asource
                     from s in asource.DefaultIfEmpty()
-                    where a.Status != ContactStatus.Blacklisted && a.UserId != null
-                    select new
+                    join t in _context.Teams on b.TeamId equals t.Id into bteam
+                    from t in bteam.DefaultIfEmpty()
+                    join tod in _context.TypeOfDatas on s.TypeOfDataId equals tod.Id into stype
+                    from tod in stype.DefaultIfEmpty()
+                    where a.UserId != null
+                    where a.Status == ContactStatus.Contacted
+                    select new ContactListItem
                     {
-                        a.Id,
-                        a.PhoneNumber,
-                        a.Email,
-                        a.CreatedDate,
-                        a.Name,
-                        a.Note,
+                        Id = a.Id,
+                        PhoneNumber = a.PhoneNumber,
+                        CreatedDate = a.CreatedDate,
+                        Name = a.Name,
+                        Note = a.Note,
                         TelesalesId = a.UserId,
                         TelesalesName = b.Name,
-                        a.Gender,
-                        IsBooked = _context.Leads.Any(x => x.PhoneNumber == a.PhoneNumber),
-                        a.SourceId,
-                        b.TmId,
-                        b.DotId,
-                        b.DosId,
-                        a.Confirm1,
+                        ShowUp = _context.Leads.Any(x => x.PhoneNumber == a.PhoneNumber && !x.Duplicated),
+                        SourceId = a.SourceId,
+                        TmId = b.TmId,
+                        DotId = b.DotId,
+                        DosId = b.DosId,
+                        Confirm1 = a.Confirm1,
                         SourceName = s.Name,
-                        IsCalled = _context.CallHistories.Any(x => x.ContactId == a.Id)
+                        TypeOfDataId = s.TypeOfDataId,
+                        TypeOfDataName = tod.Name,
+                        SourceType = tod.Source
                     };
-        query = query.Where(x => !x.IsCalled);
         if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
         {
             query = query.Where(x => !string.IsNullOrEmpty(x.PhoneNumber) && x.PhoneNumber.ToLower().Contains(filterOptions.PhoneNumber.ToLower()));
-        }
-        if (!string.IsNullOrWhiteSpace(filterOptions.Email))
-        {
-            query = query.Where(x => !string.IsNullOrEmpty(x.Email) && x.Email.ToLower().Contains(filterOptions.Email.ToLower()));
         }
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {
@@ -249,11 +249,23 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         }
         if (filterOptions.IsBooked.HasValue)
         {
-            query = query.Where(x => x.IsBooked == filterOptions.IsBooked);
+            query = query.Where(x => x.ShowUp == filterOptions.IsBooked);
         }
         if (filterOptions.Confirm1.HasValue)
         {
             query = query.Where(x => x.Confirm1 == filterOptions.Confirm1);
+        }
+        if (filterOptions.TypeOfDataId.HasValue)
+        {
+            query = query.Where(x => x.TypeOfDataId == filterOptions.TypeOfDataId);
+        }
+        if (filterOptions.SourceType.HasValue)
+        {
+            query = query.Where(x => x.SourceType == filterOptions.SourceType);
+        }
+        if (filterOptions.TelesalesId.HasValue)
+        {
+            query = query.Where(x => x.TelesalesId == filterOptions.TelesalesId);
         }
         if (_hcaService.IsUserInRole(RoleName.Telesale))
         {

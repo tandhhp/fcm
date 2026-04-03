@@ -12,10 +12,11 @@ public interface ISourceRepository : IAsyncRepository<Source>
     Task<TResult> AssignAsync(SourceAssignArgs args);
     Task<TResult<object>> AvailablesAsync();
     Task<TypeOfData?> GetTypeOfDataByIdAsync(int? typeOfDataId);
+    Task<TResult> GetTypeOfDataBySourceIdAsync(int sourceId);
     Task<bool> IsExistAsync(string name);
     Task<bool> IsUsedAsync(int id);
     Task<ListResult<object>> ListAsync(SourceFilterOptions filterOptions);
-    Task<object> OptionsAsync(SelectOptions selectOptions);
+    Task<object> OptionsAsync(SourceSelectOptions selectOptions);
     Task<ListResult<SourceReportResult>> ReportAsync(FilterOptions filterOptions);
     Task<object?> TypeOfDataOptionsAsync(TypeOfDataSelectOptions selectOptions);
 }
