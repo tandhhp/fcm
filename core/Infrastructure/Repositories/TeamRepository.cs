@@ -55,11 +55,16 @@ public class TeamRepository(ApplicationDbContext context) : EfRepository<Team>(c
                     {
                         t.Id,
                         t.Name,
-                        t.DepartmentId
+                        t.DepartmentId,
+                        t.CallCenterId
                     };
         if (selectOptions.DepartmentId != null)
         {
             query = query.Where(t => t.DepartmentId == selectOptions.DepartmentId);
+        }
+        if (selectOptions.CallCenterId.HasValue)
+        {
+            query = query.Where(t => t.CallCenterId == selectOptions.CallCenterId);
         }
         if (!string.IsNullOrWhiteSpace(selectOptions.KeyWords))
         {
@@ -94,7 +99,6 @@ public class TeamRepository(ApplicationDbContext context) : EfRepository<Team>(c
     public async Task<ListResult<object>> UsersAsync(UserTeamFilterOptions filterOptions)
     {
         var query = from u in _context.Users
-                    where u.TeamId == filterOptions.TeamId
                     select new
                     {
                         u.Id,
@@ -107,9 +111,18 @@ public class TeamRepository(ApplicationDbContext context) : EfRepository<Team>(c
                         u.Avatar,
                         u.LineCode
                     };
+        if (filterOptions.TeamId.HasValue)
+        {
+            query = query.Where(u => u.TeamId == filterOptions.TeamId);
+        }
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {
             query = query.Where(u => u.Name.Contains(filterOptions.Name, StringComparison.CurrentCultureIgnoreCase));
+        }
+        if (!string.IsNullOrWhiteSpace(filterOptions.TeamIds))
+        {
+            var teamIds = filterOptions.TeamIds.Split(",");
+            query = query.Where(u => teamIds.Contains(u.TeamId.ToString()));
         }
         return await ListResult<object>.Success(query, filterOptions);
     }

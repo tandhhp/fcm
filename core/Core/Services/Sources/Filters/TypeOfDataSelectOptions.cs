@@ -11,4 +11,17 @@ public class TypeOfDataSelectOptions : SelectOptions
 public class SourceSelectOptions : SelectOptions
 {
     public int? TeamId { get; set; }
+    public TypeOfDataSelectType? TypeOfData { get; set; }
+}
+
+public class SourceTeamSelectOptions : SelectOptions
+{
+    public TypeOfDataSelectType TypeOfData { get; set; }
+}
+
+public enum TypeOfDataSelectType
+{
+    New = 1,
+    Old = 2,
+    StartCase = 3
 }

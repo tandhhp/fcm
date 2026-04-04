@@ -341,6 +341,11 @@ export default [
         access: 'can_read_page_contact_source'
       },
       {
+        name: 'Chia dữ liệu',
+        path: '/contact/assign',
+        component: './contact/source/assign'
+      },
+      {
         name: 'Tele Report',
         path: '/contact/report-tele',
         component: './contact/report/tele'

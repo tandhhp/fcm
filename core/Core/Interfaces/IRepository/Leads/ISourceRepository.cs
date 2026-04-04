@@ -17,6 +17,8 @@ public interface ISourceRepository : IAsyncRepository<Source>
     Task<bool> IsUsedAsync(int id);
     Task<ListResult<object>> ListAsync(SourceFilterOptions filterOptions);
     Task<object> OptionsAsync(SourceSelectOptions selectOptions);
+    Task<object?> OptionsByTypeOfDataAsync(SourceSelectOptions selectOptions);
     Task<ListResult<SourceReportResult>> ReportAsync(FilterOptions filterOptions);
+    Task<object?> TeamOptionsAsync(SourceTeamSelectOptions selectOptions);
     Task<object?> TypeOfDataOptionsAsync(TypeOfDataSelectOptions selectOptions);
 }

@@ -17,7 +17,9 @@ public interface ISourceService
     Task<TResult> GetTypeOfDataBySourceIdAsync(int sourceId);
     Task<ListResult<object>> ListAsync(SourceFilterOptions filterOptions);
     Task<object> OptionsAsync(SourceSelectOptions selectOptions);
+    Task<object?> OptionsByTypeOfDataAsync(SourceSelectOptions selectOptions);
     Task<ListResult<SourceReportResult>> ReportAsync(FilterOptions filterOptions);
+    Task<object?> TeamOptionsAsync(SourceTeamSelectOptions selectOptions);
     Task<object?> TypeOfDataOptionsAsync(TypeOfDataSelectOptions selectOptions);
     Task<object?> TypeOfDataSourcesAsync();
     Task<TResult> UpdateAsync(SourceUpdateArgs args);

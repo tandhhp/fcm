@@ -78,7 +78,11 @@ public class SourceService(ISourceRepository _sourceRepository, ILogService _log
 
     public Task<object> OptionsAsync(SourceSelectOptions selectOptions) => _sourceRepository.OptionsAsync(selectOptions);
 
+    public Task<object?> OptionsByTypeOfDataAsync(SourceSelectOptions selectOptions) => _sourceRepository.OptionsByTypeOfDataAsync(selectOptions);
+
     public Task<ListResult<SourceReportResult>> ReportAsync(FilterOptions filterOptions) => _sourceRepository.ReportAsync(filterOptions);
+
+    public Task<object?> TeamOptionsAsync(SourceTeamSelectOptions selectOptions) => _sourceRepository.TeamOptionsAsync(selectOptions);
 
     public Task<object?> TypeOfDataOptionsAsync(TypeOfDataSelectOptions selectOptions) => _sourceRepository.TypeOfDataOptionsAsync(selectOptions);
 

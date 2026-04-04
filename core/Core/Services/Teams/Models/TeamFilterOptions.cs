@@ -11,5 +11,6 @@ public class TeamFilterOptions : FilterOptions
 public class UserTeamFilterOptions : FilterOptions
 {
     public string? Name { get; set; }
-    public int TeamId { get; set; }
+    public int? TeamId { get; set; }
+    public string? TeamIds { get; set; }
 }

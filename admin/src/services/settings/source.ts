@@ -69,3 +69,15 @@ export async function apiGetTypeOfDataBySource(sourceId: number) {
         }
     });
 }
+
+export async function apiSourceTeamOptions(params?: any) {
+    return request(`source/team/options`, {
+        params
+    });
+}
+
+export async function apiSourceByTeamAndTypeOfData(params?: any) {
+    return request(`source/options-by-type-of-data`, {
+        params
+    });
+}

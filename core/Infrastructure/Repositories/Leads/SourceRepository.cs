@@ -147,6 +147,56 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
         }).ToListAsync();
     }
 
+    public async Task<object?> OptionsByTypeOfDataAsync(SourceSelectOptions selectOptions)
+    {
+        var query = from s in _context.Sources
+                    select new
+                    {
+                        s.Id,
+                        s.Name,
+                        s.TeamId,
+                        ContactCount = (from c in _context.Contacts.Where(x => x.SourceId == s.Id)
+                                        where c.UserId != null
+                                        where c.Status != ContactStatus.Blacklisted
+                                        select c.Id).Count()
+                    };
+        if (selectOptions.TypeOfData == TypeOfDataSelectType.New)
+        {
+            query = from s in _context.Sources
+                    select new
+                    {
+                        s.Id,
+                        s.Name,
+                        s.TeamId,
+                        ContactCount = (from c in _context.Contacts.Where(x => x.SourceId == s.Id)
+                                        where c.Status != ContactStatus.Blacklisted
+                                        where c.UserId == null
+                                        select c.Id).Count()
+                    };
+        }
+        if (selectOptions.TypeOfData == TypeOfDataSelectType.Old)
+        {
+            query = from s in _context.Sources
+                    select new
+                    {
+                        s.Id,
+                        s.Name,
+                        s.TeamId,
+                        ContactCount = (from c in _context.Contacts.Where(x => x.SourceId == s.Id)
+                                        where c.UserId != null
+                                        where c.Status != ContactStatus.Blacklisted
+                                        where c.CreatedDate < DateTime.UtcNow.AddMonths(-1)
+                                        select c.Id).Count()
+                    };
+        }
+        query = query.Where(x => x.TeamId == selectOptions.TeamId);
+        return await query.OrderByDescending(x => x.ContactCount).Select(x => new
+        {
+            Label = $"{x.Name} ({x.ContactCount})",
+            Value = x.Id
+        }).ToListAsync();
+    }
+
     public async Task<ListResult<SourceReportResult>> ReportAsync(FilterOptions filterOptions)
     {
         var query = from s in _context.Sources
@@ -170,6 +220,54 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
             });
         }
         return new ListResult<SourceReportResult>(result, await query.CountAsync(), filterOptions);
+    }
+
+    public async Task<object?> TeamOptionsAsync(SourceTeamSelectOptions selectOptions)
+    {
+        var query = from t in _context.Teams
+                    select new
+                    {
+                        t.Id,
+                        t.Name,
+                        ContactCount = (from s in _context.Sources.Where(s => s.TeamId == t.Id)
+                                        join c in _context.Contacts on s.Id equals c.SourceId
+                                        where c.UserId != null
+                                        select c.Id).Count()
+                    };
+        if (selectOptions.TypeOfData == TypeOfDataSelectType.New)
+        {
+            // new: là đẩy dữ liệu lên và chưa chia, chưa dùng tới
+            query = from t in _context.Teams
+                    select new
+                    {
+                        t.Id,
+                        t.Name,
+                        ContactCount = (from s in _context.Sources.Where(s => s.TeamId == t.Id)
+                                        join c in _context.Contacts on s.Id equals c.SourceId
+                                        where c.UserId == null
+                                        select c.Id).Count()
+                    };
+        }
+        if (selectOptions.TypeOfData == TypeOfDataSelectType.Old)
+        {
+            // old là đã chia rồi và mốc sẽ là 1 tháng trở về trước
+            query = from t in _context.Teams
+                    select new
+                    {
+                        t.Id,
+                        t.Name,
+                        ContactCount = (from s in _context.Sources.Where(s => s.TeamId == t.Id)
+                                        join c in _context.Contacts on s.Id equals c.SourceId
+                                        where c.UserId != null
+                                        where c.CreatedDate < DateTime.UtcNow.AddMonths(-1)
+                                        select c.Id).Count()
+                    };
+        }
+        return await query.OrderByDescending(x => x.ContactCount).Select(x => new
+        {
+            Label = $"{x.Name} ({x.ContactCount})",
+            Value = x.Id
+        }).ToListAsync();
     }
 
     public async Task<object?> TypeOfDataOptionsAsync(TypeOfDataSelectOptions selectOptions)

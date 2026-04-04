@@ -29,8 +29,14 @@ export async function apiTeamUsers(params: any) {
 }
 
 
-export async function apiTeamOptions() {
-    return request('team/options');
+export async function apiTeamOptions(params?: {
+    callCenterId?: number;
+    keyWord?: string;
+    departmentId?: number;
+}) {
+    return request('team/options', {
+        params
+    });
 }
 
 export async function apiTeamAddUser(data: any) {

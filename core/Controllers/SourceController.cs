@@ -44,4 +44,10 @@ public class SourceController(ISourceService _sourceService) : BaseController
 
     [HttpGet("type-of-data-by-source-id")]
     public async Task<IActionResult> GetTypeOfDataBySourceIdAsync([FromQuery] int sourceId) => Ok(await _sourceService.GetTypeOfDataBySourceIdAsync(sourceId));
+
+    [HttpGet("team/options")]
+    public async Task<IActionResult> TeamOptionsAsync([FromQuery] SourceTeamSelectOptions selectOptions) => Ok(await _sourceService.TeamOptionsAsync(selectOptions));
+
+    [HttpGet("options-by-type-of-data")]
+    public async Task<IActionResult> OptionsByTypeOfDataAsync([FromQuery] SourceSelectOptions selectOptions) => Ok(await _sourceService.OptionsByTypeOfDataAsync(selectOptions));
 }
