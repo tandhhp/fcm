@@ -95,16 +95,16 @@ const SourceForm: React.FC<Props> = (props) => {
                     ]} />
                 </Col>
                 <Col xs={24} md={12}>
-                    <ProFormSelect name="overwrite" label="Overwrite" options={[
+                    <ProFormSelect name="overwrite" initialValue={false} label="Overwrite" options={[
                         { label: 'Có', value: true },
                         { label: 'Không', value: false }
-                    ]} />
+                    ]} allowClear={false} />
                 </Col>
                 <Col xs={24} md={12}>
-                    <ProFormSelect name="protected" label="Protected" options={[
+                    <ProFormSelect name="protected" initialValue={false} label="Protected" options={[
                         { label: 'Có', value: true },
                         { label: 'Không', value: false }
-                    ]} />
+                    ]} allowClear={false} />
                 </Col>
             </Row>
             <ProFormSelect name="teamId" label="Group" request={apiTeamOptions} showSearch />

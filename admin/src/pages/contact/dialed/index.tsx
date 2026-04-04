@@ -42,105 +42,13 @@ const Index: React.FC = () => {
                 actionRef={actionRef}
                 request={apiContactDialedCalls}
                 rowKey="id"
-                scroll={{
-                    x: true
-                }}
+                scroll={{ x: true }}
                 columns={[
                     {
                         title: '#',
                         valueType: 'indexBorder',
                         width: 30,
                         align: 'center'
-                    },
-                    {
-                        title: 'SDT',
-                        dataIndex: 'phoneNumber',
-                        minWidth: 100,
-                        width: 100,
-                        render: (text, record) => {
-                            return (
-                                <Button type="link" size="small" icon={<PhoneOutlined />} onClick={() => {
-                                    setContact(record);
-                                    setOpenCall(true);
-                                }}>{text}</Button>
-                            )
-                        }
-                    },
-                    {
-                        title: 'Tên liên hệ',
-                        dataIndex: 'name',
-                        minWidth: 150,
-                    },
-                    {
-                        title: 'Ngày gọi',
-                        dataIndex: 'calledAt',
-                        valueType: 'dateTime',
-                        search: false,
-                        width: 150,
-                        minWidth: 150
-                    },
-                    {
-                        title: 'Trạng thái',
-                        dataIndex: 'callStatusId',
-                        request: apiCallOptions,
-                        valueType: 'select',
-                        fieldProps: {
-                            showSearch: true
-                        }
-                    },
-                    {
-                        title: 'Nguồn',
-                        dataIndex: 'sourceName',
-                        search: false
-                    },
-                    {
-                        title: 'Người gọi',
-                        dataIndex: 'teleName',
-                        search: false
-                    },
-                    {
-                        title: 'Nguồn',
-                        dataIndex: 'sourceId',
-                        hideInTable: true,
-                        valueType: 'select',
-                        request: apiSourceOptions,
-                        fieldProps: {
-                            showSearch: true
-                        }
-                    },
-                    {
-                        title: 'Extra',
-                        dataIndex: 'extraStatus',
-                        search: false
-                    },
-                    {
-                        title: 'Tuổi',
-                        dataIndex: 'age'
-                    },
-                    {
-                        title: 'Công việc',
-                        dataIndex: 'job'
-                    },
-                    {
-                        title: 'Hẹn gọi',
-                        dataIndex: 'followUpDate',
-                        valueType: 'date',
-                        search: false,
-                        width: 100,
-                        minWidth: 100
-                    },
-                    {
-                        title: 'Sự kiện',
-                        dataIndex: 'isBooked',
-                        valueType: 'select',
-                        valueEnum: {
-                            true: { text: 'Đã đặt', status: 'Success' },
-                            false: { text: 'Chưa đặt', status: 'Default' }
-                        }
-                    },
-                    {
-                        title: 'Ghi chú',
-                        dataIndex: 'note'
                     },
                     {
                         title: <SettingOutlined />,
@@ -199,12 +107,118 @@ const Index: React.FC = () => {
                                 <Button size="small" type="dashed" icon={<MoreOutlined />} />
                             </Dropdown>
                         ],
-                        width: 40
+                        width: 30
+                    },
+                    {
+                        title: 'SDT',
+                        dataIndex: 'phoneNumber',
+                        minWidth: 100,
+                        width: 100,
+                        render: (text, record) => {
+                            return (
+                                <Button type="link" size="small" icon={<PhoneOutlined />} onClick={() => {
+                                    setContact(record);
+                                    setOpenCall(true);
+                                }}>{text}</Button>
+                            )
+                        }
+                    },
+                    {
+                        title: 'Tên liên hệ',
+                        dataIndex: 'name',
+                        minWidth: 180,
+                    },
+                    {
+                        title: 'Ngày gọi',
+                        dataIndex: 'calledAt',
+                        valueType: 'dateTime',
+                        search: false,
+                        width: 150,
+                        minWidth: 150
+                    },
+                    {
+                        title: 'Trạng thái',
+                        dataIndex: 'callStatusId',
+                        request: apiCallOptions,
+                        valueType: 'select',
+                        fieldProps: {
+                            showSearch: true
+                        },
+                        minWidth: 150
+                    },
+                    {
+                        title: 'Nguồn',
+                        dataIndex: 'sourceName',
+                        search: false,
+                        minWidth: 180
+                    },
+                    {
+                        title: 'Người gọi',
+                        dataIndex: 'teleName',
+                        search: false,
+                        minWidth: 150
+                    },
+                    {
+                        title: 'Team',
+                        dataIndex: 'teamName',
+                        search: false,
+                        minWidth: 150
+                    },
+                    {
+                        title: 'Nguồn',
+                        dataIndex: 'sourceId',
+                        hideInTable: true,
+                        valueType: 'select',
+                        request: apiSourceOptions,
+                        fieldProps: {
+                            showSearch: true
+                        },
+                        minWidth: 200
+                    },
+                    {
+                        title: 'Extra',
+                        dataIndex: 'extraStatus',
+                        search: false,
+                        minWidth: 150
+                    },
+                    {
+                        title: 'Tuổi',
+                        dataIndex: 'age',
+                        minWidth: 100
+                    },
+                    {
+                        title: 'Công việc',
+                        dataIndex: 'job',
+                        minWidth: 100
+                    },
+                    {
+                        title: 'Hẹn gọi',
+                        dataIndex: 'followUpDate',
+                        valueType: 'date',
+                        search: false,
+                        width: 100,
+                        minWidth: 100
+                    },
+                    {
+                        title: 'Sự kiện',
+                        dataIndex: 'isBooked',
+                        valueType: 'select',
+                        valueEnum: {
+                            true: { text: 'Đã đặt', status: 'Success' },
+                            false: { text: 'Chưa đặt', status: 'Default' }
+                        },
+                        minWidth: 100
+                    },
+                    {
+                        title: 'Ghi chú',
+                        dataIndex: 'note',
+                        minWidth: 200
                     }
                 ]}
                 search={{
                     layout: 'vertical'
                 }}
+                size="small"
             />
             <ModalForm
                 open={openExport}

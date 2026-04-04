@@ -23,6 +23,8 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         var query = from c in _context.Contacts
                     join u in _context.Users on c.UserId equals u.Id
                     join s in _context.Sources on c.SourceId equals s.Id
+                    join t in _context.Teams on u.TeamId equals t.Id into ut
+                    from t in ut.DefaultIfEmpty()
                     where c.Status != ContactStatus.Blacklisted
                     select new
                     {
@@ -65,9 +67,10 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                             .Select(ch => ch.ExtraStatus)
                             .FirstOrDefault(),
                         IsBooked = _context.Leads.Any(x => x.PhoneNumber == c.PhoneNumber),
-                        c.SourceId
+                        c.SourceId,
+                        s.TeamId,
+                        TeamName = t.Name
                     };
-        query = query.Where(c => c.CallStatusId != 0);
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {
             query = query.Where(c => c.Name.ToLower().Contains(filterOptions.Name.ToLower()));
@@ -214,7 +217,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                     join tod in _context.TypeOfDatas on s.TypeOfDataId equals tod.Id into stype
                     from tod in stype.DefaultIfEmpty()
                     where a.UserId != null
-                    where a.Status == ContactStatus.Contacted
+                    where a.Status != ContactStatus.Contacted
                     select new ContactListItem
                     {
                         Id = a.Id,

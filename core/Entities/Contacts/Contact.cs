@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Waffle.Entities.Users;
 
@@ -30,6 +31,8 @@ public class Contact : AuditEntity
     public int? SourceId { get; set; }
     public bool Confirm1 { get; set; }
     public Confirm2Status Confirm2Status { get; set; }
+    [Comment("Lần gọi gần nhất")]
+    public DateTime? LastCallTime { get; set; }
 
     public virtual Transport? Transport { get; set; }
     public virtual District? District { get; set; }
