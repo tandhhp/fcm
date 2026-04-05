@@ -4,6 +4,7 @@ using Waffle.Core.Constants;
 using Waffle.Core.Foundations;
 using Waffle.Core.Interfaces.IRepository;
 using Waffle.Core.Interfaces.IService;
+using Waffle.Core.Services.Contacts.Args;
 using Waffle.Core.Services.Contacts.Filters;
 using Waffle.Core.Services.Contacts.Models;
 using Waffle.Core.Services.Contacts.Results;
@@ -26,6 +27,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                     join t in _context.Teams on u.TeamId equals t.Id into ut
                     from t in ut.DefaultIfEmpty()
                     where c.Status != ContactStatus.Blacklisted
+                    where c.LastCallTime != null
                     select new
                     {
                         c.Id,
@@ -34,11 +36,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         c.CreatedDate,
                         c.UserId,
                         TeleName = u.Name,
-                        CalledAt = _context.CallHistories
-                            .Where(ch => ch.ContactId == c.Id)
-                            .OrderByDescending(ch => ch.CreatedDate)
-                            .Select(ch => ch.CreatedDate)
-                            .FirstOrDefault(),
+                        CalledAt = c.LastCallTime,
                         Note = _context.CallHistories
                             .Where(ch => ch.ContactId == c.Id)
                             .OrderByDescending(ch => ch.CreatedDate)
@@ -51,21 +49,13 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                             .OrderByDescending(ch => ch.CreatedDate)
                             .Select(ch => ch.Age)
                             .FirstOrDefault(),
-                        FollowUpDate = _context.CallHistories
-                            .Where(ch => ch.ContactId == c.Id)
-                            .OrderByDescending(ch => ch.CreatedDate)
-                            .Select(ch => ch.FollowUpDate)
-                            .FirstOrDefault(),
+                        FollowUpDate = c.FollowUpdate,
                         Job = _context.CallHistories
                             .Where(ch => ch.ContactId == c.Id)
                             .OrderByDescending(ch => ch.CreatedDate)
                             .Select(ch => ch.Job)
                             .FirstOrDefault(),
-                        ExtraStatus = _context.CallHistories
-                            .Where(ch => ch.ContactId == c.Id)
-                            .OrderByDescending(ch => ch.CreatedDate)
-                            .Select(ch => ch.ExtraStatus)
-                            .FirstOrDefault(),
+                        c.ExtraStatus,
                         IsBooked = _context.Leads.Any(x => x.PhoneNumber == c.PhoneNumber),
                         c.SourceId,
                         s.TeamId,
@@ -81,7 +71,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         }
         if (filterOptions.FromDate.HasValue && filterOptions.ToDate.HasValue)
         {
-            query = query.Where(c => c.CalledAt.Date >= filterOptions.FromDate.Value.Date && c.CalledAt.Date <= filterOptions.ToDate.Value.Date);
+            query = query.Where(c => c.CalledAt != null && c.CalledAt >= filterOptions.FromDate.Value.Date && c.CalledAt <= filterOptions.ToDate.Value.Date);
         }
         if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
         {
@@ -144,6 +134,11 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         }
         query = query.OrderByDescending(c => c.CreatedDate);
         return await ListResult<object>.Success(query, filterOptions);
+    }
+
+    public async Task<TResult> GetReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<TResult<object>> GetTmrReportAsync()

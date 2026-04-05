@@ -81,3 +81,23 @@ export async function apiSourceByTeamAndTypeOfData(params?: any) {
         params
     });
 }
+
+export async function apiSourceContactList(params?: any) {
+    return request(`source/contact-list`, {
+        params
+    });
+}
+
+export async function apiSourceContactAssign(data: {
+    sourceIds: number[];
+    typeOfData: number;
+    callStatusId?: number;
+    extraStatus?: string;
+    contactCount: number;
+    teleIds: string[];
+}) {
+    return request(`source/contact-assign`, {
+        method: 'POST',
+        data
+    });
+}

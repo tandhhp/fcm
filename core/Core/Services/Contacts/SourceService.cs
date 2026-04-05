@@ -16,6 +16,8 @@ public class SourceService(ISourceRepository _sourceRepository, ILogService _log
 
     public Task<TResult<object>> AvailablesAsync() => _sourceRepository.AvailablesAsync();
 
+    public Task<ListResult<object>> ContactListAsync(SourceContactFilterOptions filterOptions) => _sourceRepository.ContactListAsync(filterOptions);
+
     public async Task<TResult> CreateAsync(SourceCreateArgs args)
     {
         try
@@ -75,6 +77,8 @@ public class SourceService(ISourceRepository _sourceRepository, ILogService _log
     public Task<TResult> GetTypeOfDataBySourceIdAsync(int sourceId) => _sourceRepository.GetTypeOfDataBySourceIdAsync(sourceId);
 
     public Task<ListResult<object>> ListAsync(SourceFilterOptions filterOptions) => _sourceRepository.ListAsync(filterOptions);
+
+    public Task<TResult> MultipleAssignAsync(SourceMultipleAssignArgs args) => _sourceRepository.MultipleAssignAsync(args);
 
     public Task<object> OptionsAsync(SourceSelectOptions selectOptions) => _sourceRepository.OptionsAsync(selectOptions);
 

@@ -341,7 +341,7 @@ export default [
         access: 'can_read_page_contact_source'
       },
       {
-        name: 'Chia dữ liệu',
+        name: 'Chia nguồn',
         path: '/contact/assign',
         component: './contact/source/assign'
       },
@@ -356,9 +356,9 @@ export default [
         component: './contact/report/cdr'
       },
       {
-        name: 'Sàn DOS',
-        path: '/contact/dos',
-        component: './contact/dos'
+        name: 'Call Center',
+        path: '/contact/call-center',
+        component: './contact/call-center'
       },
       {
         name: 'Chi tiết DOS',

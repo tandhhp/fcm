@@ -21,7 +21,9 @@ public class CallStatusRepository(ApplicationDbContext context) : EfRepository<C
                     {
                         a.Id,
                         a.Name,
-                        CallCount = _context.CallHistories.Count(x => x.CallStatusId == a.Id)
+                        CallCount = _context.CallHistories.Count(x => x.CallStatusId == a.Id),
+                        a.Code,
+                        a.Type
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {

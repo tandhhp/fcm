@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Waffle.Core.Foundations;
 using Waffle.Core.Interfaces.IRepository.Leads;
+using Waffle.Core.Services.Events.Filters;
 using Waffle.Core.Services.Sources.Args;
 using Waffle.Core.Services.Sources.Filters;
 using Waffle.Core.Services.Sources.Results;
@@ -8,6 +9,7 @@ using Waffle.Data;
 using Waffle.Entities;
 using Waffle.Entities.Contacts;
 using Waffle.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Waffle.Infrastructure.Repositories.Leads;
 
@@ -67,6 +69,65 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
         return TResult<object>.Ok(data);
     }
 
+    public async Task<ListResult<object>> ContactListAsync(SourceContactFilterOptions filterOptions)
+    {
+        var query = from c in _context.Contacts
+                    join s in _context.Sources on c.SourceId equals s.Id
+                    join t in _context.Teams on s.TeamId equals t.Id
+                    join u in _context.Users on c.UserId equals u.Id into cu
+                    from u in cu.DefaultIfEmpty()
+                    where c.Status != ContactStatus.Blacklisted
+                    select new
+                    {
+                        c.Id,
+                        c.Name,
+                        c.PhoneNumber,
+                        c.Status,
+                        c.UserId,
+                        c.SourceId,
+                        s.TeamId,
+                        s.TypeOfDataId,
+                        TeamName = t.Name,
+                        c.Gender,
+                        c.CreatedDate,
+                        c.LastCallTime,
+                        TeleName = u.Name,
+                        c.ExtraStatus,
+                        c.CallStatusId
+                    };
+        if (!string.IsNullOrWhiteSpace(filterOptions.SourceIds))
+        {
+            var sourceIds = filterOptions.SourceIds.Split(',').Select(id => int.TryParse(id, out var parsedId) ? parsedId : (int?)null).Where(id => id.HasValue).Select(id => id.Value).ToList();
+            query = query.Where(x => x.SourceId != null && sourceIds.Contains(x.SourceId.Value));
+        }
+        if (filterOptions.TeamId.HasValue)
+        {
+            query = query.Where(x => x.TeamId == filterOptions.TeamId);
+        }
+        if (filterOptions.TypeOfData == TypeOfDataSelectType.New)
+        {
+            query = query.Where(x => x.UserId == null);
+        }
+        if (filterOptions.TypeOfData == TypeOfDataSelectType.Old)
+        {
+            query = query.Where(x => x.CreatedDate < DateTime.Now.AddDays(-1));
+        }
+        if (filterOptions.TypeOfData == TypeOfDataSelectType.StartCase)
+        {
+            query = query.Where(x => x.UserId != null);
+        }
+        if (!string.IsNullOrWhiteSpace(filterOptions.ExtraStatus))
+        {
+            query = query.Where(x => x.ExtraStatus != null && x.ExtraStatus.ToLower().Contains(filterOptions.ExtraStatus.ToLower()));
+        }
+        if (filterOptions.CallStatusId.HasValue)
+        {
+            query = query.Where(x => x.CallStatusId == filterOptions.CallStatusId);
+        }
+        query = query.OrderByDescending(x => x.CreatedDate);
+        return await ListResult<object>.Success(query, filterOptions);
+    }
+
     public async Task<TypeOfData?> GetTypeOfDataByIdAsync(int? typeOfDataId) => await _context.TypeOfDatas.FindAsync(typeOfDataId);
 
     public async Task<TResult> GetTypeOfDataBySourceIdAsync(int sourceId)
@@ -120,6 +181,54 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
         }
         query = query.OrderByDescending(x => x.Id);
         return await ListResult<object>.Success(query, filterOptions);
+    }
+
+    public async Task<TResult> MultipleAssignAsync(SourceMultipleAssignArgs args)
+    {
+        if (args.TeleIds is null || args.TeleIds.Count == 0) return TResult.Failed("Chưa chọn telesales để gán!");
+
+        var queryContact = from c in _context.Contacts
+                           select c;
+        if (args.TypeOfData == TypeOfDataSelectType.New)
+        {
+            queryContact = queryContact.Where(x => x.UserId == null);
+        }
+        if (args.TypeOfData == TypeOfDataSelectType.Old)
+        {
+            queryContact = queryContact.Where(x => x.CreatedDate < DateTime.Now.AddDays(-1));
+        }
+        if (args.TypeOfData == TypeOfDataSelectType.StartCase)
+        {
+            queryContact = queryContact.Where(x => x.UserId != null);
+        }
+        if (!string.IsNullOrWhiteSpace(args.ExtraStatus))
+        {
+            queryContact = queryContact.Where(x => x.ExtraStatus != null && x.ExtraStatus.ToLower().Contains(args.ExtraStatus.ToLower()));
+        }
+        if (args.CallStatusId.HasValue)
+        {
+            queryContact = queryContact.Where(x => x.CallStatusId == args.CallStatusId);
+        }
+        if (args.SourceIds != null && args.SourceIds.Count > 0)
+        {
+            queryContact = queryContact.Where(x => x.SourceId != null && args.SourceIds.Contains(x.SourceId.Value));
+        }
+        var contactCount = await queryContact.CountAsync();
+        if (contactCount == 0) return TResult.Failed("Không có liên hệ để gán.");
+        if (contactCount < args.ContactCount) return TResult.Failed($"Chỉ có {contactCount} liên hệ phù hợp để gán, không đủ {args.ContactCount} liên hệ.");
+
+        var contacts = await queryContact.OrderBy(x => Guid.NewGuid()).Take(args.ContactCount).ToListAsync();
+        if (!contacts.Any()) return TResult.Failed("Không có liên hệ để gán.");
+
+        var teleIds = args.TeleIds.ToList();
+        for (int i = 0; i < contacts.Count; i++)
+        {
+            contacts[i].UserId = teleIds[i % teleIds.Count];
+            _context.Contacts.Update(contacts[i]);
+        }
+
+        await _context.SaveChangesAsync();
+        return TResult.Success;
     }
 
     public async Task<object> OptionsAsync(SourceSelectOptions selectOptions)

@@ -19,10 +19,14 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
             var contact = await _contactService.FindAsync(args.ContactId);
             if (contact is null) return TResult.Failed("Không tìm thấy liên hệ!");
             var followUpDate = args.FollowUpDate;
+            contact.LastCallTime = DateTime.Now;
+            contact.ExtraStatus = args.ExtraStatus;
+            contact.CallStatusId = args.CallStatusId;
             if (followUpDate.HasValue && args.FollowUpTime.HasValue)
             {
                 followUpDate = followUpDate.Value.Date.Add(args.FollowUpTime.Value);
             }
+            contact.FollowUpdate = followUpDate;
             await _callHistoryRepository.AddAsync(new()
             {
                 ContactId = args.ContactId,

@@ -9,7 +9,7 @@ using Waffle.ExternalAPI.Tel4vn.Filters;
 using Waffle.Foundations;
 using Waffle.Models;
 
-namespace Waffle.Controllers;
+namespace Waffle.Controllers.Teles;
 
 public class CallController(ICallStatusService _callStatusService, ICallHistoryService _callHistoryService, ITel4vnService _tel4VnService) : BaseController
 {

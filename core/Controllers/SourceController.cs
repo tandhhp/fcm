@@ -50,4 +50,10 @@ public class SourceController(ISourceService _sourceService) : BaseController
 
     [HttpGet("options-by-type-of-data")]
     public async Task<IActionResult> OptionsByTypeOfDataAsync([FromQuery] SourceSelectOptions selectOptions) => Ok(await _sourceService.OptionsByTypeOfDataAsync(selectOptions));
+
+    [HttpGet("contact-list")]
+    public async Task<IActionResult> ContactListAsync([FromQuery] SourceContactFilterOptions filterOptions) => Ok(await _sourceService.ContactListAsync(filterOptions));
+
+    [HttpPost("multiple-assign")]
+    public async Task<IActionResult> MultipleAssignAsync([FromBody] SourceMultipleAssignArgs args) => Ok(await _sourceService.MultipleAssignAsync(args));
 }

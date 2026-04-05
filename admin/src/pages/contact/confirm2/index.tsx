@@ -2,7 +2,7 @@ import { apiContactConfirm2, apiContactNeedConfirm2 } from "@/services/contact";
 import { ManOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProColumnType, ProForm, ProFormSelect, ProTable } from "@ant-design/pro-components"
 import { useAccess } from "@umijs/max";
-import { message, Switch } from "antd";
+import { message } from "antd";
 import { useRef } from "react";
 
 const Index: React.FC = () => {
@@ -56,11 +56,6 @@ const Index: React.FC = () => {
             title: 'Số điện thoại',
             dataIndex: 'phoneNumber',
             width: 110
-        },
-        {
-            title: 'Email',
-            dataIndex: 'email',
-            search: false
         },
         {
             title: 'Ngày tạo',
@@ -146,6 +141,7 @@ const Index: React.FC = () => {
                 }}
                 request={apiContactNeedConfirm2}
                 columns={columns}
+                size="small"
             />
         </PageContainer>
     )

@@ -16,7 +16,8 @@ public class CallStatusService(ICallStatusRepository _callStatusRepository, ILog
         await _callStatusRepository.AddAsync(new CallStatus
         {
             Name = args.Name,
-            Code = args.Code
+            Code = args.Code,
+            Type = args.Type
         });
         return TResult.Success;
     }
@@ -41,6 +42,7 @@ public class CallStatusService(ICallStatusRepository _callStatusRepository, ILog
         await _logService.AddAsync($"Cập nhật trạng thái cuộc gọi {data.Name}");
         data.Name = args.Name;
         data.Code = args.Code;
+        data.Type = args.Type;
         await _callStatusRepository.UpdateAsync(data);
         return TResult.Success;
     }

@@ -323,4 +323,6 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
     public Task<TResult<object>> GetTmrReportAsync() => _contactRepository.GetTmrReportAsync();
 
     public Task<ListResult<object>> DialedCallsAsync(ContactFilterOptions filterOptions) => _contactRepository.DialedCallsAsync(filterOptions);
+
+    public Task<TResult> GetReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions) => _contactRepository.GetReportDataSourceAsync(filterOptions);
 }

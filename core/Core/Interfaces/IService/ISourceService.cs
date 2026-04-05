@@ -10,12 +10,14 @@ public interface ISourceService
 {
     Task<TResult> AssignAsync(SourceAssignArgs args);
     Task<TResult<object>> AvailablesAsync();
+    Task<ListResult<object>> ContactListAsync(SourceContactFilterOptions filterOptions);
     Task<TResult> CreateAsync(SourceCreateArgs args);
     Task<TResult> DeleteAsync(int id);
     Task<TResult<object>> DetailAsync(int id);
     Task<Source?> FindAsync(int id);
     Task<TResult> GetTypeOfDataBySourceIdAsync(int sourceId);
     Task<ListResult<object>> ListAsync(SourceFilterOptions filterOptions);
+    Task<TResult> MultipleAssignAsync(SourceMultipleAssignArgs args);
     Task<object> OptionsAsync(SourceSelectOptions selectOptions);
     Task<object?> OptionsByTypeOfDataAsync(SourceSelectOptions selectOptions);
     Task<ListResult<SourceReportResult>> ReportAsync(FilterOptions filterOptions);

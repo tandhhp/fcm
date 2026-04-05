@@ -56,7 +56,7 @@ const Index: React.FC = () => {
                                 search: false
                             },
                             {
-                                title: 'Ngày theo dõi',
+                                title: 'Follow up',
                                 dataIndex: 'followUpDate',
                                 valueType: 'dateTime',
                                 search: false

@@ -62,11 +62,6 @@ const ContactPage: React.FC = () => {
             }
         },
         {
-            title: 'Email',
-            dataIndex: 'email',
-            search: false
-        },
-        {
             title: 'Ngày tạo',
             dataIndex: 'createdDate',
             valueType: 'date',
@@ -79,18 +74,24 @@ const ContactPage: React.FC = () => {
             search: false
         },
         {
-            title: 'Sự kiện',
-            dataIndex: 'isBooked',
+            title: 'Source',
+            dataIndex: 'sourceType',
             valueType: 'select',
             valueEnum: {
-                true: { text: 'Đã đặt lịch', status: 'Success' },
-                false: { text: 'Chưa đặt lịch', status: 'Default' }
-            },
-            width: 120
+                1: 'Cold Data',
+                2: 'Company',
+                3: 'Private',
+                4: 'Reference'
+            }
         },
         {
-            title: 'Nguồn',
+            title: 'Source Name',
             dataIndex: 'sourceName',
+            search: false
+        },
+        {
+            title: 'Type of Data',
+            dataIndex: 'typeOfDataName',
             search: false
         },
         {
@@ -181,6 +182,7 @@ const ContactPage: React.FC = () => {
                 }}
                 request={listContact}
                 columns={columns}
+                size="small"
             />
             <BlockContactModal open={openBlock} contact={contact} reload={() => actionRef.current?.reload()} onOpenChange={setOpenBlock} />
             <ContactForm open={openForm} onOpenChange={setOpenForm} data={contact} reload={() => actionRef.current?.reload()} />

@@ -26,4 +26,5 @@ public interface IContactService
     Task<ListResult<object>> NeedConfirmsAsync(ContactFilterOptions filterOptions);
     Task<TResult<object>> GetTmrReportAsync();
     Task<ListResult<object>> DialedCallsAsync(ContactFilterOptions filterOptions);
+    Task<TResult> GetReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions);
 }

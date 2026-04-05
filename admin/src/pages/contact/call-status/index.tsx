@@ -22,7 +22,7 @@ const Index: React.FC = () => {
     }
 
     return (
-        <PageContainer extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => setOpenForm(true)} disabled={!access.telesaleManager}>Thêm trạng thái cuộc gọi</Button>}>
+        <PageContainer extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => setOpenForm(true)} disabled={!access.telesaleManager && !access.dot}>Thêm trạng thái cuộc gọi</Button>}>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                 <ProCard title="Tổng liên hệ" headerBordered>

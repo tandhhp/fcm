@@ -25,7 +25,12 @@ export async function apiTeamDelete(id: string) {
 }
 
 export async function apiTeamUsers(params: any) {
-    return request(`team/users`, { params });
+    return request(`team/users`, {
+        params: {
+            ...params,
+            pageSize: 9999
+        }
+    });
 }
 
 

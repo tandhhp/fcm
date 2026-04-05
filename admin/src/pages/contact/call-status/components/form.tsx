@@ -42,6 +42,10 @@ const CallStatusForm: React.FC<Props> = (props) => {
     return (
         <ModalForm {...props} title="Thông tin trạng thái cuộc gọi" formRef={formRef} onFinish={onFinish}>
             <ProFormText name="id" hidden />
+            <ProFormText name="code" label="Mã trạng thái"
+                rules={[{ required: true, message: 'Mã trạng thái là bắt buộc' }]}
+                disabled={!!props.data}
+            />
             <ProFormText name="name" label="Tên trạng thái cuộc gọi" rules={[{ required: true, message: 'Tên trạng thái cuộc gọi là bắt buộc' }]} />
         </ModalForm>
     )

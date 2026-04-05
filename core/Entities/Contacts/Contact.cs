@@ -33,11 +33,17 @@ public class Contact : AuditEntity
     public Confirm2Status Confirm2Status { get; set; }
     [Comment("Lần gọi gần nhất")]
     public DateTime? LastCallTime { get; set; }
+    [StringLength(256)]
+    public string? ExtraStatus { get; set; }
+    [ForeignKey(nameof(CallStatus))]
+    public int? CallStatusId { get; set; }
+    public DateTime? FollowUpdate { get; set; }
 
     public virtual Transport? Transport { get; set; }
     public virtual District? District { get; set; }
     public virtual JobKind? JobKind { get; set; }
     public virtual Source? Source { get; set; }
+    public virtual CallStatus? CallStatus { get; set; }
     public virtual ICollection<ContactActivity>? Activities { get; set; }
     public virtual ICollection<CallHistory>? CallHistories { get; set; }
 }

@@ -1,12 +1,11 @@
 import { apiSourceList, apiTypeOfDataOptions } from "@/services/settings/source";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { useRef, useState } from "react";
-import { EditOutlined, EyeOutlined, ImportOutlined, MoreOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
+import { EditOutlined, EyeOutlined, ImportOutlined, MoreOutlined, PlusOutlined, SettingOutlined, UserDeleteOutlined } from "@ant-design/icons";
 import { Button, Dropdown, Space } from "antd";
 import SourceForm from "./components/form";
-import { history, useAccess } from "@umijs/max";
+import { history, Link, useAccess } from "@umijs/max";
 import ContactImport from "@/pages/contact/components/import";
-import AssignForm from "./components/assign-form";
 import { apiTeamOptions } from "@/services/users/team";
 
 const Index: React.FC = () => {
@@ -28,7 +27,9 @@ const Index: React.FC = () => {
                 headerTitle={(
                     <Space>
                         <Button icon={<ImportOutlined />} disabled={!access.canAdmin && !access.dot && !access.adminData} onClick={() => setOpenImport(true)}>Đổ dữ liệu</Button>
-                        <AssignForm reload={() => actionRef.current?.reload()} />
+                        <Link to={`/contact/assign`}>
+                            <Button icon={<UserDeleteOutlined />} type="primary" disabled={!access.dot && !access.canAdmin}>Chia nguồn</Button>
+                        </Link>
                     </Space>
                 )}
                 request={apiSourceList}

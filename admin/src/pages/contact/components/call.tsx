@@ -65,10 +65,10 @@ const CallForm: React.FC<Props> = (props) => {
                     ]} />
                 </Col>
                 <Col xs={24} md={12}>
-                    <ProFormDatePicker name="followUpDate" label="Ngày theo dõi" width="lg" />
+                    <ProFormDatePicker name="followUpDate" label="Follow up date" width="lg" />
                 </Col>
                 <Col xs={24} md={12}>
-                    <ProFormTimePicker name="followUpTime" label="Giờ theo dõi" width="lg" />
+                    <ProFormTimePicker name="followUpTime" label="Follow up time" width="lg" />
                 </Col>
                 <Col xs={24} md={12}>
                     <ProFormText label="Nghề nghiệp" name="job" />

@@ -25,3 +25,24 @@ public enum TypeOfDataSelectType
     Old = 2,
     StartCase = 3
 }
+
+public class SourceContactFilterOptions : FilterOptions
+{
+    public TypeOfDataSelectType TypeOfData { get; set; }
+    public int? TeamId { get; set; }
+    public string? SourceIds { get; set; }
+    public int? CallStatusId { get; set; }
+    public string? ExtraStatus { get; set; }
+}
+
+public class SourceMultipleAssignArgs
+{
+    // Lấy nguồn ở đâu
+    public List<int>? SourceIds { get; set; }
+    public TypeOfDataSelectType? TypeOfData { get; set; }
+    public int? CallStatusId { get; set; }
+    public string? ExtraStatus { get; set; }
+    public int ContactCount { get; set; }
+    // Gán cho ai
+    public List<Guid>? TeleIds { get; set; }
+}

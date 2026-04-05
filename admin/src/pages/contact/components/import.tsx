@@ -52,6 +52,7 @@ const ContactImport: React.FC<Props> = (props) => {
         const formData = new FormData();
         formData.append('file', values.file[0].originFileObj);
         formData.append('sourceId', values.sourceId);
+        formData.append('teleId', values.teleId);
         await apiContactImport(formData);
         message.success('Nhập dữ liệu thành công');
         formRef.current?.resetFields();

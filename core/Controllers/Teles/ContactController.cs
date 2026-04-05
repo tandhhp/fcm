@@ -1196,4 +1196,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
 
     [HttpGet("tmr-report")]
     public async Task<IActionResult> GetTmrReportAsync() => Ok(await _contactService.GetTmrReportAsync());
+
+    [HttpGet("report-data-source")]
+    public async Task<IActionResult> GetReportDataSourceAsync([FromQuery] ReportDataSourceFilterOptions filterOptions) => Ok(await _contactService.GetReportDataSourceAsync(filterOptions));
 }
