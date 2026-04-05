@@ -5,6 +5,7 @@ import CallStatusForm from "./components/form";
 import { Button, Dropdown, message, Popconfirm, Statistic } from "antd";
 import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined, SettingOutlined } from "@ant-design/icons";
 import { useAccess, useRequest } from "@umijs/max";
+import { callStatusOptions } from "./components/call-status-options";
 
 const Index: React.FC = () => {
 
@@ -22,7 +23,10 @@ const Index: React.FC = () => {
     }
 
     return (
-        <PageContainer extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => setOpenForm(true)} disabled={!access.telesaleManager && !access.dot}>Thêm trạng thái cuộc gọi</Button>}>
+        <PageContainer extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => {
+            setSelectedRow(null);
+            setOpenForm(true);
+        }} disabled={!access.telesaleManager && !access.dot}>Tạo trạng thái</Button>}>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                 <ProCard title="Tổng liên hệ" headerBordered>
@@ -54,7 +58,25 @@ const Index: React.FC = () => {
                         align: 'center'
                     },
                     {
-                        title: 'Trạng thái cuộc gọi',
+                        title: 'Loại trạng thái',
+                        dataIndex: 'type',
+                        valueType: 'select',
+                        fieldProps: {
+                            options: callStatusOptions
+                        }
+                    },
+                    {
+                        title: 'Thứ tự hiển thị',
+                        dataIndex: 'sortOrder',
+                        search: false,
+                        valueType: 'digit'
+                    },
+                    {
+                        title: 'Mã trạng thái',
+                        dataIndex: 'code',
+                    },
+                    {
+                        title: 'Tên trạng thái',
                         dataIndex: 'name',
                     },
                     {
@@ -78,14 +100,14 @@ const Index: React.FC = () => {
                                             setSelectedRow(record);
                                             setOpenForm(true);
                                         },
-                                        disabled: !access.telesaleManager
+                                        disabled: !access.telesaleManager && !access.dot
                                     }
                                 ]
                             }}>
                                 <Button type="dashed" icon={<MoreOutlined />} size="small" />
                             </Dropdown>,
                             <Popconfirm key={"delete"} title="Xác nhận xoá trạng thái cuộc gọi?" onConfirm={() => onDelete(record.id)}>
-                                <Button type="primary" danger size="small" icon={<DeleteOutlined />} disabled={!access.telesaleManager} />
+                                <Button type="primary" danger size="small" icon={<DeleteOutlined />} disabled={!access.telesaleManager && !access.dot} />
                             </Popconfirm>
                         ]
                     }

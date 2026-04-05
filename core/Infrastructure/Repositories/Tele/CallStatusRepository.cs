@@ -23,13 +23,14 @@ public class CallStatusRepository(ApplicationDbContext context) : EfRepository<C
                         a.Name,
                         CallCount = _context.CallHistories.Count(x => x.CallStatusId == a.Id),
                         a.Code,
-                        a.Type
+                        a.Type,
+                        a.SortOrder
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {
             query = query.Where(x => x.Name.ToLower().Contains(filterOptions.Name.ToLower()));
         }
-        query = query.OrderByDescending(x => x.CallCount);
+        query = query.OrderBy(x => x.Type).ThenBy(x => x.SortOrder);
         return await ListResult<object>.Success(query, filterOptions);
     }
 

@@ -17,7 +17,8 @@ public class CallStatusService(ICallStatusRepository _callStatusRepository, ILog
         {
             Name = args.Name,
             Code = args.Code,
-            Type = args.Type
+            Type = args.Type,
+            SortOrder = args.SortOrder
         });
         return TResult.Success;
     }
@@ -43,6 +44,7 @@ public class CallStatusService(ICallStatusRepository _callStatusRepository, ILog
         data.Name = args.Name;
         data.Code = args.Code;
         data.Type = args.Type;
+        data.SortOrder = args.SortOrder;
         await _callStatusRepository.UpdateAsync(data);
         return TResult.Success;
     }

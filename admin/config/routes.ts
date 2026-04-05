@@ -330,7 +330,7 @@ export default [
         hideInMenu: true
       },
       {
-        name: 'TMR Report',
+        name: 'Trạng thái cuộc gọi',
         path: '/contact/call-status',
         component: './contact/call-status'
       },

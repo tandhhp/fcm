@@ -147,7 +147,7 @@ const Login: React.FC = () => {
             style={{
               background: 'none',
             }}
-            copyright="Powered by DefZone.Net"
+            copyright="Powered by 1stClass Membership"
             links={[
               {
                 key: 'github',

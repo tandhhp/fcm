@@ -7,4 +7,5 @@ public class CallStatusCreateArgs
     public string Name { get; set; } = default!;
     public string Code { get; set; } = default!;
     public CallStatusType Type { get; set; }
+    public int SortOrder { get; set; }
 }
