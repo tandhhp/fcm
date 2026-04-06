@@ -141,138 +141,92 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
 
     public async Task<TResult> GetReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions)
     {
-        var result = new ReportDataSource();
+        var sourceGroups = await _context.Teams.Where(x => filterOptions.TeamId == null || x.Id == filterOptions.TeamId)
+            .Select(x => new { x.Id, x.Name })
+            .ToListAsync();
 
-        using var package = new ExcelPackage();
-        var ws = package.Workbook.Worksheets.Add("Sheet1");
+        var callStatuses = await _context.CallStatuses.ToListAsync();
+        var contacts = await _context.Contacts.ToListAsync();
+        var sources = await _context.Sources.Include(s => s.TypeOfData).ToListAsync();
+        var showUps = await _context.Leads.ToListAsync();
+        var callHistories = await _context.CallHistories.ToListAsync();
 
-        // ==========================================
-        // PHẦN 1: TẠO HEADER (DÒNG 1 VÀ 2)
-        // ==========================================
+        // Calculate totals
+        var totalContacts = contacts.Count;
+        var totalContactsWithType = contacts.Where(c => sources.Any(s => s.Id == c.SourceId && s.TypeOfDataId != null)).Count();
+        var totalContactsCalled = callHistories.Select(ch => ch.ContactId).Distinct().Count();
+        var totalNotUpdated = contacts.Where(c => !callHistories.Any(ch => ch.ContactId == c.Id)).Count();
+        var totalCf1 = contacts.Where(c => c.Confirm1 == true).Count();
+        var totalShowUp = showUps.Where(l => !l.Duplicated).Count();
+        var totalDeal = showUps.Where(l => !l.Duplicated && l.Status == LeadStatus.CloseDeal).Count();
 
-        // Source Group & Source Name (Gộp dòng 1 và 2)
-        ws.Cells[1, 1].Value = "Source Group";
-        ws.Cells[1, 1, 2, 1].Merge = true;
-
-        ws.Cells[1, 2].Value = "Source Name";
-        ws.Cells[1, 2, 2, 2].Merge = true;
-
-        // Type of Data (Gộp 3 cột)
-        ws.Cells[1, 3].Value = "Type of Data";
-        ws.Cells[1, 3, 1, 5].Merge = true;
-        ws.Cells[2, 3].Value = "Contact Import";
-        ws.Cells[2, 4].Value = "Contact Start Case";
-        ws.Cells[2, 5].Value = "Total";
-
-        // Total not Contacted (Gộp 3 cột)
-        ws.Cells[1, 6].Value = "Total not Contacted";
-        ws.Cells[1, 6, 1, 8].Merge = true;
-        ws.Cells[2, 6].Value = "0. Tele not update";
-        ws.Cells[2, 7].Value = "1. Temporary locked/Wrong number/Knm";
-        ws.Cells[2, 8].Value = "Total (1)";
-
-        // Total Contacted (Gộp 5 cột)
-        ws.Cells[1, 9].Value = "Total Contacted";
-        ws.Cells[1, 9, 1, 13].Merge = true;
-        ws.Cells[2, 9].Value = "2. Not Enough Qualify";
-        ws.Cells[2, 10].Value = "3. Meet Require";
-        ws.Cells[2, 11].Value = "4. Refuse to talk";
-        ws.Cells[2, 12].Value = "5. Location";
-        ws.Cells[2, 13].Value = "Total (2)";
-
-        // Total Invite (Gộp 2 cột)
-        ws.Cells[1, 14].Value = "Total Invite";
-        ws.Cells[1, 14, 1, 15].Merge = true;
-        ws.Cells[2, 14].Value = "CF1";
-        ws.Cells[2, 15].Value = "Consider";
-
-        // Các cột tỉ lệ và chốt (Gộp dòng 1 và 2)
-        ws.Cells[1, 16].Value = "%CF/Total Contacted";
-        ws.Cells[1, 16, 2, 16].Merge = true;
-
-        ws.Cells[1, 17].Value = "Showup";
-        ws.Cells[1, 17, 2, 17].Merge = true;
-
-        ws.Cells[1, 18].Value = "%Showup/CF";
-        ws.Cells[1, 18, 2, 18].Merge = true;
-
-        ws.Cells[1, 19].Value = "Deal";
-        ws.Cells[1, 19, 2, 19].Merge = true;
-
-        ws.Cells[1, 20].Value = "%Deal/Showup";
-        ws.Cells[1, 20, 2, 20].Merge = true;
-
-        // Format Header (In đậm, căn giữa, thêm màu nền)
-        using (var headerRange = ws.Cells[1, 1, 2, 20])
+        var result = new
         {
-            headerRange.Style.Font.Bold = true;
-            headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            headerRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-            headerRange.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
-        }
-
-        // ==========================================
-        // PHẦN 2: THÊM DỮ LIỆU MẪU (TỪ DÒNG 3 TRỞ ĐI)
-        // ==========================================
-
-        // Dòng 3: Total Sum
-        ws.Cells[3, 1].Value = "Total";
-        object[] row3Data = { null, null, 1011896, 195603, 1011896, 13380, 132624, 146004, 154, 9172, 39038, 1235, 49599, 5550, 2736, 0, 7296, 0, 974, 0 };
-        InsertRowData(ws, 3, row3Data);
-
-        // Dòng 4: Administrator
-        ws.Cells[4, 1].Value = "Administrator";
-        ws.Cells[4, 2].Value = "Total Source Name";
-        object[] row4Data = { null, null, 1, null, 1, null, null, null, null, null, null, null, null, null, 0, null, 0, 0, 0, 0 };
-        InsertRowData(ws, 4, row4Data);
-
-        // Dòng 5: Un Identify
-        ws.Cells[5, 2].Value = "Un Identify";
-        object[] row5Data = { null, null, 1, null, 1, null, null, null, null, null, null, null, null, null, 0, null, 0, null, 0, null };
-        InsertRowData(ws, 5, row5Data);
-
-        // Dòng 6: BOD Dịu Linh
-        ws.Cells[6, 1].Value = "BOD Dịu Linh";
-        ws.Cells[6, 2].Value = "Total Source Name";
-        object[] row6Data = { null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, 0, 0, 0, 0 };
-        InsertRowData(ws, 6, row6Data);
-
-        // Dòng 7: BOD DIU LINH_AL CTR
-        ws.Cells[7, 2].Value = "BOD DIU LINH_AL CTR";
-        object[] row7Data = { null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, 0, null, 0, null };
-        InsertRowData(ws, 7, row7Data);
-
-        // ==========================================
-        // PHẦN 3: ĐỊNH DẠNG VÀ LƯU FILE
-        // ==========================================
-
-        // Tự động điều chỉnh độ rộng các cột chứa dữ liệu
-        ws.Cells[ws.Dimension.Address].AutoFitColumns();
-
-        // Thêm viền (Borders) cho toàn bộ bảng dữ liệu
-        using (var dataRange = ws.Cells[1, 1, 7, 20])
-        {
-            dataRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            dataRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            dataRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            dataRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-        }
-
-        return TResult.Ok(await package.GetAsByteArrayAsync());
-    }
-
-    // Hàm hỗ trợ để điền nhanh mảng dữ liệu vào 1 dòng cụ thể trong EPPlus
-    static void InsertRowData(ExcelWorksheet ws, int rowNumber, object[] data)
-    {
-        for (int i = 0; i < data.Length; i++)
-        {
-            if (data[i] != null)
+            Total = new
             {
-                // EPPlus tự động nhận diện kiểu dữ liệu (số học, chuỗi) khi gán Value
-                ws.Cells[rowNumber, i + 1].Value = data[i];
-            }
-        }
+                SourceGroup = "Total",
+                ContactImport = totalContacts,
+                ContactStartCase = totalContactsWithType,
+                Total = totalContacts,
+                TeleNotUpdate = totalNotUpdated,
+                CF1 = totalCf1,
+                Showup = totalShowUp,
+                Deal = totalDeal,
+                PercentCFTotalContacted = totalContactsCalled > 0 ? (double)totalCf1 / totalContactsCalled * 100 : 0,
+                PercentShowupCF = totalCf1 > 0 ? (double)totalShowUp / totalCf1 * 100 : 0,
+                PercentDealShowup = totalShowUp > 0 ? (double)totalDeal / totalShowUp * 100 : 0
+            },
+            Teams = sourceGroups.OrderBy(t => t.Name).Select(team =>
+            {
+                var teamSources = sources.Where(s => s.TeamId == team.Id).ToList();
+                var teamContacts = contacts.Where(c => teamSources.Any(s => s.Id == c.SourceId)).ToList();
+                var teamContactIds = teamContacts.Select(c => c.Id).ToList();
+                var teamCallHistories = callHistories.Where(ch => teamContactIds.Contains(ch.ContactId)).ToList();
+                var teamCf1 = teamContacts.Where(c => c.Confirm1 == true).Count();
+                var teamShowUp = showUps.Where(l => !l.Duplicated && teamContacts.Any(c => c.PhoneNumber == l.PhoneNumber)).Count();
+                var teamDeal = showUps.Where(l => !l.Duplicated && l.Status == LeadStatus.CloseDeal && teamContacts.Any(c => c.PhoneNumber == l.PhoneNumber)).Count();
+                var teamContactsCalled = teamCallHistories.Select(ch => ch.ContactId).Distinct().Count();
+
+                return new
+                {
+                    SourceGroup = team.Name,
+                    SourceName = "Total Source Name",
+                    ContactImport = teamContacts.Count,
+                    Total = teamContacts.Count,
+                    CF1 = teamCf1,
+                    Showup = teamShowUp,
+                    Deal = teamDeal,
+                    PercentCFTotalContacted = teamContactsCalled > 0 ? (double)teamCf1 / teamContactsCalled * 100 : 0,
+                    PercentShowupCF = teamCf1 > 0 ? (double)teamShowUp / teamCf1 * 100 : 0,
+                    PercentDealShowup = teamShowUp > 0 ? (double)teamDeal / teamShowUp * 100 : 0,
+                    Sources = teamSources.OrderBy(s => s.Name).Select(source =>
+                    {
+                        var sourceContacts = teamContacts.Where(c => c.SourceId == source.Id).ToList();
+                        var sourceContactIds = sourceContacts.Select(c => c.Id).ToList();
+                        var sourceCf1 = sourceContacts.Where(c => c.Confirm1 == true).Count();
+                        var sourceShowUp = showUps.Where(l => !l.Duplicated && sourceContacts.Any(c => c.PhoneNumber == l.PhoneNumber)).Count();
+                        var sourceDeal = showUps.Where(l => !l.Duplicated && l.Status == LeadStatus.CloseDeal && sourceContacts.Any(c => c.PhoneNumber == l.PhoneNumber)).Count();
+                        var sourceCallHistories = callHistories.Where(ch => sourceContactIds.Contains(ch.ContactId)).ToList();
+                        var sourceContactsCalled = sourceCallHistories.Select(ch => ch.ContactId).Distinct().Count();
+
+                        return new
+                        {
+                            SourceName = source.Name,
+                            ContactImport = sourceContacts.Count,
+                            Total = sourceContacts.Count,
+                            CF1 = sourceCf1,
+                            Showup = sourceShowUp,
+                            Deal = sourceDeal,
+                            PercentCFTotalContacted = sourceContactsCalled > 0 ? (double)sourceCf1 / sourceContactsCalled * 100 : 0,
+                            PercentShowupCF = sourceCf1 > 0 ? (double)sourceShowUp / sourceCf1 * 100 : 0,
+                            PercentDealShowup = sourceShowUp > 0 ? (double)sourceDeal / sourceShowUp * 100 : 0
+                        };
+                    }).ToList()
+                };
+            }).ToList()
+        };
+
+        return TResult.Ok(result);
     }
 
     public async Task<TResult<object>> GetTmrReportAsync()
@@ -345,7 +299,6 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                     from t in bteam.DefaultIfEmpty()
                     join tod in _context.TypeOfDatas on s.TypeOfDataId equals tod.Id into stype
                     from tod in stype.DefaultIfEmpty()
-                    where a.UserId != null
                     where a.Status != ContactStatus.Contacted
                     select new ContactListItem
                     {
@@ -475,4 +428,138 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
     }
 
     public void Update(Contact contact) => _context.Contacts.Update(contact);
+
+    public async Task<IEnumerable<string?>> AllPhoneNumbersAsync() => await _context.Contacts.Select(c => c.PhoneNumber).Distinct().ToListAsync();
+
+    public async Task<TResult<byte[]?>> ExportReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions)
+    {
+        var sourceGroups = await _context.Teams.Where(x => filterOptions.TeamId == null || x.Id == filterOptions.TeamId)
+            .Select(x => new { x.Id, x.Name })
+            .ToListAsync();
+
+        var callStatuses = await _context.CallStatuses.ToListAsync();
+        var contacts = await _context.Contacts.ToListAsync();
+        var sources = await _context.Sources.Include(s => s.TypeOfData).ToListAsync();
+        var showUps = await _context.Leads.ToListAsync();
+        var callHistories = await _context.CallHistories.ToListAsync();
+
+        using var package = new ExcelPackage();
+        var ws = package.Workbook.Worksheets.Add("Sheet1");
+
+        // Header setup
+        ws.Cells[1, 1].Value = "Source Group";
+        ws.Cells[1, 1, 2, 1].Merge = true;
+        ws.Cells[1, 2].Value = "Source Name";
+        ws.Cells[1, 2, 2, 2].Merge = true;
+        ws.Cells[1, 3].Value = "Type of Data";
+        ws.Cells[1, 3, 1, 5].Merge = true;
+        ws.Cells[2, 3].Value = "Contact Import";
+        ws.Cells[2, 4].Value = "Contact Start Case";
+        ws.Cells[2, 5].Value = "Total";
+        ws.Cells[1, 6].Value = "Total not Contacted";
+        ws.Cells[1, 6, 1, 8].Merge = true;
+        ws.Cells[2, 6].Value = "0. Tele not update";
+        ws.Cells[2, 7].Value = "1. Temporary locked/Wrong number/Knm";
+        ws.Cells[2, 8].Value = "Total (1)";
+        ws.Cells[1, 9].Value = "Total Contacted";
+        ws.Cells[1, 9, 1, 13].Merge = true;
+        ws.Cells[2, 9].Value = "2. Not Enough Qualify";
+        ws.Cells[2, 10].Value = "3. Meet Require";
+        ws.Cells[2, 11].Value = "4. Refuse to talk";
+        ws.Cells[2, 12].Value = "5. Location";
+        ws.Cells[2, 13].Value = "Total (2)";
+        ws.Cells[1, 14].Value = "Total Invite";
+        ws.Cells[1, 14, 1, 15].Merge = true;
+        ws.Cells[2, 14].Value = "CF1";
+        ws.Cells[2, 15].Value = "Consider";
+        ws.Cells[1, 16].Value = "%CF/Total Contacted";
+        ws.Cells[1, 16, 2, 16].Merge = true;
+        ws.Cells[1, 17].Value = "Showup";
+        ws.Cells[1, 17, 2, 17].Merge = true;
+        ws.Cells[1, 18].Value = "%Showup/CF";
+        ws.Cells[1, 18, 2, 18].Merge = true;
+        ws.Cells[1, 19].Value = "Deal";
+        ws.Cells[1, 19, 2, 19].Merge = true;
+        ws.Cells[1, 20].Value = "%Deal/Showup";
+        ws.Cells[1, 20, 2, 20].Merge = true;
+
+        using (var headerRange = ws.Cells[1, 1, 2, 20])
+        {
+            headerRange.Style.Font.Bold = true;
+            headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            headerRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+            headerRange.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+        }
+
+        int currentRow = 3;
+
+        // Total row
+        var totalContacts = contacts.Count;
+        var totalContactsWithType = contacts.Where(c => sources.Any(s => s.Id == c.SourceId && s.TypeOfDataId != null)).Count();
+        var totalContactsCalled = callHistories.Select(ch => ch.ContactId).Distinct().Count();
+        var totalNotUpdated = contacts.Where(c => !callHistories.Any(ch => ch.ContactId == c.Id)).Count();
+        var totalCf1 = contacts.Where(c => c.Confirm1 == true).Count();
+        var totalShowUp = showUps.Where(l => !l.Duplicated).Count();
+        var totalDeal = showUps.Where(l => !l.Duplicated && l.Status == LeadStatus.CloseDeal).Count();
+
+        ws.Cells[currentRow, 1].Value = "Total";
+        ws.Cells[currentRow, 3].Value = totalContacts;
+        ws.Cells[currentRow, 4].Value = totalContactsWithType;
+        ws.Cells[currentRow, 5].Value = totalContacts;
+        ws.Cells[currentRow, 6].Value = totalNotUpdated;
+        ws.Cells[currentRow, 14].Value = totalCf1;
+        ws.Cells[currentRow, 17].Value = totalShowUp;
+        ws.Cells[currentRow, 19].Value = totalDeal;
+        currentRow++;
+
+        // Data by team and source
+        foreach (var team in sourceGroups.OrderBy(t => t.Name))
+        {
+            var teamSources = sources.Where(s => s.TeamId == team.Id).ToList();
+            var teamContacts = contacts.Where(c => teamSources.Any(s => s.Id == c.SourceId)).ToList();
+            var teamContactIds = teamContacts.Select(c => c.Id).ToList();
+            var teamCallHistories = callHistories.Where(ch => teamContactIds.Contains(ch.ContactId)).ToList();
+            var teamCf1 = teamContacts.Where(c => c.Confirm1 == true).Count();
+            var teamShowUp = showUps.Where(l => !l.Duplicated && teamContacts.Any(c => c.PhoneNumber == l.PhoneNumber)).Count();
+            var teamDeal = showUps.Where(l => !l.Duplicated && l.Status == LeadStatus.CloseDeal && teamContacts.Any(c => c.PhoneNumber == l.PhoneNumber)).Count();
+
+            ws.Cells[currentRow, 1].Value = team.Name;
+            ws.Cells[currentRow, 2].Value = "Total Source Name";
+            ws.Cells[currentRow, 3].Value = teamContacts.Count;
+            ws.Cells[currentRow, 5].Value = teamContacts.Count;
+            ws.Cells[currentRow, 14].Value = teamCf1;
+            ws.Cells[currentRow, 17].Value = teamShowUp;
+            ws.Cells[currentRow, 19].Value = teamDeal;
+            currentRow++;
+
+            foreach (var source in teamSources.OrderBy(s => s.Name))
+            {
+                var sourceContacts = teamContacts.Where(c => c.SourceId == source.Id).ToList();
+                var sourceContactIds = sourceContacts.Select(c => c.Id).ToList();
+                var sourceCf1 = sourceContacts.Where(c => c.Confirm1 == true).Count();
+                var sourceShowUp = showUps.Where(l => !l.Duplicated && sourceContacts.Any(c => c.PhoneNumber == l.PhoneNumber)).Count();
+                var sourceDeal = showUps.Where(l => !l.Duplicated && l.Status == LeadStatus.CloseDeal && sourceContacts.Any(c => c.PhoneNumber == l.PhoneNumber)).Count();
+
+                ws.Cells[currentRow, 2].Value = source.Name;
+                ws.Cells[currentRow, 3].Value = sourceContacts.Count;
+                ws.Cells[currentRow, 5].Value = sourceContacts.Count;
+                ws.Cells[currentRow, 14].Value = sourceCf1;
+                ws.Cells[currentRow, 17].Value = sourceShowUp;
+                ws.Cells[currentRow, 19].Value = sourceDeal;
+                currentRow++;
+            }
+        }
+
+        ws.Cells[ws.Dimension.Address].AutoFitColumns();
+        using (var dataRange = ws.Cells[1, 1, currentRow - 1, 20])
+        {
+            dataRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            dataRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            dataRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            dataRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+        }
+
+        return TResult<byte[]?>.Ok(await package.GetAsByteArrayAsync());
+    }
 }

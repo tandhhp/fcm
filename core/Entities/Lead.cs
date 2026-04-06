@@ -66,7 +66,7 @@ public enum LeadStatus
     [Display(Name = "Check-in")]
     Checkin,
     [Display(Name = "Chốt deal")]
-    LeadAccept,
+    CloseDeal,
     [Display(Name = "Từ chối")]
     LeadReject,
     [Display(Name = "Mời lại")]

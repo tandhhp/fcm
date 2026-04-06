@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
@@ -20,7 +21,7 @@ using Waffle.Models;
 using Waffle.Models.Args;
 using Waffle.Models.Filters;
 
-namespace Waffle.Controllers;
+namespace Waffle.Controllers.Teles;
 
 public class ContactController(UserManager<ApplicationUser> _userManager,
     INotificationService _notificationService,
@@ -812,7 +813,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
         {
             var lead = await _context.Leads.FindAsync(args.Id);
             if (lead is null) return BadRequest("Không tìm thấy khách hàng!");
-            if (lead.Status == LeadStatus.LeadAccept) return BadRequest("Khách đã chốt deal không thể mời lại!");
+            if (lead.Status == LeadStatus.CloseDeal) return BadRequest("Khách đã chốt deal không thể mời lại!");
 
             var feedback = await _context.LeadFeedbacks.FirstOrDefaultAsync(x => x.LeadId == lead.Id);
             lead.Status = LeadStatus.ReInvite;
@@ -1073,7 +1074,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
                     case LeadStatus.Checkin:
                         status = "Check-in";
                         break;
-                    case LeadStatus.LeadAccept:
+                    case LeadStatus.CloseDeal:
                         status = "Chốt deal";
                         break;
                     case LeadStatus.LeadReject:
@@ -1199,4 +1200,13 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
 
     [HttpGet("report-data-source")]
     public async Task<IActionResult> GetReportDataSourceAsync([FromQuery] ReportDataSourceFilterOptions filterOptions) => Ok(await _contactService.GetReportDataSourceAsync(filterOptions));
+
+    [HttpGet("report-data-source/export")]
+    public async Task<IActionResult> ExportReportDataSourceAsync([FromQuery] ReportDataSourceFilterOptions filterOptions)
+    {
+        var result = await _contactService.ExportReportDataSourceAsync(filterOptions);
+        if (!result.Succeeded) return BadRequest(result.Message);
+        if (result.Data is null) return BadRequest("Không có dữ liệu để xuất");
+        return File(result.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "data.xlsx");
+    }
 }

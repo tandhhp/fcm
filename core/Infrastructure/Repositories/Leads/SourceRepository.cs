@@ -114,11 +114,15 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
         }
         if (filterOptions.TypeOfData == TypeOfDataSelectType.StartCase)
         {
-            query = query.Where(x => x.UserId != null);
+            query = query.Where(x => x.UserId != null && x.LastCallTime != null && x.LastCallTime > DateTime.Now.AddMonths(-1));
         }
         if (!string.IsNullOrWhiteSpace(filterOptions.ExtraStatus))
         {
             query = query.Where(x => x.ExtraStatus != null && x.ExtraStatus.ToLower().Contains(filterOptions.ExtraStatus.ToLower()));
+        }
+        if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
+        {
+            query = query.Where(x => x.PhoneNumber == filterOptions.PhoneNumber);
         }
         if (filterOptions.CallStatusId.HasValue)
         {

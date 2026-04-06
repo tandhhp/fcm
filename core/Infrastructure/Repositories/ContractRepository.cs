@@ -227,7 +227,7 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
     public async Task<object?> GetLeadOptionsAsync(ContactLeadSelectOptions selectOptions)
     {
         var query = from l in _context.Leads
-                    where !string.IsNullOrEmpty(l.IdentityNumber) && !string.IsNullOrEmpty(l.PhoneNumber) && (l.Status == LeadStatus.Checkin || l.Status == LeadStatus.LeadAccept)
+                    where !string.IsNullOrEmpty(l.IdentityNumber) && !string.IsNullOrEmpty(l.PhoneNumber) && (l.Status == LeadStatus.Checkin || l.Status == LeadStatus.CloseDeal)
                     select new
                     {
                         l.Id,

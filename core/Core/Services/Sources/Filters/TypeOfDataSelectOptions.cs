@@ -23,6 +23,7 @@ public enum TypeOfDataSelectType
 {
     New = 1,
     Old = 2,
+    // Nguồn dữ liệu mới, đã phân cho tele trong 1 tháng gần nhất
     StartCase = 3
 }
 
@@ -33,6 +34,7 @@ public class SourceContactFilterOptions : FilterOptions
     public string? SourceIds { get; set; }
     public int? CallStatusId { get; set; }
     public string? ExtraStatus { get; set; }
+    public string? PhoneNumber { get; set; }
 }
 
 public class SourceMultipleAssignArgs

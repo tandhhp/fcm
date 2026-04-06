@@ -95,7 +95,7 @@ const Index: React.FC = () => {
                         search: false
                     },
                     {
-                        title: 'Thành viên',
+                        title: 'SLNV',
                         valueType: 'digit',
                         search: false,
                         dataIndex: 'userCount'

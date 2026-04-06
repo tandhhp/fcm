@@ -27,4 +27,5 @@ public interface IContactService
     Task<TResult<object>> GetTmrReportAsync();
     Task<ListResult<object>> DialedCallsAsync(ContactFilterOptions filterOptions);
     Task<TResult> GetReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions);
+    Task<TResult<byte[]?>> ExportReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions);
 }

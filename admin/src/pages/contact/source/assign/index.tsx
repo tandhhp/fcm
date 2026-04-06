@@ -4,7 +4,7 @@ import { apiSourceByTeamAndTypeOfData, apiSourceContactAssign, apiSourceContactL
 import { apiCallCenterOptions } from "@/services/users/call-center";
 import { apiTeamOptions, apiTeamUsers } from "@/services/users/team";
 import { UserOutlined } from "@ant-design/icons";
-import { ActionType, PageContainer, ProCard, ProForm, ProFormInstance, ProFormSelect, ProTable } from "@ant-design/pro-components"
+import { ActionType, PageContainer, ProCard, ProForm, ProFormInstance, ProFormSelect, ProFormText, ProTable } from "@ant-design/pro-components"
 import { Button, Col, Divider, message, Popconfirm, Row } from "antd";
 import { useEffect, useRef, useState } from "react";
 
@@ -26,6 +26,7 @@ const Index: React.FC = () => {
     const [extraStatus, setExtraStatus] = useState<string>();
     const [selectedTelesalesIds, setSelectedTelesalesIds] = useState<string[]>([]);
     const [contactPerAgent, setContactPerAgent] = useState<number>(0);
+    const [phoneNumber, setPhoneNumber] = useState<string>('');
 
     useEffect(() => {
         const fetchUsersInTeam = async () => {
@@ -170,6 +171,16 @@ const Index: React.FC = () => {
                                     }}
                                 />
                             </Col>
+                            <Col md={6} xs={24}>
+                                <ProFormText name="phoneNumber" 
+                                tooltip="Nhấn Enter để tìm kiếm"
+                                label="Số điện thoại" fieldProps={{
+                                    onPressEnter: (e) => {
+                                        setPhoneNumber(e.currentTarget.value);
+                                        actionContactRef.current?.reload();
+                                    }
+                                }} />
+                            </Col>
                         </Row>
                     </ProForm>
                     <ProTable
@@ -184,7 +195,8 @@ const Index: React.FC = () => {
                             teamId: teamId,
                             sourceIds: sourceIds.join(','),
                             callStatusId: callStatusId,
-                            extraStatus: extraStatus
+                            extraStatus: extraStatus,
+                            phoneNumber: phoneNumber
                         }}
                         pagination={{
                             pageSize: 10
@@ -257,7 +269,7 @@ const Index: React.FC = () => {
                         </Row>
                     </ProForm>
                     <ProTable
-                        headerTitle="Danh sách nhân viên" rowKey="id" search={false}
+                        headerTitle="Agents" rowKey="id" search={false}
                         ghost
                         pagination={false}
                         className="mb-4"
@@ -279,7 +291,7 @@ const Index: React.FC = () => {
                                 dataIndex: 'userName'
                             },
                             {
-                                title: 'name',
+                                title: 'Họ và tên',
                                 dataIndex: 'name'
                             },
                             {
@@ -306,23 +318,22 @@ const Index: React.FC = () => {
                         dataSource={usersInTeam} />
                     <div className="mb-4">
                         <div className="grid md:grid-cols-3 gap-4">
-                            <div className="border p-2 rounded">
+                            <div className="border p-2 rounded bg-slate-100">
                                 SL Agent: <b>{selectedTelesalesIds.length}</b>
                             </div>
                             <div className="border rounded flex items-center gap-2 pl-2">
                                 SL Liên hệ/Agent:
                                 <input type="number" className="border-l flex-1 p-2"
-                                onChange={(e) => setContactPerAgent(Number(e.target.value))}
+                                    onChange={(e) => setContactPerAgent(Number(e.target.value))}
                                 />
                             </div>
-                            <div className="border p-2 rounded">
+                            <div className="border p-2 rounded bg-slate-100">
                                 SL Liên hệ: <b>{contactPerAgent * selectedTelesalesIds.length}</b>
                             </div>
                         </div>
                     </div>
                     <div>
-                        <Popconfirm title="Bạn có chắc chắn muốn chia dữ liệu cho các nhân viên này không?" onConfirm={() => {
-                        }}>
+                        <Popconfirm title="Bạn có chắc chắn muốn chia dữ liệu cho các nhân viên này không?" onConfirm={handleAssign}>
                             <Button type="primary" block>Chia dữ liệu</Button>
                         </Popconfirm>
                     </div>

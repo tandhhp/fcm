@@ -113,8 +113,8 @@ export default (initialState: { currentUser?: API.User }) => {
   const can_read_page_event = event || sales || sm || dos || dot || telesaleManager || telesale || cx || canAdmin;
   const can_read_page_event_showup_report = event || canAdmin || dot || dos || sm || cx || sales;
   const can_confirm2 = currentUser && (currentUser.claims?.some((claim) => claim.type === 'ACCESS' && claim.value === 'CONFIRM2') || false) || canAdmin;
-  const can_read_page_user = canAdmin || hr || dot;
-  const can_read_page_department = canAdmin || hr || dot;
+  const can_read_page_user = canAdmin || hr || dot || adminData;
+  const can_read_page_department = canAdmin || hr || dot || adminData;
 
   return {
     canAdmin,

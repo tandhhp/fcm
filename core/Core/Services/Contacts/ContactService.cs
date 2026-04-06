@@ -219,7 +219,7 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
             if (args.File is null || args.File.Length == 0) return TResult.Failed("File không hợp lệ!");
             var source = await _sourceService.FindAsync(args.SourceId);
             if (source is null) return TResult.Failed("Nguồn không tồn tại!");
-            var phoneNumbers = await _leadService.AllPhoneNumbersAsync();
+            var phoneNumbers = await _contactRepository.AllPhoneNumbersAsync();
             var contacts = new List<Contact>();
             using var pgk = new ExcelPackage(args.File.OpenReadStream());
             var worksheet = pgk.Workbook.Worksheets[0];
@@ -325,4 +325,6 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
     public Task<ListResult<object>> DialedCallsAsync(ContactFilterOptions filterOptions) => _contactRepository.DialedCallsAsync(filterOptions);
 
     public Task<TResult> GetReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions) => _contactRepository.GetReportDataSourceAsync(filterOptions);
+
+    public Task<TResult<byte[]?>> ExportReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions) => _contactRepository.ExportReportDataSourceAsync(filterOptions);
 }

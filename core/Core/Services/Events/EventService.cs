@@ -26,13 +26,13 @@ public class EventService(ApplicationDbContext _context, IEventRepository _event
         {
             var lead = await _leadService.FindAsync(args.LeadId);
             if (lead is null) return TResult.Failed("Không tìm thấy Key-In!");
-            if (lead.Status != LeadStatus.Checkin && lead.Status != LeadStatus.LeadAccept) return TResult.Failed("Trạng thái Key-In không hợp lệ!");
+            if (lead.Status != LeadStatus.Checkin && lead.Status != LeadStatus.CloseDeal) return TResult.Failed("Trạng thái Key-In không hợp lệ!");
             if (string.IsNullOrWhiteSpace(args.ContractCode)) return TResult.Failed("Vui lòng nhập mã hợp đồng!");
             if (args.ContractAmount <= 0) return TResult.Failed("Số tiền hợp đồng không hợp lệ!");
             if (await _contractService.AnyAsync(args.ContractCode)) return TResult.Failed("Mã hợp đồng đã tồn tại!");
             if (lead.SalesId is null) return TResult.Failed("Bạn chưa chọn Rep!");
             await _eventRepository.CreateContractAsync(lead, args.ContractCode, args.ContractAmount, args.CardId, args.SourceId);
-            lead.Status = LeadStatus.LeadAccept;
+            lead.Status = LeadStatus.CloseDeal;
             _context.Leads.Update(lead);
             await _context.SaveChangesAsync();
             return TResult.Success;
@@ -117,7 +117,7 @@ public class EventService(ApplicationDbContext _context, IEventRepository _event
         var query = from a in _context.Leads
                     join c in _context.Users on a.SalesId equals c.Id
                     join d in _context.LeadFeedbacks on a.Id equals d.LeadId
-                    where a.Status == LeadStatus.LeadAccept
+                    where a.Status == LeadStatus.CloseDeal
                     select new
                     {
                         a.EventDate,
