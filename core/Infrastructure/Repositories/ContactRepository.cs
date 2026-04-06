@@ -562,4 +562,232 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
 
         return TResult<byte[]?>.Ok(await package.GetAsByteArrayAsync());
     }
+
+    public async Task<TResult<byte[]?>> ExportTmrDataReportAsync(TmrDataReportFilterOptions filterOptions)
+    {
+        var callStatuses = await _context.CallStatuses.ToListAsync();
+
+        int? GetStatusId(string name) =>
+            callStatuses.FirstOrDefault(x => x.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase))?.Id;
+
+        var teleNotUpdateId = GetStatusId("Tele not update");
+        var tempLockedId = GetStatusId("Temporary locked/Wrong number/Knm");
+        var notEnoughId = GetStatusId("Not Enough Qualify");
+        var meetRequireId = GetStatusId("Meet Require");
+        var refuseId = GetStatusId("Refuse to talk");
+        var locationId = GetStatusId("Location");
+
+        var data = await (from t in _context.Teams
+                          join u in _context.Users on t.Id equals u.TeamId into tu
+                          from u in tu.DefaultIfEmpty()
+                          join c in _context.Contacts on u.Id equals c.UserId into uc
+                          from c in uc.DefaultIfEmpty()
+                          where filterOptions.TeamId == null || t.Id == filterOptions.TeamId
+                          select new
+                          {
+                              TeamId = t.Id,
+                              TeamName = t.Name,
+                              UserId = (Guid?)u.Id,
+                              UserName = u.UserName,
+                              FullName = u.Name,
+                              ContactId = (Guid?)c.Id,
+                              ContactStatus = (ContactStatus?)c.Status,
+                              CallStatusId = c.CallStatusId
+                          }).ToListAsync();
+
+        (int tele, int temp, int notEnough, int meet, int refuse, int location) GetCounts(IEnumerable<dynamic> items) =>
+            (
+                tele: items.Count(x => x.ContactId != null && teleNotUpdateId.HasValue && x.CallStatusId == teleNotUpdateId),
+                temp: items.Count(x => x.ContactId != null && tempLockedId.HasValue && x.CallStatusId == tempLockedId),
+                notEnough: items.Count(x => x.ContactId != null && notEnoughId.HasValue && x.CallStatusId == notEnoughId),
+                meet: items.Count(x => x.ContactId != null && meetRequireId.HasValue && x.CallStatusId == meetRequireId),
+                refuse: items.Count(x => x.ContactId != null && refuseId.HasValue && x.CallStatusId == refuseId),
+                location: items.Count(x => x.ContactId != null && locationId.HasValue && x.CallStatusId == locationId)
+            );
+
+        var teams = data.GroupBy(x => new { x.TeamId, x.TeamName })
+            .Select(g => new
+            {
+                TeamId = g.Key.TeamId,
+                LeaderName = g.Key.TeamName,
+                TotalAssign = g.Count(x => x.ContactId != null),
+                TotalAvailableContact = g.Count(x => x.ContactId != null && x.ContactStatus != ContactStatus.Blacklisted),
+                CallStatusCounts = GetCounts(g),
+                Users = g.Where(x => x.UserId != null)
+                    .GroupBy(x => new { x.UserId, x.UserName, x.FullName })
+                    .Select(ug => new
+                    {
+                        UserId = ug.Key.UserId,
+                        UserName = ug.Key.UserName,
+                        FullName = ug.Key.FullName,
+                        TotalAssign = ug.Count(x => x.ContactId != null),
+                        TotalAvailableContact = ug.Count(x => x.ContactId != null && x.ContactStatus != ContactStatus.Blacklisted),
+                        CallStatusCounts = GetCounts(ug)
+                    }).ToList()
+            }).ToList();
+
+        using (var package = new ExcelPackage())
+        {
+            var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+
+            worksheet.Cells[1, 1].Value = "Team Name";
+            worksheet.Cells[1, 2].Value = "User Name";
+            worksheet.Cells[1, 3].Value = "Full Name";
+            worksheet.Cells[1, 4].Value = "Assign";
+
+            worksheet.Cells[2, 4].Value = "Total Assign";
+            worksheet.Cells[2, 5].Value = "Total Available Contact";
+
+            if (filterOptions.ViewType == TmrDataReportViewType.CallStatus)
+            {
+                worksheet.Cells[1, 4].Value = "Call Status";
+                worksheet.Cells[2, 4].Value = "Tele not update";
+                worksheet.Cells[2, 5].Value = "Temporary locked/Wrong number/Knm";
+                worksheet.Cells[2, 6].Value = "Not Enough Qualify";
+                worksheet.Cells[2, 7].Value = "Meet Require";
+                worksheet.Cells[2, 8].Value = "Refuse to talk";
+                worksheet.Cells[2, 9].Value = "Location";
+            }
+
+            using (var range = worksheet.Cells[1, 1, 2, 9])
+            {
+                range.Style.Font.Bold = true;
+            }
+
+            int currentRow = 3;
+
+            foreach (var team in teams)
+            {
+                worksheet.Cells[currentRow, 1].Value = $"[Leader] {team.LeaderName}_Total";
+
+                if (filterOptions.ViewType == TmrDataReportViewType.CallStatus)
+                {
+                    worksheet.Cells[currentRow, 4].Value = team.CallStatusCounts.tele;
+                    worksheet.Cells[currentRow, 5].Value = team.CallStatusCounts.temp;
+                    worksheet.Cells[currentRow, 6].Value = team.CallStatusCounts.notEnough;
+                    worksheet.Cells[currentRow, 7].Value = team.CallStatusCounts.meet;
+                    worksheet.Cells[currentRow, 8].Value = team.CallStatusCounts.refuse;
+                    worksheet.Cells[currentRow, 9].Value = team.CallStatusCounts.location;
+                }
+                else
+                {
+                    worksheet.Cells[currentRow, 4].Value = team.TotalAssign;
+                    worksheet.Cells[currentRow, 5].Value = team.TotalAvailableContact;
+                }
+
+                using (var leaderRowRange = worksheet.Cells[currentRow, 1, currentRow, filterOptions.ViewType == TmrDataReportViewType.CallStatus ? 9 : 5])
+                {
+                    leaderRowRange.Style.Font.Bold = true;
+                    leaderRowRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    leaderRowRange.Style.Fill.BackgroundColor.SetColor(Color.LightYellow);
+                }
+
+                currentRow++;
+
+                foreach (var user in team.Users)
+                {
+                    worksheet.Cells[currentRow, 2].Value = user.UserName;
+                    worksheet.Cells[currentRow, 3].Value = user.FullName;
+
+                    if (filterOptions.ViewType == TmrDataReportViewType.CallStatus)
+                    {
+                        worksheet.Cells[currentRow, 4].Value = user.CallStatusCounts.tele;
+                        worksheet.Cells[currentRow, 5].Value = user.CallStatusCounts.temp;
+                        worksheet.Cells[currentRow, 6].Value = user.CallStatusCounts.notEnough;
+                        worksheet.Cells[currentRow, 7].Value = user.CallStatusCounts.meet;
+                        worksheet.Cells[currentRow, 8].Value = user.CallStatusCounts.refuse;
+                        worksheet.Cells[currentRow, 9].Value = user.CallStatusCounts.location;
+                    }
+                    else
+                    {
+                        worksheet.Cells[currentRow, 4].Value = user.TotalAssign;
+                        worksheet.Cells[currentRow, 5].Value = user.TotalAvailableContact;
+                    }
+
+                    currentRow++;
+                }
+            }
+
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+            return TResult<byte[]?>.Ok(await package.GetAsByteArrayAsync());
+        }
+    }
+
+    public async Task<TResult> GetTmrDataReportAsync(TmrDataReportFilterOptions filterOptions)
+    {
+        try
+        {
+            var callStatuses = await _context.CallStatuses.ToListAsync();
+
+            int? GetStatusId(CallStatusType type) =>
+                callStatuses.FirstOrDefault(x => x.Type == type)?.Id;
+
+            var teleNotUpdateId = GetStatusId(CallStatusType.TELE_NOT_UPDATE);
+            var tempLockedId = GetStatusId(CallStatusType.TEMPORARY_LOCKED_WRONG_NUMBER_KNM);
+            var notEnoughId = GetStatusId(CallStatusType.NOT_ENOUGH_QUALIFY);
+            var meetRequireId = GetStatusId(CallStatusType.MEET_REQUIRE);
+            var refuseId = GetStatusId(CallStatusType.REFUSE_TO_TALK);
+            var locationId = GetStatusId(CallStatusType.LOCATION);
+
+            var data = await (from t in _context.Teams
+                              join u in _context.Users on t.Id equals u.TeamId into tu
+                              from u in tu.DefaultIfEmpty()
+                              join c in _context.Contacts on u.Id equals c.UserId into uc
+                              from c in uc.DefaultIfEmpty()
+                              where filterOptions.TeamId == null || t.Id == filterOptions.TeamId
+                              select new
+                              {
+                                  TeamId = t.Id,
+                                  TeamName = t.Name,
+                                  UserId = (Guid?)u.Id,
+                                  UserName = u.UserName,
+                                  FullName = u.Name,
+                                  ContactId = (Guid?)c.Id,
+                                  ContactStatus = (ContactStatus?)c.Status,
+                                  CallStatusId = c.CallStatusId
+                              }).ToListAsync();
+
+            (int tele, int temp, int notEnough, int meet, int refuse, int location) GetCounts(IEnumerable<dynamic> items) =>
+                (
+                    tele: items.Count(x => x.ContactId != null && teleNotUpdateId.HasValue && x.CallStatusId == teleNotUpdateId),
+                    temp: items.Count(x => x.ContactId != null && tempLockedId.HasValue && x.CallStatusId == tempLockedId),
+                    notEnough: items.Count(x => x.ContactId != null && notEnoughId.HasValue && x.CallStatusId == notEnoughId),
+                    meet: items.Count(x => x.ContactId != null && meetRequireId.HasValue && x.CallStatusId == meetRequireId),
+                    refuse: items.Count(x => x.ContactId != null && refuseId.HasValue && x.CallStatusId == refuseId),
+                    location: items.Count(x => x.ContactId != null && locationId.HasValue && x.CallStatusId == locationId)
+                );
+
+            var teams = data.GroupBy(x => new { x.TeamId, x.TeamName })
+                .Select(g => new
+                {
+                    TeamId = g.Key.TeamId,
+                    LeaderName = g.Key.TeamName,
+                    TotalAssign = g.Count(x => x.ContactId != null),
+                    TotalAvailableContact = g.Count(x => x.ContactId != null && x.ContactStatus != ContactStatus.Blacklisted),
+                    CallStatusCounts = GetCounts(g),
+                    Users = g.Where(x => x.UserId != null)
+                        .GroupBy(x => new { x.UserId, x.UserName, x.FullName })
+                        .Select(ug => new
+                        {
+                            UserId = ug.Key.UserId,
+                            UserName = ug.Key.UserName,
+                            FullName = ug.Key.FullName,
+                            TotalAssign = ug.Count(x => x.ContactId != null),
+                            TotalAvailableContact = ug.Count(x => x.ContactId != null && x.ContactStatus != ContactStatus.Blacklisted),
+                            CallStatusCounts = GetCounts(ug)
+                        }).ToList()
+                }).ToList();
+
+            return TResult.Ok(new
+            {
+                ViewType = filterOptions.ViewType,
+                Teams = teams
+            });
+        }
+        catch (Exception ex)
+        {
+            return TResult.Failed(ex.ToString());
+        }
+    }
 }

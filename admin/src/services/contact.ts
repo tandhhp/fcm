@@ -1,14 +1,15 @@
+import { ReportData, TMRViewReportData } from '@/typings/report';
 import { request } from '@umijs/max';
 
 export async function listContact(params: any) {
-  return request(`contact/list`, { 
+  return request(`contact/list`, {
     params: {
       ...params,
       fromDate: params?.lastCall ? params.lastCall[0] : undefined,
       toDate: params?.lastCall ? params.lastCall[1] : undefined,
       lastCall: undefined
     }
-   });
+  });
 }
 
 export async function deleteContact(id: string) {
@@ -229,14 +230,14 @@ export async function apiContactAssignSource(data: any) {
 }
 
 export async function apiContactNeedConfirm2(params: any) {
-  return request(`contact/need-confirms`, { 
+  return request(`contact/need-confirms`, {
     params: {
       ...params,
       fromDate: params?.dateRange ? params.dateRange[0] : undefined,
       toDate: params?.dateRange ? params.dateRange[1] : undefined,
       dateRange: undefined
     }
-   });
+  });
 }
 
 export async function apiContactConfirm2(data: any) {
@@ -252,6 +253,44 @@ export async function apiContactDialedCalls(params: any) {
 
 export async function apiExportDialedCalls(params: any) {
   return request(`contact/export-dialed-calls`, {
+    params,
+    responseType: 'blob'
+  });
+}
+
+export async function apiReportDataSource(params: {
+  teamId?: number;
+  fromDate?: string;
+  toDate?: string;
+  sourceId?: number;
+}) {
+  return request<API.TResult<ReportData>>(`contact/report-data-source`, { params });
+}
+
+export async function apiReportDataSourceExport(params: {
+  teamId?: number;
+  fromDate?: string;
+  toDate?: string;
+  sourceId?: number;
+}) {
+  return request(`contact/report-data-source/export`, {
+    params,
+    responseType: 'blob'
+  });
+}
+
+export async function apiReportTmrData(params: {
+  TeamId?: number;
+  viewType?: 0 | 1; // 0: Assigned, 1: Call Status
+}) {
+  return request<API.TResult<TMRViewReportData>>(`contact/tmr-data-report`, { params });
+}
+
+export async function apiReportTmrDataExport(params: {
+  TeamId?: number;
+  viewType?: 0 | 1; // 0: Assigned, 1: Call Status
+}) {
+  return request(`contact/tmr-data-report/export`, {
     params,
     responseType: 'blob'
   });

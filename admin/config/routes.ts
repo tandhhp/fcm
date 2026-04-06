@@ -351,7 +351,7 @@ export default [
         component: './contact/report/tele'
       },
       {
-        name: 'CDR',
+        name: 'Danh sách cuộc gọi',
         path: '/contact/report/cdr',
         component: './contact/report/cdr'
       },
@@ -549,6 +549,26 @@ export default [
         path: '/event/report',
         component: './event/report',
         access: 'can_read_page_event_showup_report'
+      }
+    ]
+  },
+  {
+    icon: 'DatabaseOutlined',
+    name: 'Thống kê',
+    path: '/report',
+    access: 'can_read_page_report',
+    routes: [
+      {
+        name: 'Report data source',
+        path: '/report/data-source',
+        component: './contact/report/data-source',
+        access: 'can_read_page_report_data_source'
+      },
+      {
+        name: 'Report TMR data',
+        path: '/report/tmr-data',
+        component: './contact/report/tmr-data',
+        access: 'can_read_page_report_tmr_data'
       }
     ]
   },

@@ -1209,4 +1209,16 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
         if (result.Data is null) return BadRequest("Không có dữ liệu để xuất");
         return File(result.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "data.xlsx");
     }
+
+    [HttpGet("tmr-data-report")]
+    public async Task<IActionResult> GetTmrDataReportAsync([FromQuery] TmrDataReportFilterOptions filterOptions) => Ok(await _contactService.GetTmrDataReportAsync(filterOptions));
+
+    [HttpGet("tmr-data-report/export")]
+    public async Task<IActionResult> ExportTmrDataReportAsync([FromQuery] TmrDataReportFilterOptions filterOptions)
+    {
+        var result = await _contactService.ExportTmrDataReportAsync(filterOptions);
+        if (!result.Succeeded) return BadRequest(result.Message);
+        if (result.Data is null) return BadRequest("Không có dữ liệu để xuất");
+        return File(result.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "data.xlsx");
+    }
 }

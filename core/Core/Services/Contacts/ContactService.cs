@@ -327,4 +327,8 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
     public Task<TResult> GetReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions) => _contactRepository.GetReportDataSourceAsync(filterOptions);
 
     public Task<TResult<byte[]?>> ExportReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions) => _contactRepository.ExportReportDataSourceAsync(filterOptions);
+
+    public Task<TResult> GetTmrDataReportAsync(TmrDataReportFilterOptions filterOptions) => _contactRepository.GetTmrDataReportAsync(filterOptions);
+
+    public Task<TResult<byte[]?>> ExportTmrDataReportAsync(TmrDataReportFilterOptions filterOptions) => _contactRepository.ExportTmrDataReportAsync(filterOptions);
 }

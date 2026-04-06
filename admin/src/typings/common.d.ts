@@ -8,4 +8,9 @@ declare namespace API {
         pageSize: number;
         [key: string]: any;
     }
+    type TResult<T> = {
+        succeeded: boolean;
+        data: T;
+        message?: string;
+    }
 }

@@ -28,4 +28,6 @@ public interface IContactService
     Task<ListResult<object>> DialedCallsAsync(ContactFilterOptions filterOptions);
     Task<TResult> GetReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions);
     Task<TResult<byte[]?>> ExportReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions);
+    Task<TResult> GetTmrDataReportAsync(TmrDataReportFilterOptions filterOptions);
+    Task<TResult<byte[]?>> ExportTmrDataReportAsync(TmrDataReportFilterOptions filterOptions);
 }

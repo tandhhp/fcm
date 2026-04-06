@@ -12,8 +12,10 @@ public interface IContactRepository : IAsyncRepository<Contact>
     Task<IEnumerable<string?>> AllPhoneNumbersAsync();
     Task<ListResult<object>> DialedCallsAsync(ContactFilterOptions filterOptions);
     Task<TResult<byte[]?>> ExportReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions);
+    Task<TResult<byte[]?>> ExportTmrDataReportAsync(TmrDataReportFilterOptions filterOptions);
     Task<ListResult<object>> GetBlacklistAsync(BlacklistFilterOptions filterOptions);
     Task<TResult> GetReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions);
+    Task<TResult> GetTmrDataReportAsync(TmrDataReportFilterOptions filterOptions);
     Task<TResult<object>> GetTmrReportAsync();
     Task<List<Contact>> GetUnassignedContactsAsync(int numberOfContact, int sourceId);
     Task<ListResult<object>> GetUnassignedListAsync(UnassignedFilterOptions filterOptions);
