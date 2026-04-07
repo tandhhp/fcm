@@ -1,8 +1,11 @@
 import { apiCallComplete, apiCallOptions } from "@/services/call";
+import { apiEventOptions } from "@/services/event";
+import { CALL_STATUS_CODE } from "@/utils/constants";
 import { PhoneOutlined } from "@ant-design/icons";
 import { DrawerForm, DrawerFormProps, ProDescriptions, ProFormDatePicker, ProFormInstance, ProFormSelect, ProFormText, ProFormTextArea, ProFormTimePicker } from "@ant-design/pro-components"
 import { Button, Col, message, Row } from "antd";
-import { useRef } from "react";
+import dayjs, { Dayjs } from "dayjs";
+import { useRef, useState } from "react";
 
 type Props = DrawerFormProps & {
     data?: any;
@@ -12,6 +15,7 @@ type Props = DrawerFormProps & {
 const CallForm: React.FC<Props> = (props) => {
 
     const formRef = useRef<ProFormInstance>(null);
+    const [selectedStatus, setSelectedStatus] = useState<string>();
 
     const onFinish = async (values: any) => {
         if (!props.data) {
@@ -28,9 +32,9 @@ const CallForm: React.FC<Props> = (props) => {
 
     return (
         <DrawerForm {...props} title={`Cuộc gọi ${props.data?.name}`} onFinish={onFinish} formRef={formRef}
-        drawerProps={{
-            destroyOnHidden: true
-        }}
+            drawerProps={{
+                destroyOnHidden: true
+            }}
         >
             <ProDescriptions column={2} className="mb-4" bordered size="small" title="Thông tin liên hệ" dataSource={props.data} >
                 <ProDescriptions.Item label="Họ và tên">{props.data?.name} {props.data?.gender === true ? '(Nữ)' : props.data?.gender === false ? '(Nam)' : ''}</ProDescriptions.Item>
@@ -39,9 +43,13 @@ const CallForm: React.FC<Props> = (props) => {
                 <ProDescriptions.Item label="Ngày tạo" valueType={"date"}>{props.data?.createdDate}</ProDescriptions.Item>
             </ProDescriptions>
             <Button type="primary" icon={<PhoneOutlined />} block href={`tel:${props.data?.phoneNumber}`} className="mb-4">Gọi điện</Button>
-            <Row gutter={[16, 16]}>
+            <Row gutter={16}>
                 <Col xs={24} md={12}>
-                    <ProFormSelect name={`callStatusId`} label="Trạng thái" request={apiCallOptions} showSearch
+                    <ProFormSelect name={`callStatusId`}
+                        onChange={(_, option) => {
+                            setSelectedStatus(option.code);
+                        }}
+                        label="Trạng thái" request={apiCallOptions} showSearch
                         rules={[
                             {
                                 required: true
@@ -49,7 +57,7 @@ const CallForm: React.FC<Props> = (props) => {
                         ]} />
                 </Col>
                 <Col xs={24} md={12}>
-                    <ProFormSelect name={`extraStatus`} label="Trạng thái bổ sung" options={[
+                    <ProFormSelect name={`extraStatus`} label="Extra Status" options={[
                         {
                             label: 'Có tiền',
                             value: 'Có tiền'
@@ -79,6 +87,24 @@ const CallForm: React.FC<Props> = (props) => {
             </Row>
             <ProFormText label="Thói quen du lịch" name="travelHabit" />
             <ProFormTextArea label="Ghi chú" name="note" />
+            {
+                (selectedStatus === CALL_STATUS_CODE.CONFIRM1 || selectedStatus === CALL_STATUS_CODE.CONSIDER) && (
+                    <>
+                        <Row gutter={16}>
+                            <Col xs={24} md={12}>
+                                <ProFormDatePicker name="eventDate" label="Event date" width="lg"
+                                    formProps={{
+                                        disabledDate: (current: Dayjs) => current && current < dayjs().startOf('day')
+                                    }}
+                                />
+                            </Col>
+                            <Col xs={24} md={12}>
+                                <ProFormSelect name="eventId" label="Khung giờ" request={apiEventOptions} showSearch />
+                            </Col>
+                        </Row>
+                    </>
+                )
+            }
         </DrawerForm>
     )
 }

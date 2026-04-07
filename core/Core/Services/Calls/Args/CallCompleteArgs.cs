@@ -12,4 +12,7 @@ public class CallCompleteArgs
     public string? ExtraStatus { get; set; }
     public DateTime? FollowUpDate { get; set; }
     public TimeSpan? FollowUpTime { get; set; }
+    public DateTime? EventDate { get; set; }
+    public Guid? EventId { get; set; }
+
 }

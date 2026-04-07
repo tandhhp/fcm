@@ -1,4 +1,4 @@
-import { ReportData, TMRViewReportData } from '@/typings/report';
+import { ReportData, ReportMultipleAssign, TMRViewReportData } from '@/typings/report';
 import { request } from '@umijs/max';
 
 export async function listContact(params: any) {
@@ -291,6 +291,25 @@ export async function apiReportTmrDataExport(params: {
   viewType?: 0 | 1; // 0: Assigned, 1: Call Status
 }) {
   return request(`contact/tmr-data-report/export`, {
+    params,
+    responseType: 'blob'
+  });
+}
+
+export async function apiReportMultipleAssign(params: {
+  fromDate?: string;
+  toDate?: string;
+  teamId?: number;
+}) {
+  return request<API.TResult<ReportMultipleAssign[]>>(`contact/multiple-assign-report`, { params });
+}
+
+export async function apiReportMultipleAssignExport(params: {
+  fromDate?: string;
+  toDate?: string;
+  teamId?: number;
+}) {
+  return request(`contact/multiple-assign-report/export`, {
     params,
     responseType: 'blob'
   });

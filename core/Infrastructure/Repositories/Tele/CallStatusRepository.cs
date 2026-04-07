@@ -37,6 +37,7 @@ public class CallStatusRepository(ApplicationDbContext context) : EfRepository<C
     public async Task<object> OptionsAsync(SelectOptions options) => await _context.CallStatuses.Select(x => new
     {
         Label = x.Name,
-        Value = x.Id
+        Value = x.Id,
+        x.Code
     }).ToListAsync();
 }

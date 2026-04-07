@@ -299,7 +299,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                     from t in bteam.DefaultIfEmpty()
                     join tod in _context.TypeOfDatas on s.TypeOfDataId equals tod.Id into stype
                     from tod in stype.DefaultIfEmpty()
-                    where a.Status != ContactStatus.Contacted
+                    where a.LastCallTime == null
                     select new ContactListItem
                     {
                         Id = a.Id,
@@ -903,7 +903,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                             TeleName = u.Name,
                             ContactId = c.Id,
                             c.LastCallTime,
-                            c.ModifiedDate
+                            ModifiedDate = c.ModifiedDate ?? c.CreatedDate
                         };
             if (filterOptions.TeamId.HasValue)
             {
@@ -911,11 +911,11 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
             }
             if (filterOptions.FromDate.HasValue)
             {
-                query = query.Where(x => x.ModifiedDate != null && x.ModifiedDate >= filterOptions.FromDate.Value);
+                query = query.Where(x => x.ModifiedDate >= filterOptions.FromDate.Value);
             }
             if (filterOptions.ToDate.HasValue)
             {
-                query = query.Where(x => x.ModifiedDate != null && x.ModifiedDate <= filterOptions.ToDate.Value);
+                query = query.Where(x => x.ModifiedDate <= filterOptions.ToDate.Value);
             }
             var data = await query.GroupBy(x => new
             {

@@ -96,7 +96,7 @@ export async function apiSourceContactAssign(data: {
     contactCount: number;
     teleIds: string[];
 }) {
-    return request(`source/contact-assign`, {
+    return request(`source/multiple-assign`, {
         method: 'POST',
         data
     });

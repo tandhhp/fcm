@@ -1,7 +1,7 @@
 import { deleteContact, listContact } from "@/services/contact";
 import { CalendarOutlined, DeleteOutlined, EditOutlined, EyeOutlined, ManOutlined, MoreOutlined, PhoneOutlined, PlusOutlined, StopOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProColumnType, ProTable } from "@ant-design/pro-components"
-import { history } from "@umijs/max";
+import { history, useAccess } from "@umijs/max";
 import { Button, Dropdown, Popconfirm, message } from "antd";
 import { useRef, useState } from "react";
 import BlockContactModal from "./components/block-modal";
@@ -12,6 +12,7 @@ import { apiSourceOptions } from "@/services/settings/source";
 
 const ContactPage: React.FC = () => {
 
+    const access = useAccess();
     const actionRef = useRef<ActionType>();
     const [contact, setContact] = useState<any>();
     const [openBlock, setOpenBlock] = useState<boolean>(false);
@@ -160,7 +161,7 @@ const ContactPage: React.FC = () => {
                     message.success('Xóa thành công!');
                     actionRef.current?.reload();
                 }}>
-                    <Button type="primary" danger icon={<DeleteOutlined />} size="small"></Button>
+                    <Button type="primary" danger icon={<DeleteOutlined />} size="small" disabled={access.telesale}></Button>
                 </Popconfirm>
             ],
             width: 60
@@ -171,7 +172,9 @@ const ContactPage: React.FC = () => {
         <PageContainer extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => {
             setContact(undefined);
             setOpenForm(true);
-        }}>Tạo mới</Button>}>
+        }} disabled={access.telesale}>
+            Tạo mới
+        </Button>}>
             <ProTable
                 scroll={{
                     x: true

@@ -569,6 +569,12 @@ export default [
         path: '/report/tmr-data',
         component: './contact/report/tmr-data',
         access: 'can_read_page_report_tmr_data'
+      },
+      {
+        name: 'Report mutiple assign',
+        path: '/report/multiple-assign',
+        component: './contact/report/multiple-assign',
+        access: 'can_read_page_report_multiple_assign'
       }
     ]
   },

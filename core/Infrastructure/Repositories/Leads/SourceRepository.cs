@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Waffle.Core.Foundations;
 using Waffle.Core.Interfaces.IRepository.Leads;
-using Waffle.Core.Services.Events.Filters;
 using Waffle.Core.Services.Sources.Args;
 using Waffle.Core.Services.Sources.Filters;
 using Waffle.Core.Services.Sources.Results;
@@ -9,7 +8,6 @@ using Waffle.Data;
 using Waffle.Entities;
 using Waffle.Entities.Contacts;
 using Waffle.Models;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Waffle.Infrastructure.Repositories.Leads;
 
@@ -89,7 +87,7 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
                         s.TypeOfDataId,
                         TeamName = t.Name,
                         c.Gender,
-                        c.CreatedDate,
+                        CreatedDate = c.ModifiedDate ?? c.CreatedDate,
                         c.LastCallTime,
                         TeleName = u.Name,
                         c.ExtraStatus,
@@ -110,11 +108,11 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
         }
         if (filterOptions.TypeOfData == TypeOfDataSelectType.Old)
         {
-            query = query.Where(x => x.CreatedDate < DateTime.Now.AddDays(-1));
+            query = query.Where(x => x.CreatedDate < DateTime.Now.AddDays(-1) && x.UserId != null);
         }
         if (filterOptions.TypeOfData == TypeOfDataSelectType.StartCase)
         {
-            query = query.Where(x => x.UserId != null && x.LastCallTime != null && x.LastCallTime > DateTime.Now.AddMonths(-1));
+            query = query.Where(x => x.UserId != null && x.LastCallTime != null);
         }
         if (!string.IsNullOrWhiteSpace(filterOptions.ExtraStatus))
         {
@@ -199,11 +197,11 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
         }
         if (args.TypeOfData == TypeOfDataSelectType.Old)
         {
-            queryContact = queryContact.Where(x => x.CreatedDate < DateTime.Now.AddDays(-1));
+            queryContact = queryContact.Where(x => x.CreatedDate < DateTime.Now.AddDays(-1) && x.UserId != null);
         }
         if (args.TypeOfData == TypeOfDataSelectType.StartCase)
         {
-            queryContact = queryContact.Where(x => x.UserId != null);
+            queryContact = queryContact.Where(x => x.UserId != null && x.LastCallTime != null);
         }
         if (!string.IsNullOrWhiteSpace(args.ExtraStatus))
         {
@@ -228,6 +226,8 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
         for (int i = 0; i < contacts.Count; i++)
         {
             contacts[i].UserId = teleIds[i % teleIds.Count];
+            contacts[i].LastCallTime = null;
+            contacts[i].ModifiedDate = DateTime.Now;
             _context.Contacts.Update(contacts[i]);
         }
 
@@ -269,7 +269,7 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
                         s.Name,
                         s.TeamId,
                         ContactCount = (from c in _context.Contacts.Where(x => x.SourceId == s.Id)
-                                        where c.UserId != null
+                                        where c.UserId != null && c.LastCallTime != null
                                         where c.Status != ContactStatus.Blacklisted
                                         select c.Id).Count()
                     };
@@ -298,7 +298,7 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
                         ContactCount = (from c in _context.Contacts.Where(x => x.SourceId == s.Id)
                                         where c.UserId != null
                                         where c.Status != ContactStatus.Blacklisted
-                                        where c.CreatedDate < DateTime.UtcNow.AddMonths(-1)
+                                        where (c.ModifiedDate ?? c.CreatedDate) < DateTime.Now.AddMonths(-1)
                                         select c.Id).Count()
                     };
         }

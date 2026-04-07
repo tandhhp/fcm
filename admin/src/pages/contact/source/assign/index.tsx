@@ -27,6 +27,7 @@ const Index: React.FC = () => {
     const [selectedTelesalesIds, setSelectedTelesalesIds] = useState<string[]>([]);
     const [contactPerAgent, setContactPerAgent] = useState<number>(0);
     const [phoneNumber, setPhoneNumber] = useState<string>('');
+    const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchUsersInTeam = async () => {
@@ -76,6 +77,7 @@ const Index: React.FC = () => {
             return;
         }
         const contactCount = contactPerAgent * selectedTelesalesIds.length;
+        setLoadingSubmit(true);
         await apiSourceContactAssign({
             sourceIds,
             typeOfData,
@@ -85,6 +87,7 @@ const Index: React.FC = () => {
             teleIds: selectedTelesalesIds
         });
         message.success('Chia dữ liệu thành công');
+        setLoadingSubmit(false);
     }
 
     return (
@@ -334,7 +337,9 @@ const Index: React.FC = () => {
                     </div>
                     <div>
                         <Popconfirm title="Bạn có chắc chắn muốn chia dữ liệu cho các nhân viên này không?" onConfirm={handleAssign}>
-                            <Button type="primary" block>Chia dữ liệu</Button>
+                            <Button type="primary" block loading={loadingSubmit}>
+                                Chia dữ liệu
+                            </Button>
                         </Popconfirm>
                     </div>
                 </ProCard>

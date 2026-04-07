@@ -26,7 +26,7 @@ const Index: React.FC = () => {
         <PageContainer extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => {
             setSelectedRow(null);
             setOpenForm(true);
-        }} disabled={!access.telesaleManager && !access.dot}>Tạo trạng thái</Button>}>
+        }} disabled={!access.canAdmin}>Tạo trạng thái</Button>}>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                 <ProCard title="Tổng liên hệ" headerBordered>
@@ -100,14 +100,14 @@ const Index: React.FC = () => {
                                             setSelectedRow(record);
                                             setOpenForm(true);
                                         },
-                                        disabled: !access.telesaleManager && !access.dot
+                                        disabled: !access.canAdmin
                                     }
                                 ]
                             }}>
                                 <Button type="dashed" icon={<MoreOutlined />} size="small" />
                             </Dropdown>,
                             <Popconfirm key={"delete"} title="Xác nhận xoá trạng thái cuộc gọi?" onConfirm={() => onDelete(record.id)}>
-                                <Button type="primary" danger size="small" icon={<DeleteOutlined />} disabled={!access.telesaleManager && !access.dot} />
+                                <Button type="primary" danger size="small" icon={<DeleteOutlined />} disabled={!access.canAdmin} />
                             </Popconfirm>
                         ]
                     }

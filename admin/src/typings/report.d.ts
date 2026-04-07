@@ -69,3 +69,11 @@ export interface TMRViewReportData {
     viewType: number;
     teams: TMRTeam[];
 }
+
+export interface ReportMultipleAssign {
+    teamName: string;
+    sourceName: string;
+    totalAssigned: number;
+    totalUsingAssigned: number;
+    totalRemainingAssigned: number;
+}

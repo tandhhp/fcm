@@ -59,12 +59,6 @@ const Index: React.FC = () => {
     // Cột cho User table (bên trong expand)
     const userColumns = viewType === 0 ? [
         {
-            title: 'User ID',
-            dataIndex: 'userId',
-            key: 'userId',
-            width: 100,
-        },
-        {
             title: 'Username',
             dataIndex: 'userName',
             key: 'userName',
@@ -91,12 +85,6 @@ const Index: React.FC = () => {
             width: 130,
         },
     ] : [
-        {
-            title: 'User ID',
-            dataIndex: 'userId',
-            key: 'userId',
-            width: 100,
-        },
         {
             title: 'Username',
             dataIndex: 'userName',
@@ -167,12 +155,6 @@ const Index: React.FC = () => {
     // Cột cho Team table
     const teamColumns = viewType === 0 ? [
         {
-            title: 'Team ID',
-            dataIndex: 'teamId',
-            key: 'teamId',
-            width: 100,
-        },
-        {
             title: 'Leader',
             dataIndex: 'leaderName',
             key: 'leaderName',
@@ -193,12 +175,6 @@ const Index: React.FC = () => {
             width: 130,
         },
     ] : [
-        {
-            title: 'Team ID',
-            dataIndex: 'teamId',
-            key: 'teamId',
-            width: 100,
-        },
         {
             title: 'Leader',
             dataIndex: 'leaderName',

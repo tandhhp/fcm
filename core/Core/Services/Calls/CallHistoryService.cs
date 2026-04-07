@@ -1,17 +1,24 @@
-﻿using Waffle.Core.Interfaces.IRepository.Calls;
+﻿using Microsoft.AspNetCore.Identity;
+using Waffle.Core.Interfaces.IRepository.Calls;
 using Waffle.Core.Interfaces.IService;
 using Waffle.Core.Interfaces.IService.Calls;
 using Waffle.Core.Services.Calls.Args;
 using Waffle.Core.Services.Calls.Filters;
 using Waffle.Core.Services.Calls.Models;
+using Waffle.Core.Services.Leads;
+using Waffle.Core.Services.Leads.Args;
+using Waffle.Data;
+using Waffle.Entities;
+using Waffle.Entities.Contacts;
 using Waffle.Infrastructure.Repositories.Calls;
 using Waffle.Models;
 
 namespace Waffle.Core.Services.Calls;
 
-public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, IContactService _contactService, IHCAService _hcaService) : ICallHistoryService
+public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, ILeadService _leadService, ApplicationDbContext _context, IContactService _contactService, IHCAService _hcaService) : ICallHistoryService
 {
     public Task<ListResult<object>> HistoriesAsync(CallHistoryFilterOptions filterOptions) => _callHistoryRepository.HistoriesAsync(filterOptions);
+
     public async Task<TResult> CompleteAsync(CallCompleteArgs args)
     {
         try
@@ -26,7 +33,34 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
             {
                 followUpDate = followUpDate.Value.Date.Add(args.FollowUpTime.Value);
             }
+            var callStatus = await _context.CallStatuses.FindAsync(args.CallStatusId);
+            if (callStatus is null) return TResult.Failed("Không tìm thấy trạng thái cuộc gọi!");
+            if (callStatus.Code == CallStatusCode.CONFIRM1 || callStatus.Code == CallStatusCode.CONSIDER)
+            {
+                contact.Confirm1 = true;
+                if (args.EventDate != null && args.EventId != null)
+                {
+                    var lead = await _leadService.FindByPhoneNumberAsync(contact.PhoneNumber);
+                    if (lead != null && !lead.Duplicated) return TResult.Failed($"Liên hệ đã có lịch hẹn vào ngày {lead.EventDate:dd-MM-yyyy}!");
+                    if (contact.UserId == null) return TResult.Failed("Liên hệ chưa có người phụ trách!");
+                    var telesales = await _context.Users.FindAsync(contact.UserId);
+                    if (telesales is null) return TResult.Failed("Người phụ trách không tồn tại!");
+                    await _context.Leads.AddAsync(new Lead
+                    {
+                        Name = contact.Name,
+                        PhoneNumber = contact.PhoneNumber!,
+                        Email = contact.Email,
+                        EventDate = args.EventDate.GetValueOrDefault(),
+                        EventId = args.EventId.GetValueOrDefault(),
+                        Gender = contact.Gender,
+                        Note = args.Note,
+                        TelesaleId = contact.UserId,
+                        BranchId = telesales.BranchId
+                    });
+                }
+            }
             contact.FollowUpdate = followUpDate;
+            _context.Contacts.Update(contact);
             await _callHistoryRepository.AddAsync(new()
             {
                 ContactId = args.ContactId,

@@ -132,6 +132,8 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
         data.SourceId = args.SourceId;
         data.Gender = args.Gender;
         data.TransportId = args.TransportId;
+        data.ModifiedDate = DateTime.Now;
+        data.ModifiedBy = _hcaService.GetUserId();
         await _logService.AddAsync($"Cập nhật liên hệ {data.Name} - {data.PhoneNumber}");
         await _contactRepository.UpdateAsync(data);
         return TResult.Success;
@@ -292,6 +294,8 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
         foreach (var contact in contacts)
         {
             contact.UserId = tele.Id;
+            contact.ModifiedDate = DateTime.Now;
+            contact.ModifiedBy = _hcaService.GetUserId();
             _contactRepository.Update(contact);
         }
         await _contactRepository.SaveChangesAsync();
@@ -304,6 +308,8 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
         var contact = await _contactRepository.FindAsync(id);
         if (contact is null) return TResult.Failed("Không tìm thấy liên hệ!");
         contact.Confirm1 = !contact.Confirm1;
+        contact.ModifiedDate = DateTime.Now;
+        contact.ModifiedBy = _hcaService.GetUserId();
         await _contactRepository.UpdateAsync(contact);
         return TResult.Success;
     }

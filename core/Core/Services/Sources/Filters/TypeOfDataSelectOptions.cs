@@ -21,9 +21,17 @@ public class SourceTeamSelectOptions : SelectOptions
 
 public enum TypeOfDataSelectType
 {
+    /// <summary>
+    /// Mới tinh, chưa sử dụng cho tele nào hết
+    /// </summary>
     New = 1,
+    /// <summary>
+    /// Chia cho tele rồi và trong 1 tháng trở về trước
+    /// </summary>
     Old = 2,
-    // Nguồn dữ liệu mới, đã phân cho tele trong 1 tháng gần nhất
+    /// <summary>
+    /// Nguồn dữ liệu đã sử dụng đã phân cho tele
+    /// </summary>
     StartCase = 3
 }
 
