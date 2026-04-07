@@ -30,4 +30,6 @@ public interface IContactService
     Task<TResult<byte[]?>> ExportReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions);
     Task<TResult> GetTmrDataReportAsync(TmrDataReportFilterOptions filterOptions);
     Task<TResult<byte[]?>> ExportTmrDataReportAsync(TmrDataReportFilterOptions filterOptions);
+    Task<TResult<byte[]?>> ExportMultipleAssignReportAsync(MultipleAssignReportFilterOptions filterOptions);
+    Task<TResult> GetMultipleAssignReportAsync(MultipleAssignReportFilterOptions filterOptions);
 }

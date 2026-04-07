@@ -1221,4 +1221,16 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
         if (result.Data is null) return BadRequest("Không có dữ liệu để xuất");
         return File(result.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "data.xlsx");
     }
+
+    [HttpGet("multiple-assign-report")]
+    public async Task<IActionResult> GetMultipleAssignReportAsync([FromQuery] MultipleAssignReportFilterOptions filterOptions) => Ok(await _contactService.GetMultipleAssignReportAsync(filterOptions));
+
+    [HttpGet("multiple-assign-report/export")]
+    public async Task<IActionResult> ExportMultipleAssignReportAsync([FromQuery] MultipleAssignReportFilterOptions filterOptions)
+    {
+        var result = await _contactService.ExportMultipleAssignReportAsync(filterOptions);
+        if (!result.Succeeded) return BadRequest(result.Message);
+        if (result.Data is null) return BadRequest("Không có dữ liệu để xuất");
+        return File(result.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "data.xlsx");
+    }
 }

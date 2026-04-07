@@ -118,6 +118,7 @@ export default (initialState: { currentUser?: API.User }) => {
   const can_read_page_report = canAdmin || dot || adminData;
   const can_read_page_report_data_source = can_read_page_report;
   const can_read_page_report_tmr_data = can_read_page_report;
+  const can_read_page_report_multiple_assign = can_read_page_report;
 
   return {
     canAdmin,
@@ -173,6 +174,7 @@ export default (initialState: { currentUser?: API.User }) => {
     can_read_page_department,
     can_read_page_report,
     can_read_page_report_data_source,
-    can_read_page_report_tmr_data
+    can_read_page_report_tmr_data,
+    can_read_page_report_multiple_assign
   };
 };

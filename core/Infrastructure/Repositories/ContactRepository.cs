@@ -781,13 +781,162 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
 
             return TResult.Ok(new
             {
-                ViewType = filterOptions.ViewType,
+                filterOptions.ViewType,
                 Teams = teams
             });
         }
         catch (Exception ex)
         {
             return TResult.Failed(ex.ToString());
+        }
+    }
+
+    public async Task<TResult<byte[]?>> ExportMultipleAssignReportAsync(MultipleAssignReportFilterOptions filterOptions)
+    {
+        try
+        {
+            var query = from t in _context.Teams
+                        join s in _context.Sources on t.Id equals s.TeamId
+                        join c in _context.Contacts on s.Id equals c.SourceId
+                        join u in _context.Users on c.UserId equals u.Id
+                        where c.UserId != null && c.Status != ContactStatus.Blacklisted
+                        select new
+                        {
+                            t.Id,
+                            TeamName = t.Name,
+                            SourceName = s.Name,
+                            TeleName = u.Name,
+                            ContactId = c.Id,
+                            c.LastCallTime,
+                            c.ModifiedDate
+                        };
+            if (filterOptions.TeamId.HasValue)
+            {
+                query = query.Where(x => x.Id == filterOptions.TeamId);
+            }
+            if (filterOptions.FromDate.HasValue)
+            {
+                query = query.Where(x => x.ModifiedDate != null && x.ModifiedDate >= filterOptions.FromDate.Value);
+            }
+            if (filterOptions.ToDate.HasValue)
+            {
+                query = query.Where(x => x.ModifiedDate != null && x.ModifiedDate <= filterOptions.ToDate.Value);
+            }
+            var data = await query.GroupBy(x => new
+            {
+                x.Id,
+                x.TeamName,
+                x.SourceName,
+                x.TeleName
+            }).Select(x => new
+            {
+                x.Key.TeamName,
+                x.Key.SourceName,
+                x.Key.TeleName,
+                TotalAssigned = x.Count(),
+                TotalUsingAssigned = x.Count(c => c.LastCallTime != null),
+                TotalRemainingAssigned = x.Count(c => c.LastCallTime == null)
+            }).ToListAsync();
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Multiple Assign Report");
+
+            worksheet.Cells[1, 1].Value = "Team Name";
+            worksheet.Cells[1, 2].Value = "Source Name";
+            worksheet.Cells[1, 3].Value = "Tele Name";
+            worksheet.Cells[1, 4].Value = "Total Assigned";
+            worksheet.Cells[1, 5].Value = "Total Using Assigned";
+            worksheet.Cells[1, 6].Value = "Total Remaining Assigned";
+
+            using (var headerRange = worksheet.Cells[1, 1, 1, 6])
+            {
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                headerRange.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+            }
+
+            int currentRow = 2;
+            foreach (var item in data)
+            {
+                worksheet.Cells[currentRow, 1].Value = item.TeamName;
+                worksheet.Cells[currentRow, 2].Value = item.SourceName;
+                worksheet.Cells[currentRow, 3].Value = item.TeleName;
+                worksheet.Cells[currentRow, 4].Value = item.TotalAssigned;
+                worksheet.Cells[currentRow, 5].Value = item.TotalUsingAssigned;
+                worksheet.Cells[currentRow, 6].Value = item.TotalRemainingAssigned;
+                currentRow++;
+            }
+
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+            using (var dataRange = worksheet.Cells[1, 1, currentRow - 1, 6])
+            {
+                dataRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                dataRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                dataRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                dataRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            }
+
+            return TResult<byte[]?>.Ok(await package.GetAsByteArrayAsync());
+        }
+        catch (Exception ex)
+        {
+            return TResult<byte[]?>.Failed(ex.Message);
+        }
+    }
+
+    public async Task<TResult> GetMultipleAssignReportAsync(MultipleAssignReportFilterOptions filterOptions)
+    {
+        try
+        {
+            var query = from t in _context.Teams
+                        join s in _context.Sources on t.Id equals s.TeamId
+                        join c in _context.Contacts on s.Id equals c.SourceId
+                        join u in _context.Users on c.UserId equals u.Id
+                        where c.UserId != null && c.Status != ContactStatus.Blacklisted
+                        select new
+                        {
+                            t.Id,
+                            TeamName = t.Name,
+                            SourceName = s.Name,
+                            TeleName = u.Name,
+                            ContactId = c.Id,
+                            c.LastCallTime,
+                            c.ModifiedDate
+                        };
+            if (filterOptions.TeamId.HasValue)
+            {
+                query = query.Where(x => x.Id == filterOptions.TeamId);
+            }
+            if (filterOptions.FromDate.HasValue)
+            {
+                query = query.Where(x => x.ModifiedDate != null && x.ModifiedDate >= filterOptions.FromDate.Value);
+            }
+            if (filterOptions.ToDate.HasValue)
+            {
+                query = query.Where(x => x.ModifiedDate != null && x.ModifiedDate <= filterOptions.ToDate.Value);
+            }
+            var data = await query.GroupBy(x => new
+            {
+                x.Id,
+                x.TeamName,
+                x.SourceName,
+                x.TeleName
+            }).Select(x => new
+            {
+                x.Key.TeamName,
+                x.Key.SourceName,
+                TotalAssigned = x.Count(),
+                TotalUsingAssigned = x.Count(c => c.LastCallTime != null),
+                TotalRemainingAssigned = x.Count(c => c.LastCallTime == null)
+            }).ToListAsync();
+
+            return TResult.Ok(data);
+        }
+        catch (Exception ex)
+        {
+            return TResult.Failed(ex.Message);
         }
     }
 }
