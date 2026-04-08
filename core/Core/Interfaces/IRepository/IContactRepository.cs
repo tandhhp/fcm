@@ -14,6 +14,7 @@ public interface IContactRepository : IAsyncRepository<Contact>
     Task<TResult<byte[]?>> ExportMultipleAssignReportAsync(MultipleAssignReportFilterOptions filterOptions);
     Task<TResult<byte[]?>> ExportReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions);
     Task<TResult<byte[]?>> ExportTmrDataReportAsync(TmrDataReportFilterOptions filterOptions);
+    Task<Contact?> FindByPhoneNumberAsync(string phoneNumber);
     Task<ListResult<object>> GetBlacklistAsync(BlacklistFilterOptions filterOptions);
     Task<TResult> GetMultipleAssignReportAsync(MultipleAssignReportFilterOptions filterOptions);
     Task<TResult> GetReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions);

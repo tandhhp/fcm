@@ -70,7 +70,7 @@ const ContactPage: React.FC = () => {
             width: 100
         },
         {
-            title: 'Phụ trách',
+            title: 'Telesales',
             dataIndex: 'telesalesName',
             search: false
         },
@@ -93,6 +93,16 @@ const ContactPage: React.FC = () => {
         {
             title: 'Type of Data',
             dataIndex: 'typeOfDataName',
+            search: false
+        },
+        {
+            title: 'Họ & Tên 2',
+            dataIndex: 'name2',
+            search: false
+        },
+        {
+            title: 'SDT 2',
+            dataIndex: 'phoneNumber2',
             search: false
         },
         {

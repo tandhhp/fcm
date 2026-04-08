@@ -45,4 +45,9 @@ public class HCAService(IHttpContextAccessor _httpContextAccessor) : IHCAService
         var user = _httpContextAccessor.HttpContext?.User;
         return user?.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
     }
+
+    public HttpRequest? Request()
+    {
+        return _httpContextAccessor.HttpContext?.Request;
+    }
 }

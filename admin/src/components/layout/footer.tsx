@@ -12,13 +12,13 @@ const Footer: React.FC = () => {
         <>
             <DefaultFooter copyright="2025 First Class Membership. All rights reserved." links={[
                 {
-                    key: 'Waffle',
+                    key: 'home-icon',
                     title: <HomeOutlined />,
                     href: 'https://1stclass.com.vn',
                     blankTarget: true,
                 },
                 {
-                    key: 'Waffle',
+                    key: 'home-text',
                     title: `Trang chủ`,
                     href: 'https://1stclass.com.vn',
                     blankTarget: true,

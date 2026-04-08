@@ -1,16 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Waffle.Core.Interfaces.IRepository.Calls;
+﻿using Waffle.Core.Interfaces.IRepository.Calls;
 using Waffle.Core.Interfaces.IService;
 using Waffle.Core.Interfaces.IService.Calls;
 using Waffle.Core.Services.Calls.Args;
 using Waffle.Core.Services.Calls.Filters;
 using Waffle.Core.Services.Calls.Models;
-using Waffle.Core.Services.Leads;
-using Waffle.Core.Services.Leads.Args;
 using Waffle.Data;
 using Waffle.Entities;
 using Waffle.Entities.Contacts;
-using Waffle.Infrastructure.Repositories.Calls;
 using Waffle.Models;
 
 namespace Waffle.Core.Services.Calls;
@@ -25,6 +21,7 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
         {
             var contact = await _contactService.FindAsync(args.ContactId);
             if (contact is null) return TResult.Failed("Không tìm thấy liên hệ!");
+            if (contact.UserId is null) return TResult.Failed("Liên hệ chưa có người phụ trách!");
             var followUpDate = args.FollowUpDate;
             contact.LastCallTime = DateTime.Now;
             contact.ExtraStatus = args.ExtraStatus;

@@ -7,4 +7,5 @@ public interface IHCAService
     bool IsUserInAnyRole(params string[] roles);
     Guid GetUserId();
     string GetUserName();
+    HttpRequest? Request();
 }

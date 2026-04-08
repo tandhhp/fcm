@@ -11,7 +11,7 @@ namespace Waffle.Controllers.Settings;
 public class JobKindController(IJobKindService _jobKindService) : BaseController
 {
     [HttpGet("list")]
-    public async Task<IActionResult> ListAsync([FromQuery] FilterOptions filterOptions) => Ok(await _jobKindService.ListAsync(filterOptions)); 
+    public async Task<IActionResult> ListAsync([FromQuery] JobKindFilterOptions filterOptions) => Ok(await _jobKindService.ListAsync(filterOptions)); 
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsync(int id) => Ok(await _jobKindService.GetAsync(id));

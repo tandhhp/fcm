@@ -318,7 +318,9 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         SourceName = s.Name,
                         TypeOfDataId = s.TypeOfDataId,
                         TypeOfDataName = tod.Name,
-                        SourceType = tod.Source
+                        SourceType = tod.Source,
+                        Name2 = a.Name2,
+                        PhoneNumber2 = a.PhoneNumber2
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
         {
@@ -359,14 +361,6 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         if (_hcaService.IsUserInRole(RoleName.TelesaleManager))
         {
             query = query.Where(x => x.TmId == userId);
-        }
-        if (_hcaService.IsUserInRole(RoleName.Dot))
-        {
-            query = query.Where(x => x.DotId == userId);
-        }
-        if (_hcaService.IsUserInRole(RoleName.Dos))
-        {
-            query = query.Where(x => x.DosId == userId);
         }
         query = query.OrderByDescending(x => x.CreatedDate);
         return await ListResult<dynamic>.Success(query, filterOptions);
@@ -939,4 +933,6 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
             return TResult.Failed(ex.Message);
         }
     }
+
+    public async Task<Contact?> FindByPhoneNumberAsync(string phoneNumber) => await _context.Contacts.FirstOrDefaultAsync(c => c.PhoneNumber == phoneNumber);
 }
