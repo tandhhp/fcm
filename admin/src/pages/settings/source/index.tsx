@@ -1,12 +1,13 @@
 import { apiSourceList, apiTypeOfDataOptions } from "@/services/settings/source";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { useRef, useState } from "react";
-import { EditOutlined, EyeOutlined, ImportOutlined, MoreOutlined, PlusOutlined, SettingOutlined, UserDeleteOutlined } from "@ant-design/icons";
+import { EditOutlined, EyeOutlined, ImportOutlined, MoreOutlined, PlusOutlined, RetweetOutlined, SettingOutlined, UserDeleteOutlined } from "@ant-design/icons";
 import { Button, Dropdown, Space } from "antd";
 import SourceForm from "./components/form";
 import { history, Link, useAccess } from "@umijs/max";
 import ContactImport from "@/pages/contact/components/import";
 import { apiTeamOptions } from "@/services/users/team";
+import TransferModal from "./components/transfer-modal";
 
 const Index: React.FC = () => {
 
@@ -15,6 +16,7 @@ const Index: React.FC = () => {
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [selectedRow, setSelectedRow] = useState<any>(null);
     const [openImport, setOpenImport] = useState<boolean>(false);
+    const [openTransfer, setOpenTransfer] = useState<boolean>(false);
 
     return (
         <PageContainer extra={<Button type="primary" onClick={() => setOpenForm(true)} icon={<PlusOutlined />}>Thêm nguồn</Button>}>
@@ -108,6 +110,15 @@ const Index: React.FC = () => {
                                         }
                                     },
                                     {
+                                        key: 'transfer',
+                                        label: 'Chuyển nguồn',
+                                        icon: <RetweetOutlined />,
+                                        onClick: () => {
+                                            setSelectedRow(entity);
+                                            setOpenTransfer(true);
+                                        }
+                                    },
+                                    {
                                         key: 'edit',
                                         label: 'Chỉnh sửa',
                                         onClick: () => {
@@ -126,6 +137,13 @@ const Index: React.FC = () => {
             />
             <SourceForm open={openForm} onOpenChange={setOpenForm} data={selectedRow} reload={() => actionRef.current?.reload()} />
             <ContactImport open={openImport} onOpenChange={setOpenImport} reload={() => actionRef.current?.reload()} />
+            <TransferModal 
+                open={openTransfer} 
+                onOpenChange={setOpenTransfer} 
+                sourceId={selectedRow?.id}
+                sourceName={selectedRow?.name}
+                reload={() => actionRef.current?.reload()} 
+            />
         </PageContainer>
     )
 }

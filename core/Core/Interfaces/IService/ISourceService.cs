@@ -25,4 +25,5 @@ public interface ISourceService
     Task<object?> TypeOfDataOptionsAsync(TypeOfDataSelectOptions selectOptions);
     Task<object?> TypeOfDataSourcesAsync();
     Task<TResult> UpdateAsync(SourceUpdateArgs args);
+    Task<TResult> TransferAsync(SourceTransferArgs args);
 }

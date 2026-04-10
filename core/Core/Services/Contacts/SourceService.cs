@@ -113,4 +113,27 @@ public class SourceService(ISourceRepository _sourceRepository, ILogService _log
         await _sourceRepository.UpdateAsync(data);
         return TResult.Success;
     }
+
+    public async Task<TResult> TransferAsync(SourceTransferArgs args)
+    {
+        try
+        {
+            var fromSource = await _sourceRepository.FindAsync(args.FromSourceId);
+            if (fromSource is null) return TResult.Failed("Nguồn gốc không tồn tại!");
+
+            var toSource = await _sourceRepository.FindAsync(args.ToSourceId);
+            if (toSource is null) return TResult.Failed("Nguồn đích không tồn tại!");
+
+            if (args.FromSourceId == args.ToSourceId)
+                return TResult.Failed("Nguồn gốc và nguồn đích không được trùng nhau!");
+
+            await _logService.AddAsync($"Chuyển contact từ nguồn {fromSource.Name} sang {toSource.Name}");
+            return await _sourceRepository.TransferAsync(args);
+        }
+        catch (Exception ex)
+        {
+            await _logService.ExceptionAsync(ex);
+            return TResult.Failed(ex.Message);
+        }
+    }
 }

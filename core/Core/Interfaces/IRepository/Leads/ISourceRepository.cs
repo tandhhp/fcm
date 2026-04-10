@@ -23,4 +23,5 @@ public interface ISourceRepository : IAsyncRepository<Source>
     Task<ListResult<SourceReportResult>> ReportAsync(FilterOptions filterOptions);
     Task<object?> TeamOptionsAsync(SourceTeamSelectOptions selectOptions);
     Task<object?> TypeOfDataOptionsAsync(TypeOfDataSelectOptions selectOptions);
+    Task<TResult> TransferAsync(SourceTransferArgs args);
 }
