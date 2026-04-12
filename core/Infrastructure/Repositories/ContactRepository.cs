@@ -148,17 +148,33 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         var callStatuses = await _context.CallStatuses.ToListAsync();
         var contacts = await _context.Contacts.ToListAsync();
         var sources = await _context.Sources.Include(s => s.TypeOfData).ToListAsync();
-        var showUps = await _context.Leads.ToListAsync();
-        var callHistories = await _context.CallHistories.ToListAsync();
+        var showUps = await _context.Leads.Select(x => new
+        {
+            x.Id,
+            x.Duplicated,
+            x.Status,
+            x.PhoneNumber
+        }).ToListAsync();
+        var callHistories = await (from ch in _context.CallHistories
+                                   join cs in _context.CallStatuses on ch.CallStatusId equals cs.Id
+                                   where filterOptions.FromDate == null || ch.CreatedDate >= filterOptions.FromDate.Value.Date
+                                   where filterOptions.ToDate == null || ch.CreatedDate <= filterOptions.ToDate.Value.Date
+                                   select new
+                                   {
+                                       ch.ContactId,
+                                       ch.CallStatusId,
+                                       cs.Code,
+                                       cs.Type
+                                   }).ToListAsync();
 
         // Calculate totals
         var totalContacts = contacts.Count;
-        var totalContactsWithType = contacts.Where(c => sources.Any(s => s.Id == c.SourceId && s.TypeOfDataId != null)).Count();
+        var totalContactsWithType = contacts.Count(c => sources.Any(s => s.Id == c.SourceId && s.TypeOfDataId != null));
         var totalContactsCalled = callHistories.Select(ch => ch.ContactId).Distinct().Count();
-        var totalNotUpdated = contacts.Where(c => !callHistories.Any(ch => ch.ContactId == c.Id)).Count();
-        var totalCf1 = contacts.Where(c => c.Confirm1 == true).Count();
-        var totalShowUp = showUps.Where(l => !l.Duplicated).Count();
-        var totalDeal = showUps.Where(l => !l.Duplicated && l.Status == LeadStatus.CloseDeal).Count();
+        var totalNotUpdated = contacts.Count(c => !callHistories.Any(ch => ch.ContactId == c.Id));
+        var totalCf1 = contacts.Count(c => c.Confirm1 == true);
+        var totalShowUp = showUps.Count(l => !l.Duplicated);
+        var totalDeal = showUps.Count(l => !l.Duplicated && l.Status == LeadStatus.CloseDeal);
 
         var result = new
         {
@@ -466,18 +482,18 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         ws.Cells[2, 3].Value = "Contact Import";
         ws.Cells[2, 4].Value = "Contact Start Case";
         ws.Cells[2, 5].Value = "Total";
-        ws.Cells[1, 6].Value = "Total not Contacted";
+        ws.Cells[1, 6].Value = "Tổng số chưa liên hệ";
         ws.Cells[1, 6, 1, 8].Merge = true;
         ws.Cells[2, 6].Value = "1. Không nghe máy";
         ws.Cells[2, 7].Value = "2. Thuê bao";
-        ws.Cells[2, 8].Value = "Total (1)";
-        ws.Cells[1, 9].Value = "Total Contacted";
+        ws.Cells[2, 8].Value = "Tổng (1)";
+        ws.Cells[1, 9].Value = "Tổng số đã liên hệ";
         ws.Cells[1, 9, 1, 13].Merge = true;
-        ws.Cells[2, 9].Value = "7. Không đạt yêu cầu";
-        ws.Cells[2, 10].Value = "6. Đạt yêu cầu";
+        ws.Cells[2, 9].Value = "7. Không đạt y/c";
+        ws.Cells[2, 10].Value = "6. Đạt y/c";
         ws.Cells[2, 11].Value = "5. Gọi lại sau";
         ws.Cells[2, 12].Value = "4. Ngoại tỉnh";
-        ws.Cells[2, 13].Value = "Total (2)";
+        ws.Cells[2, 13].Value = "Tổng (2)";
         ws.Cells[1, 14].Value = "Total Invite";
         ws.Cells[1, 14, 1, 15].Merge = true;
         ws.Cells[2, 14].Value = "CF1";
@@ -509,16 +525,20 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         var totalContactsWithType = contacts.Where(c => sources.Any(s => s.Id == c.SourceId && s.TypeOfDataId != null)).Count();
         var totalContactsCalled = callHistories.Select(ch => ch.ContactId).Distinct().Count();
         var totalNoPickup = contacts.Where(c => callHistories.Any(ch => ch.Type == CallStatusType.NO_PICK_UP)).Count();
-        var totalCf1 = contacts.Where(c => c.Confirm1 == true).Count();
-        var totalShowUp = showUps.Where(l => !l.Duplicated).Count();
-        var totalDeal = showUps.Where(l => !l.Duplicated && l.Status == LeadStatus.CloseDeal).Count();
-        var totalConsider = contacts.Where(x => callHistories.Any(ch => ch.ContactId == x.Id && ch.Code == CallStatusCode.CONSIDER)).Count();
+        var totalCf1 = contacts.Count(c => c.Confirm1 == true);
+        var totalShowUp = showUps.Count(l => !l.Duplicated);
+        var totalDeal = showUps.Count(l => !l.Duplicated && l.Status == LeadStatus.CloseDeal);
+        var totalConsider = contacts.Count(x => callHistories.Any(ch => ch.ContactId == x.Id && ch.Code == CallStatusCode.CONSIDER));
+        var totalCallLater = contacts.Count(c => callHistories.Any(ch => ch.ContactId == c.Id && ch.Code == CallStatusCode.CALL_LATER));
+        var totalLocation = contacts.Count(c => callHistories.Any(ch => ch.ContactId == c.Id && ch.Type == CallStatusType.LOCATION));
 
         ws.Cells[currentRow, 1].Value = "Total";
         ws.Cells[currentRow, 3].Value = totalContacts;
         ws.Cells[currentRow, 4].Value = totalContactsWithType;
         ws.Cells[currentRow, 5].Value = totalContacts;
         ws.Cells[currentRow, 6].Value = totalNoPickup;
+        ws.Cells[currentRow, 11].Value = totalCallLater;
+        ws.Cells[currentRow, 12].Value = totalLocation;
         ws.Cells[currentRow, 14].Value = totalCf1;
         ws.Cells[currentRow, 15].Value = totalConsider;
         ws.Cells[currentRow, 17].Value = totalShowUp;
@@ -537,11 +557,13 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
             var teamDeal = showUps.Where(l => !l.Duplicated && l.Status == LeadStatus.CloseDeal && teamContacts.Any(c => c.PhoneNumber == l.PhoneNumber)).Count();
             var teamLocation = teamCallHistories.Count(ch => ch.Type == CallStatusType.LOCATION);
             var teamConsider = teamCallHistories.Count(ch => ch.Code == CallStatusCode.CONSIDER);
+            var teamCallLater = teamCallHistories.Count(ch => ch.Code == CallStatusCode.CALL_LATER);
 
             ws.Cells[currentRow, 1].Value = team.Name;
             ws.Cells[currentRow, 2].Value = "Total Source Name";
             ws.Cells[currentRow, 3].Value = teamContacts.Count;
             ws.Cells[currentRow, 5].Value = teamContacts.Count;
+            ws.Cells[currentRow, 11].Value = teamCallLater;
             ws.Cells[currentRow, 12].Value = teamLocation;
             ws.Cells[currentRow, 14].Value = teamCf1;
             ws.Cells[currentRow, 15].Value = teamConsider;
