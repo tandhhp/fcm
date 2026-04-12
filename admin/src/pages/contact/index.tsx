@@ -70,7 +70,7 @@ const ContactPage: React.FC = () => {
             width: 100
         },
         {
-            title: 'Telesales',
+            title: 'Agent',
             dataIndex: 'telesalesName',
             search: false
         },

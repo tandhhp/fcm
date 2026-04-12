@@ -1,26 +1,30 @@
 export const callStatusOptions = [
     {
-        label: 'Tele not update',
+        label: 'Không nghe máy',
         value: 1
     },
     {
-        label: 'Tele locked / Wrong number / KNM',
+        label: 'Thuê bao',
         value: 2
     },
     {
-        label: 'Not enough qualified',
+        label: 'Sai số',
         value: 3
     },
     {
-        label: 'Meet requirement',
+        label: 'Ngoại tỉnh',
         value: 4
     },
     {
-        label: 'Refuse to talk',
+        label: 'Gọi lại sau',
         value: 5
     },
     {
-        label: 'Location',
+        label: 'Khách đạt yêu cầu',
         value: 6
+    },
+    {
+        label: 'Không đạt yêu cầu',
+        value: 7
     }
 ]

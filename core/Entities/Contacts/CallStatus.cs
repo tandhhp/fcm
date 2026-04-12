@@ -16,18 +16,20 @@ public class CallStatus : BaseEntity<int>
 
 public enum CallStatusType
 {
-    [Display(Name = "Tele not update")]
-    TELE_NOT_UPDATE = 1,
-    [Display(Name = "Tele locked / Wrong number / NM")]
-    TEMPORARY_LOCKED_WRONG_NUMBER_KNM = 2,
-    [Display(Name = "Not enough qualify")]
-    NOT_ENOUGH_QUALIFY = 3,
-    [Display(Name = "Meet require")]
-    MEET_REQUIRE = 4,
-    [Display(Name = "Refuse to talk")]
-    REFUSE_TO_TALK = 5,
-    [Display(Name = "Location")]
-    LOCATION = 6
+    [Display(Name = "Không nghe máy")]
+    NO_PICK_UP = 1,
+    [Display(Name = "Thuê bao")]
+    TEMPORARY_LOCKED = 2,
+    [Display(Name = "Sai số")]
+    WRONG_NUMBER = 3,
+    [Display(Name = "Ngoại tỉnh")]
+    LOCATION = 4,
+    [Display(Name = "Gọi lại sau")]
+    CALL_LATER = 5,
+    [Display(Name = "Khách đạt yêu cầu")]
+    MEET_REQUIRE = 6,
+    [Display(Name = "Khách không đạt yêu cầu")]
+    NOT_ENOUGH_QUALIFY = 7
 }
 
 public static class CallStatusCode
@@ -35,11 +37,11 @@ public static class CallStatusCode
     /// <summary>
     /// Tele not update
     /// </summary>
-    public const string TELE_NOT_UPDATE = nameof(TELE_NOT_UPDATE);
+    public const string NO_PICK_UP = nameof(NO_PICK_UP);
     /// <summary>
     /// Thuê bao
     /// </summary>
-    public const string NOT_AVAILABLE = nameof(TELE_NOT_UPDATE);
+    public const string NOT_AVAILABLE = nameof(NOT_AVAILABLE);
     /// <summary>
     /// Không nghe máy
     /// </summary>
@@ -48,14 +50,6 @@ public static class CallStatusCode
     /// Sai số
     /// </summary>
     public const string WRONG_NUMBER = nameof(WRONG_NUMBER);
-    /// <summary>
-    /// Thói quen kém
-    /// </summary>
-    public const string POOR_HABIT = nameof(POOR_HABIT);
-    /// <summary>
-    /// Kinh tế kém
-    /// </summary>
-    public const string POOR_FINANCIAL = nameof(POOR_FINANCIAL);
     /// <summary>
     /// Confirm 1
     /// </summary>
@@ -75,13 +69,13 @@ public static class CallStatusCode
     /// <summary>
     /// Cuộc gọi dưới 15s
     /// </summary>
-    public const string CALL_UNDER_15S = nameof(CALL_UNDER_15S);
+    public const string UNDER15S = nameof(UNDER15S);
     /// <summary>
-    /// Không quan tâm
+    /// Cuộc gọi trên 15s
     /// </summary>
-    public const string NOT_INTERESTED = nameof(NOT_INTERESTED);
+    public const string OVER15S = nameof(OVER15S);
     /// <summary>
-    /// Location
+    /// Ngoại tỉnh
     /// </summary>
     public const string LOCATION = nameof(LOCATION);
 }

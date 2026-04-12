@@ -33,7 +33,9 @@ const CallForm: React.FC<Props> = (props) => {
     return (
         <DrawerForm {...props} title={`Cuộc gọi ${props.data?.name}`} onFinish={onFinish} formRef={formRef}
             drawerProps={{
-                destroyOnHidden: true
+                destroyOnHidden: true,
+                closable: false,
+                  maskClosable: false
             }}
         >
             <ProDescriptions column={2} className="mb-4" bordered size="small" title="Thông tin liên hệ" dataSource={props.data} >

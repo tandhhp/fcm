@@ -13,4 +13,7 @@ public class ContactImportErrorRow
     public string? PhoneNumber2 { get; set; }
     public string? Note { get; set; }
     public string? CallStatus { get; set; }
+    public string? SourceName { get; set; }
+    public bool IsBlackList { get; set; }
+    public string? CheckinNote { get; set; }
 }

@@ -434,8 +434,24 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         var callStatuses = await _context.CallStatuses.ToListAsync();
         var contacts = await _context.Contacts.ToListAsync();
         var sources = await _context.Sources.Include(s => s.TypeOfData).ToListAsync();
-        var showUps = await _context.Leads.ToListAsync();
-        var callHistories = await _context.CallHistories.ToListAsync();
+        var showUps = await _context.Leads.Select(x => new
+        {
+            x.Id,
+            x.Duplicated,
+            x.Status,
+            x.PhoneNumber
+        }).ToListAsync();
+        var callHistories = await (from ch in _context.CallHistories
+                                   join cs in _context.CallStatuses on ch.CallStatusId equals cs.Id
+                                   where filterOptions.FromDate == null || ch.CreatedDate >= filterOptions.FromDate.Value.Date
+                                   where filterOptions.ToDate == null || ch.CreatedDate <= filterOptions.ToDate.Value.Date
+                                   select new
+                                   {
+                                       ch.ContactId,
+                                       ch.CallStatusId,
+                                       cs.Code,
+                                       cs.Type
+                                   }).ToListAsync();
 
         using var package = new ExcelPackage();
         var ws = package.Workbook.Worksheets.Add("Sheet1");
@@ -452,20 +468,20 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         ws.Cells[2, 5].Value = "Total";
         ws.Cells[1, 6].Value = "Total not Contacted";
         ws.Cells[1, 6, 1, 8].Merge = true;
-        ws.Cells[2, 6].Value = "0. Tele not update";
-        ws.Cells[2, 7].Value = "1. Temporary locked/Wrong number/Knm";
+        ws.Cells[2, 6].Value = "1. Không nghe máy";
+        ws.Cells[2, 7].Value = "2. Thuê bao";
         ws.Cells[2, 8].Value = "Total (1)";
         ws.Cells[1, 9].Value = "Total Contacted";
         ws.Cells[1, 9, 1, 13].Merge = true;
-        ws.Cells[2, 9].Value = "2. Not Enough Qualify";
-        ws.Cells[2, 10].Value = "3. Meet Require";
-        ws.Cells[2, 11].Value = "4. Refuse to talk";
-        ws.Cells[2, 12].Value = "5. Location";
+        ws.Cells[2, 9].Value = "7. Không đạt yêu cầu";
+        ws.Cells[2, 10].Value = "6. Đạt yêu cầu";
+        ws.Cells[2, 11].Value = "5. Gọi lại sau";
+        ws.Cells[2, 12].Value = "4. Ngoại tỉnh";
         ws.Cells[2, 13].Value = "Total (2)";
         ws.Cells[1, 14].Value = "Total Invite";
         ws.Cells[1, 14, 1, 15].Merge = true;
         ws.Cells[2, 14].Value = "CF1";
-        ws.Cells[2, 15].Value = "Consider";
+        ws.Cells[2, 15].Value = "Khách cân nhắc";
         ws.Cells[1, 16].Value = "%CF/Total Contacted";
         ws.Cells[1, 16, 2, 16].Merge = true;
         ws.Cells[1, 17].Value = "Showup";
@@ -492,17 +508,19 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         var totalContacts = contacts.Count;
         var totalContactsWithType = contacts.Where(c => sources.Any(s => s.Id == c.SourceId && s.TypeOfDataId != null)).Count();
         var totalContactsCalled = callHistories.Select(ch => ch.ContactId).Distinct().Count();
-        var totalNotUpdated = contacts.Where(c => !callHistories.Any(ch => ch.ContactId == c.Id)).Count();
+        var totalNoPickup = contacts.Where(c => callHistories.Any(ch => ch.Type == CallStatusType.NO_PICK_UP)).Count();
         var totalCf1 = contacts.Where(c => c.Confirm1 == true).Count();
         var totalShowUp = showUps.Where(l => !l.Duplicated).Count();
         var totalDeal = showUps.Where(l => !l.Duplicated && l.Status == LeadStatus.CloseDeal).Count();
+        var totalConsider = contacts.Where(x => callHistories.Any(ch => ch.ContactId == x.Id && ch.Code == CallStatusCode.CONSIDER)).Count();
 
         ws.Cells[currentRow, 1].Value = "Total";
         ws.Cells[currentRow, 3].Value = totalContacts;
         ws.Cells[currentRow, 4].Value = totalContactsWithType;
         ws.Cells[currentRow, 5].Value = totalContacts;
-        ws.Cells[currentRow, 6].Value = totalNotUpdated;
+        ws.Cells[currentRow, 6].Value = totalNoPickup;
         ws.Cells[currentRow, 14].Value = totalCf1;
+        ws.Cells[currentRow, 15].Value = totalConsider;
         ws.Cells[currentRow, 17].Value = totalShowUp;
         ws.Cells[currentRow, 19].Value = totalDeal;
         currentRow++;
@@ -517,12 +535,16 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
             var teamCf1 = teamContacts.Where(c => c.Confirm1 == true).Count();
             var teamShowUp = showUps.Where(l => !l.Duplicated && teamContacts.Any(c => c.PhoneNumber == l.PhoneNumber)).Count();
             var teamDeal = showUps.Where(l => !l.Duplicated && l.Status == LeadStatus.CloseDeal && teamContacts.Any(c => c.PhoneNumber == l.PhoneNumber)).Count();
+            var teamLocation = teamCallHistories.Count(ch => ch.Type == CallStatusType.LOCATION);
+            var teamConsider = teamCallHistories.Count(ch => ch.Code == CallStatusCode.CONSIDER);
 
             ws.Cells[currentRow, 1].Value = team.Name;
             ws.Cells[currentRow, 2].Value = "Total Source Name";
             ws.Cells[currentRow, 3].Value = teamContacts.Count;
             ws.Cells[currentRow, 5].Value = teamContacts.Count;
+            ws.Cells[currentRow, 12].Value = teamLocation;
             ws.Cells[currentRow, 14].Value = teamCf1;
+            ws.Cells[currentRow, 15].Value = teamConsider;
             ws.Cells[currentRow, 17].Value = teamShowUp;
             ws.Cells[currentRow, 19].Value = teamDeal;
             currentRow++;
@@ -717,11 +739,11 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
             int? GetStatusId(CallStatusType type) =>
                 callStatuses.FirstOrDefault(x => x.Type == type)?.Id;
 
-            var teleNotUpdateId = GetStatusId(CallStatusType.TELE_NOT_UPDATE);
-            var tempLockedId = GetStatusId(CallStatusType.TEMPORARY_LOCKED_WRONG_NUMBER_KNM);
+            var teleNotUpdateId = GetStatusId(CallStatusType.NO_PICK_UP);
+            var tempLockedId = GetStatusId(CallStatusType.TEMPORARY_LOCKED);
             var notEnoughId = GetStatusId(CallStatusType.NOT_ENOUGH_QUALIFY);
             var meetRequireId = GetStatusId(CallStatusType.MEET_REQUIRE);
-            var refuseId = GetStatusId(CallStatusType.REFUSE_TO_TALK);
+            var refuseId = GetStatusId(CallStatusType.CALL_LATER);
             var locationId = GetStatusId(CallStatusType.LOCATION);
 
             var data = await (from t in _context.Teams

@@ -95,7 +95,7 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.SourceIds))
         {
-            var sourceIds = filterOptions.SourceIds.Split(',').Select(id => int.TryParse(id, out var parsedId) ? parsedId : (int?)null).Where(id => id.HasValue).Select(id => id.Value).ToList();
+            var sourceIds = filterOptions.SourceIds.Split(',').Select(id => int.TryParse(id, out var parsedId) ? parsedId : (int?)null).Where(id => id.HasValue).Select(id => id).ToList();
             query = query.Where(x => x.SourceId != null && sourceIds.Contains(x.SourceId.Value));
         }
         if (filterOptions.TeamId.HasValue)

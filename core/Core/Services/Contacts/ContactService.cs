@@ -11,6 +11,7 @@ using Waffle.Core.Services.Contacts.Filters;
 using Waffle.Core.Services.Contacts.Models;
 using Waffle.Core.Services.Contacts.Results;
 using Waffle.Core.Services.Leads.Args;
+using Waffle.Data;
 using Waffle.Entities;
 using Waffle.Entities.Contacts;
 using Waffle.Models;
@@ -18,7 +19,7 @@ using Waffle.Models.Filters;
 
 namespace Waffle.Core.Services.Contacts;
 
-public class ContactService(IContactRepository _contactRepository, IWebHostEnvironment _env, ICallStatusRepository _callStatusRepository, IProvinceService _provinceService, ISourceService _sourceService, IDistrictService _districtService, ILogService _logService, UserManager<ApplicationUser> _userManager, IHCAService _hcaService, ILeadService _leadService) : IContactService
+public class ContactService(IContactRepository _contactRepository, ApplicationDbContext _context, IWebHostEnvironment _env, ICallStatusRepository _callStatusRepository, IProvinceService _provinceService, ISourceService _sourceService, IDistrictService _districtService, ILogService _logService, UserManager<ApplicationUser> _userManager, IHCAService _hcaService, ILeadService _leadService) : IContactService
 {
     public async Task<TResult> BlockAsync(BlockContactArgs args)
     {
@@ -228,7 +229,12 @@ public class ContactService(IContactRepository _contactRepository, IWebHostEnvir
             using var pgk = new ExcelPackage(args.File.OpenReadStream());
             var worksheet = pgk.Workbook.Worksheets[0];
             var rowCount = worksheet.Dimension.Rows;
-            
+            var leads = await _context.Leads.Select(x => new
+            {
+                x.PhoneNumber,
+                x.EventDate
+            }).Distinct().ToListAsync();
+
             var errorRows = new List<ContactImportErrorRow>();
 
             for (int row = 2; row <= rowCount; row++)
@@ -255,8 +261,9 @@ public class ContactService(IContactRepository _contactRepository, IWebHostEnvir
                 var name2 = worksheet.Cells[row, 8].Value?.ToString()?.Trim();
                 var phoneNumber2 = worksheet.Cells[row, 9].Value?.ToString()?.Trim();
 
-                if (phoneNumbers.Any(x => x == phoneNumber))
+                if (phoneNumbers.Any(x => x == phoneNumber) || leads.Any(x => x.PhoneNumber == phoneNumber))
                 {
+                    var existingLead = leads.FirstOrDefault(x => x.PhoneNumber == phoneNumber);
                     var existingContact = await _contactRepository.FindByPhoneNumberAsync(phoneNumber);
                     if (existingContact is null) continue;
                     var callStatusName = string.Empty;
@@ -283,9 +290,11 @@ public class ContactService(IContactRepository _contactRepository, IWebHostEnvir
                         Name2 = name2,
                         PhoneNumber2 = phoneNumber2,
                         CallStatus = callStatusName,
-                        Note = $"Số điện thoại đã tồn tại trong hệ thống (Liên hệ: {existingContact.Name} - {existingContact.PhoneNumber}, Nguồn: {sourceName}, Trạng thái cuộc gọi: {callStatusName})"
+                        Note = $"Số điện thoại đã tồn tại trong hệ thống",
+                        IsBlackList = existingContact.Status == ContactStatus.Blacklisted,
+                        SourceName = sourceName,
+                        CheckinNote = existingLead != null ? $"Đã có lịch hẹn vào ngày {existingLead.EventDate:dd-MM-yyyy}" : string.Empty
                     });
-                    continue;
                 }
                 var contact = new Contact
                 {
@@ -332,7 +341,10 @@ public class ContactService(IContactRepository _contactRepository, IWebHostEnvir
                 ws.Cells[1, 8].Value = "Name2";
                 ws.Cells[1, 9].Value = "PhoneNumber2";
                 ws.Cells[1, 10].Value = "CallStatus";
-                ws.Cells[1, 11].Value = "Note";
+                ws.Cells[1, 11].Value = "SourceName";
+                ws.Cells[1, 12].Value = "CheckinNote";
+                ws.Cells[1, 13].Value = "BlackList";
+                ws.Cells[1, 14].Value = "Note";
 
                 for (int i = 0; i < errorRows.Count; i++)
                 {
@@ -348,9 +360,12 @@ public class ContactService(IContactRepository _contactRepository, IWebHostEnvir
                     ws.Cells[row, 8].Value = item.Name2;
                     ws.Cells[row, 9].Value = item.PhoneNumber2;
                     ws.Cells[row, 10].Value = item.CallStatus;
-                    ws.Cells[row, 11].Value = item.Note;
+                    ws.Cells[row, 11].Value = item.SourceName;
+                    ws.Cells[row, 12].Value = item.CheckinNote;
+                    ws.Cells[row, 13].Value = item.IsBlackList ? "Có" : "Không";
+                    ws.Cells[row, 14].Value = item.Note;
                 }
-                var cells = ws.Cells[1, 1, errorRows.Count + 1, 11];
+                var cells = ws.Cells[1, 1, errorRows.Count + 1, 14];
                 cells.AutoFitColumns();
                 cells.Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
                 cells.Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
