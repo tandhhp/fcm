@@ -5,7 +5,7 @@ import { addToRole, apiDosOptions, apiLockUser, apiRoleOptions, apiSetPassword, 
 import { GENDER_OPTIONS, UserStatus } from "@/utils/constants";
 import { DeleteOutlined, EditOutlined, LockOutlined, ManOutlined, MoreOutlined, SettingOutlined, UserAddOutlined, UserOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, DrawerForm, ModalForm, PageContainer, ProColumns, ProFormDatePicker, ProFormInstance, ProFormSelect, ProFormText, ProTable } from "@ant-design/pro-components"
-import { useAccess, useParams, useRequest } from "@umijs/max";
+import { history, useAccess, useParams, useRequest } from "@umijs/max";
 import { Button, Col, Dropdown, Popconfirm, Row, Select, Space, Tag, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
@@ -242,12 +242,6 @@ const RoleCenter: React.FC = () => {
             width: 150
         },
         {
-            title: 'Địa chỉ',
-            dataIndex: 'address',
-            search: false,
-            ellipsis: true
-        },
-        {
             title: 'Ngày vào làm',
             dataIndex: 'contractDate',
             valueType: 'date',
@@ -258,7 +252,8 @@ const RoleCenter: React.FC = () => {
             title: 'Team',
             dataIndex: 'teamName',
             search: false,
-            width: 150
+            width: 180,
+            minWidth: 180
         },
         {
             title: 'Trạng thái',
@@ -342,8 +337,13 @@ const RoleCenter: React.FC = () => {
 
     return (
         <PageContainer
+            onBack={() => history.back()}
             title={data?.displayName}
-            extra={<Button type='primary' icon={<UserAddOutlined />} onClick={() => setOpen(true)} hidden={!access.canCreateEmployee}>Thêm nhân viên</Button>}>
+            extra={<Button type='primary' icon={<UserAddOutlined />} onClick={() => {
+                setUser(undefined);
+                formRef.current?.resetFields();
+                setOpen(true);
+            }} hidden={!access.canCreateEmployee}>Thêm nhân viên</Button>}>
             <ProTable
                 headerTitle={(
                     <Space>
@@ -368,13 +368,7 @@ const RoleCenter: React.FC = () => {
             <DrawerForm
                 formRef={formRef}
                 open={open}
-                onOpenChange={(visible) => {
-                    if (!visible) {
-                        setUser(null);
-                        formRef.current?.resetFields();
-                    }
-                    setOpen(visible);
-                }}
+                onOpenChange={setOpen}
                 title="Quản lý nhân viên"
                 onFinish={onFinish}
             >

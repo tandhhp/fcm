@@ -524,13 +524,13 @@ export default [
         name: 'Voucher',
         path: '/event/voucher',
         component: './event/campaign/voucher',
-        access: 'event'
+        access: 'can_read_page_event_voucher'
       },
       {
         name: 'Hợp đồng',
         path: '/event/contract',
         component: './event/contract',
-        access: 'event'
+        access: 'can_read_page_event_contract'
       },
       {
         name: 'Phiếu thu',

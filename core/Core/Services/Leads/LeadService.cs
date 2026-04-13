@@ -97,11 +97,18 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
     {
         var lead = await _leadRepository.FindAsync(args.LeadId);
         if (lead == null) return TResult.Failed("Không tìm thấy khách hàng!");
-        if (string.IsNullOrWhiteSpace(args.IdentityNumber)) return TResult.Failed("Chưa nhập số ĐDCN!");
-
-        var existingLead = await _leadRepository.FindByIdentityNumberAsync(args.IdentityNumber);
-        if (existingLead != null && existingLead.Id != lead.Id && !existingLead.Dupplicated) return TResult.Failed($"Khách hàng đã tham dự sự kiện {existingLead.EventName} ngày {existingLead.EventDate:dd/MM/yyyy}");
-
+        if (!string.IsNullOrWhiteSpace(args.IdentityNumber))
+        {
+            var existingLead = await _leadRepository.FindByIdentityNumberAsync(args.IdentityNumber);
+            if (existingLead != null && existingLead.Id != lead.Id && !existingLead.Dupplicated) return TResult.Failed($"Khách hàng đã tham dự sự kiện {existingLead.EventName} ngày {existingLead.EventDate:dd/MM/yyyy}");
+            if (existingLead != null)
+            {
+                var duplicatedLead = await _leadRepository.FindAsync(existingLead.Id);
+                if (duplicatedLead == null) return TResult.Failed("Không tìm thấy khách hàng!");
+                duplicatedLead.Duplicated = false;
+                await _leadRepository.UpdateAsync(duplicatedLead);
+            }
+        }
         lead.Status = LeadStatus.Checkin;
         lead.Note = args.Note;
         lead.IdentityNumber = args.IdentityNumber;
@@ -117,13 +124,6 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
             await _leadRepository.UpdateSubLeadsAsync(lead.Id, args.SubLeads);
         }
         await _leadRepository.UpdateAsync(lead);
-        if (existingLead != null)
-        {
-            var duplicatedLead = await _leadRepository.FindAsync(existingLead.Id);
-            if (duplicatedLead == null) return TResult.Failed("Không tìm thấy khách hàng!");
-            duplicatedLead.Duplicated = false;
-            await _leadRepository.UpdateAsync(duplicatedLead);
-        }
         return TResult.Success;
     }
 

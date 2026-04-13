@@ -320,7 +320,15 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                 DotId = args.DotId,
                 LineCode = args.LineCode,
             };
-            if (args.TmId != null)
+            if (args.DosId.HasValue)
+            {
+                user.ManagerId = args.DosId;
+            }
+            if (args.DotId.HasValue)
+            {
+                user.ManagerId = args.DotId;
+            }
+            if (args.TmId.HasValue)
             {
                 user.ManagerId = args.TmId;
                 var team = await _context.Teams.FirstOrDefaultAsync(x => x.LeaderId == args.TmId);
@@ -329,7 +337,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                     user.TeamId = team.Id;
                 }
             }
-            if (args.SmId != null)
+            if (args.SmId.HasValue)
             {
                 user.ManagerId = args.SmId;
                 var team = await _context.Teams.FirstOrDefaultAsync(x => x.LeaderId == args.SmId);
@@ -337,14 +345,6 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                 {
                     user.TeamId = team.Id;
                 }
-            }
-            if (args.DosId != null)
-            {
-                user.ManagerId = args.DosId;
-            }
-            if (args.DotId.HasValue)
-            {
-                user.ManagerId = args.DotId;
             }
             var result = await _userManager.CreateAsync(user, args.Password);
             if (!result.Succeeded) return BadRequest(result.Errors.FirstOrDefault()?.Description);

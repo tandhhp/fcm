@@ -27,36 +27,44 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
 
     public async Task<TResult> CreatePaymentAsync(ContractCreatePayment args, Guid salesId)
     {
-        var invoice = new Invoice
+        try
         {
-            Id = Guid.NewGuid(),
-            ContractId = args.ContractId,
-            Amount = args.Amount,
-            Note = args.Note,
-            CreatedBy = _hcaService.GetUserId(),
-            CreatedAt = args.CreatedDate,
-            Status = InvoiceStatus.Pending,
-            InvoiceNumber = args.InvoiceNumber,
-            SalesId = salesId,
-            PaymentMethod = args.PaymentMethod
-        };
-        if (args.EvidenceUrls != null && args.EvidenceUrls.Count > 0)
-        {
-            await _context.Evidences.AddRangeAsync(args.EvidenceUrls.Select(url => new Evidence
+            var invoice = new Invoice
             {
                 Id = Guid.NewGuid(),
                 ContractId = args.ContractId,
-                Url = url,
-                FileName = System.IO.Path.GetFileName(url),
-                UploadAt = DateTime.UtcNow,
-                UploaderId = _hcaService.GetUserId(),
-                EvidenceTypeId = 3,
-                InvoiceId = invoice.Id
-            }));
+                Amount = args.Amount,
+                Note = args.Note,
+                CreatedBy = _hcaService.GetUserId(),
+                CreatedAt = args.CreatedDate,
+                Status = InvoiceStatus.Pending,
+                InvoiceNumber = args.InvoiceNumber,
+                SalesId = salesId,
+                PaymentMethod = args.PaymentMethod
+            };
+            if (args.EvidenceUrls != null && args.EvidenceUrls.Count > 0)
+            {
+                var evidences = args.EvidenceUrls.Select(url => new Evidence
+                {
+                    Id = Guid.NewGuid(),
+                    ContractId = args.ContractId,
+                    Url = url,
+                    FileName = Path.GetFileName(url),
+                    UploadAt = DateTime.Now,
+                    UploaderId = _hcaService.GetUserId(),
+                    EvidenceTypeId = 3,
+                    InvoiceId = invoice.Id
+                });
+                await _context.Evidences.AddRangeAsync(evidences);
+            }
+            await _context.Invoices.AddAsync(invoice);
+            await _context.SaveChangesAsync();
+            return TResult.Success;
         }
-        await _context.Invoices.AddAsync(invoice);
-        await _context.SaveChangesAsync();
-        return TResult.Success;
+        catch (Exception ex)
+        {
+            return TResult.Failed(ex.ToString());
+        }
     }
 
     public async Task<TResult> DeleteEvidenceAsync(Guid id)

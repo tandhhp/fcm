@@ -121,12 +121,10 @@ const LeadCheckin: React.FC<Props> = (props) => {
                     ]} />
                 </Col>
                 <Col md={8} xs={12}>
-                    <ProFormText name="identityNumber" label="Số CCCD" rules={[
-                        { required: true, message: 'Vui lòng nhập CCCD' }
-                        ]} />
+                    <ProFormText name="identityNumber" label="Số CCCD" />
                 </Col>
                 <Col md={6} xs={12}>
-                    <ProFormDatePicker.Year label="Năm sinh" name="dateOfBirth" width="xl" rules={[{ required: true }]} />
+                    <ProFormDatePicker.Year label="Năm sinh" name="dateOfBirth" width="xl" />
                 </Col>
                 <Col md={4} xs={12}>
                     <ProFormSelect label="Giới tính" name="gender" options={GENDER_OPTIONS} />

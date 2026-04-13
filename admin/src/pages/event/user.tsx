@@ -41,6 +41,7 @@ const EventUserPage: React.FC = () => {
 
     return (
         <PageContainer title={`Khung giờ: ${data?.name}`}
+        onBack={() => history.back()}
             extra={(
                 <Space size="small">
                     <ProForm submitter={false} layout="inline">
@@ -71,7 +72,6 @@ const EventUserPage: React.FC = () => {
                             }}
                         />
                     </ProForm>
-                    <Button icon={<LeftOutlined />} onClick={() => history.push('/event/time-slot')}>Quay lại</Button>
                 </Space>
             )}>
             <div className="overflow-auto">
@@ -217,7 +217,7 @@ const EventUserPage: React.FC = () => {
                                                 setLead(entity);
                                                 setOpenCheckin(true);
                                             },
-                                            disabled: entity.status !== LeadStatus.Approved || !access.event
+                                            disabled: entity.status !== LeadStatus.Approved || (!access.event && !access.em)
                                         },
                                         {
                                             key: 'feedback',
