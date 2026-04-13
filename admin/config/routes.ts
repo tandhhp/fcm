@@ -330,6 +330,11 @@ export default [
         hideInMenu: true
       },
       {
+        name: 'Group data',
+        path: '/contact/group-data',
+        component: './contact/group-data'
+      },
+      {
         name: 'Trạng thái cuộc gọi',
         path: '/contact/call-status',
         component: './contact/call-status'

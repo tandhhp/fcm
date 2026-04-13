@@ -295,6 +295,7 @@ public class ContactService(IContactRepository _contactRepository, ApplicationDb
                         SourceName = sourceName,
                         CheckinNote = existingLead != null ? $"Đã có lịch hẹn vào ngày {existingLead.EventDate:dd-MM-yyyy}" : string.Empty
                     });
+                    continue;
                 }
                 var contact = new Contact
                 {

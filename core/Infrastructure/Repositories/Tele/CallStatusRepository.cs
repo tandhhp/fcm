@@ -34,7 +34,9 @@ public class CallStatusRepository(ApplicationDbContext context) : EfRepository<C
         return await ListResult<object>.Success(query, filterOptions);
     }
 
-    public async Task<object> OptionsAsync(SelectOptions options) => await _context.CallStatuses.Select(x => new
+    public async Task<object> OptionsAsync(SelectOptions options) => await _context.CallStatuses
+        .OrderBy(x => x.SortOrder)
+        .Select(x => new
     {
         Label = x.Name,
         Value = x.Id,

@@ -9,7 +9,7 @@ import { message } from 'antd';
 import NotificationBadge from './components/right-content/notification-badge';
 import Footer from './components/layout/footer';
 
-const { API_URL } = process.env;
+const { API_URL, PRIMARY_COLOR } = process.env;
 const loginPath = '/accounts/login';
 
 export async function getInitialState(): Promise<{
@@ -52,12 +52,12 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     token: {
       sider: {
         colorMenuBackground: '#000305ff',
-        colorBgMenuItemHover: '#085D46',
+        colorBgMenuItemHover: `#${PRIMARY_COLOR}`,
         colorTextMenu: '#FFF',
         colorTextMenuSelected: '#FFF',
         colorTextMenuItemHover: '#FFF',
         colorTextMenuActive: '#FFFFFF',
-        colorBgMenuItemSelected: '#085D46',
+        colorBgMenuItemSelected: `#${PRIMARY_COLOR}`,
         colorTextMenuSecondary: '#FFFFFF',
         colorTextMenuTitle: '#FFFFFF',
         colorTextSubMenuSelected: '#FFFFFF'

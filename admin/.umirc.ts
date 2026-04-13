@@ -6,7 +6,7 @@ export default defineConfig({
   antd: {
     theme: {
       token: {
-        colorPrimary: process.env.PRIMARY_COLOR,
+        colorPrimary: `#${process.env.PRIMARY_COLOR}`,
         fontFamily: '"Quicksand", sans-serif',
         fontOpticalSizing: 'auto',
         fontWeight: 500
