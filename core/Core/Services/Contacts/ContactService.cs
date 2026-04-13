@@ -4,11 +4,14 @@ using OfficeOpenXml;
 using Waffle.Core.Constants;
 using Waffle.Core.Helpers;
 using Waffle.Core.Interfaces.IRepository;
+using Waffle.Core.Interfaces.IRepository.Calls;
 using Waffle.Core.Interfaces.IService;
 using Waffle.Core.Services.Contacts.Args;
 using Waffle.Core.Services.Contacts.Filters;
 using Waffle.Core.Services.Contacts.Models;
+using Waffle.Core.Services.Contacts.Results;
 using Waffle.Core.Services.Leads.Args;
+using Waffle.Data;
 using Waffle.Entities;
 using Waffle.Entities.Contacts;
 using Waffle.Models;
@@ -16,7 +19,7 @@ using Waffle.Models.Filters;
 
 namespace Waffle.Core.Services.Contacts;
 
-public class ContactService(IContactRepository _contactRepository, IProvinceService _provinceService, ISourceService _sourceService, IDistrictService _districtService, ILogService _logService, UserManager<ApplicationUser> _userManager, IHCAService _hcaService, ILeadService _leadService) : IContactService
+public class ContactService(IContactRepository _contactRepository, ApplicationDbContext _context, IWebHostEnvironment _env, ICallStatusRepository _callStatusRepository, IProvinceService _provinceService, ISourceService _sourceService, IDistrictService _districtService, ILogService _logService, UserManager<ApplicationUser> _userManager, IHCAService _hcaService, ILeadService _leadService) : IContactService
 {
     public async Task<TResult> BlockAsync(BlockContactArgs args)
     {
@@ -226,6 +229,14 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
             using var pgk = new ExcelPackage(args.File.OpenReadStream());
             var worksheet = pgk.Workbook.Worksheets[0];
             var rowCount = worksheet.Dimension.Rows;
+            var leads = await _context.Leads.Select(x => new
+            {
+                x.PhoneNumber,
+                x.EventDate
+            }).Distinct().ToListAsync();
+
+            var errorRows = new List<ContactImportErrorRow>();
+
             for (int row = 2; row <= rowCount; row++)
             {
                 var name = worksheet.Cells[row, 1].Value?.ToString()?.Trim();
@@ -233,13 +244,12 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
                 var phoneNumber = worksheet.Cells[row, 2].Value?.ToString()?.Trim();
                 if (string.IsNullOrEmpty(phoneNumber)) continue;
                 if (!PhoneNumberValidator.IsValidVietnamPhoneNumber(phoneNumber)) return TResult.Failed($"Dòng {row}: Số điện thoại không hợp lệ!");
-                if (phoneNumbers.Any(x => x == phoneNumber)) continue;
                 var email = worksheet.Cells[row, 3].Value?.ToString()?.Trim();
                 var districtName = worksheet.Cells[row, 4].Value?.ToString()?.Trim();
                 var jobKindName = worksheet.Cells[row, 5].Value?.ToString()?.Trim();
                 var marriedStatusString = worksheet.Cells[row, 6].Value?.ToString()?.Trim();
                 var genderString = worksheet.Cells[row, 7].Value?.ToString()?.Trim();
-                var note = worksheet.Cells[row, 8].Value?.ToString()?.Trim();
+                var note = worksheet.Cells[row, 10].Value?.ToString()?.Trim();
                 var district = await _districtService.FindByNameAsync(districtName);
                 int? districtId = district?.Id;
                 MarriedStatus? marriedStatus = marriedStatusString?.ToLower() switch
@@ -248,6 +258,44 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
                     "đã kết hôn" => MarriedStatus.Married,
                     _ => null
                 };
+                var name2 = worksheet.Cells[row, 8].Value?.ToString()?.Trim();
+                var phoneNumber2 = worksheet.Cells[row, 9].Value?.ToString()?.Trim();
+
+                if (phoneNumbers.Any(x => x == phoneNumber) || leads.Any(x => x.PhoneNumber == phoneNumber))
+                {
+                    var existingLead = leads.FirstOrDefault(x => x.PhoneNumber == phoneNumber);
+                    var existingContact = await _contactRepository.FindByPhoneNumberAsync(phoneNumber);
+                    if (existingContact is null) continue;
+                    var callStatusName = string.Empty;
+                    if (existingContact.CallStatusId.HasValue)
+                    {
+                        var callStatus = await _callStatusRepository.FindAsync(existingContact.CallStatusId);
+                        callStatusName = callStatus?.Name ?? string.Empty;
+                    }
+                    var sourceName = string.Empty;
+                    if (existingContact.SourceId.HasValue)
+                    {
+                        var src = await _sourceService.FindAsync(existingContact.SourceId.Value);
+                        sourceName = src?.Name ?? string.Empty;
+                    }
+                    errorRows.Add(new ContactImportErrorRow
+                    {
+                        Name = name,
+                        PhoneNumber = phoneNumber,
+                        Email = email,
+                        Address = districtName,
+                        JobTitle = jobKindName,
+                        MarriedStatus = marriedStatusString,
+                        Gender = genderString,
+                        Name2 = name2,
+                        PhoneNumber2 = phoneNumber2,
+                        CallStatus = callStatusName,
+                        Note = $"Số điện thoại đã tồn tại trong hệ thống",
+                        IsBlackList = existingContact.Status == ContactStatus.Blacklisted,
+                        SourceName = sourceName,
+                        CheckinNote = existingLead != null ? $"Đã có lịch hẹn vào ngày {existingLead.EventDate:dd-MM-yyyy}" : string.Empty
+                    });
+                }
                 var contact = new Contact
                 {
                     Name = name,
@@ -267,13 +315,69 @@ public class ContactService(IContactRepository _contactRepository, IProvinceServ
                         _ => null
                     },
                     SourceId = source.Id,
-                    UserId = args.TeleId
+                    UserId = args.TeleId,
+                    Name2 = name2,
+                    PhoneNumber2 = phoneNumber2
                 };
                 contacts.Add(contact);
             }
             await _logService.AddAsync($"Nhập khẩu {contacts.Count} liên hệ");
             await _contactRepository.AddRangeAsync(contacts);
-            return TResult.Success;
+            var errorDownloadLink = string.Empty;
+            if (errorRows.Count > 0)
+            {
+                var fileName = $"contact-import-errors-{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+                var filePath = Path.Combine(_env.WebRootPath, "errors", fileName);
+                using var errorPkg = new ExcelPackage();
+                var ws = errorPkg.Workbook.Worksheets.Add("Errors");
+
+                ws.Cells[1, 1].Value = "Name";
+                ws.Cells[1, 2].Value = "PhoneNumber";
+                ws.Cells[1, 3].Value = "Email";
+                ws.Cells[1, 4].Value = "Address";
+                ws.Cells[1, 5].Value = "JobTitle";
+                ws.Cells[1, 6].Value = "MarriedStatus";
+                ws.Cells[1, 7].Value = "Gender";
+                ws.Cells[1, 8].Value = "Name2";
+                ws.Cells[1, 9].Value = "PhoneNumber2";
+                ws.Cells[1, 10].Value = "CallStatus";
+                ws.Cells[1, 11].Value = "SourceName";
+                ws.Cells[1, 12].Value = "CheckinNote";
+                ws.Cells[1, 13].Value = "BlackList";
+                ws.Cells[1, 14].Value = "Note";
+
+                for (int i = 0; i < errorRows.Count; i++)
+                {
+                    var row = i + 2;
+                    var item = errorRows[i];
+                    ws.Cells[row, 1].Value = item.Name;
+                    ws.Cells[row, 2].Value = item.PhoneNumber;
+                    ws.Cells[row, 3].Value = item.Email;
+                    ws.Cells[row, 4].Value = item.Address;
+                    ws.Cells[row, 5].Value = item.JobTitle;
+                    ws.Cells[row, 6].Value = item.MarriedStatus;
+                    ws.Cells[row, 7].Value = item.Gender;
+                    ws.Cells[row, 8].Value = item.Name2;
+                    ws.Cells[row, 9].Value = item.PhoneNumber2;
+                    ws.Cells[row, 10].Value = item.CallStatus;
+                    ws.Cells[row, 11].Value = item.SourceName;
+                    ws.Cells[row, 12].Value = item.CheckinNote;
+                    ws.Cells[row, 13].Value = item.IsBlackList ? "Có" : "Không";
+                    ws.Cells[row, 14].Value = item.Note;
+                }
+                var cells = ws.Cells[1, 1, errorRows.Count + 1, 14];
+                cells.AutoFitColumns();
+                cells.Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                cells.Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                cells.Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                cells.Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+
+                await errorPkg.SaveAsAsync(new FileInfo(filePath));
+                errorDownloadLink = $"{_hcaService.Request()?.Scheme}://{_hcaService.Request()?.Host}/errors/{fileName}";
+                await _logService.AddAsync($"Xuất file lỗi import: {errorDownloadLink}");
+            }
+
+            return TResult.Ok(errorDownloadLink);
         }
         catch (Exception ex)
         {

@@ -33,12 +33,16 @@ const CallForm: React.FC<Props> = (props) => {
     return (
         <DrawerForm {...props} title={`Cuộc gọi ${props.data?.name}`} onFinish={onFinish} formRef={formRef}
             drawerProps={{
-                destroyOnHidden: true
+                destroyOnHidden: true,
+                closable: false,
+                  maskClosable: false
             }}
         >
             <ProDescriptions column={2} className="mb-4" bordered size="small" title="Thông tin liên hệ" dataSource={props.data} >
                 <ProDescriptions.Item label="Họ và tên">{props.data?.name} {props.data?.gender === true ? '(Nữ)' : props.data?.gender === false ? '(Nam)' : ''}</ProDescriptions.Item>
                 <ProDescriptions.Item label="Số điện thoại">{props.data?.phoneNumber}</ProDescriptions.Item>
+                <ProDescriptions.Item label="Họ và tên 2">{props.data?.name2}</ProDescriptions.Item>
+                <ProDescriptions.Item label="Số điện thoại 2">{props.data?.phoneNumber2}</ProDescriptions.Item>
                 <ProDescriptions.Item label="Nguồn">{props.data?.sourceName}</ProDescriptions.Item>
                 <ProDescriptions.Item label="Ngày tạo" valueType={"date"}>{props.data?.createdDate}</ProDescriptions.Item>
             </ProDescriptions>

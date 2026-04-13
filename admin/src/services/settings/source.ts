@@ -101,3 +101,15 @@ export async function apiSourceContactAssign(data: {
         data
     });
 }
+
+export async function apiSourceTransfer(data: {
+    fromSourceId: number;
+    toSourceId: number;
+    contactIds?: string[];
+    includeAssigned: boolean;
+}) {
+    return request(`source/transfer`, {
+        method: 'POST',
+        data
+    });
+}

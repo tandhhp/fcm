@@ -22,4 +22,6 @@ public class ContactListItem : BaseEntity
     public string? TypeOfDataName { get; set; }
     public SourceType? SourceType { get; set; }
     public bool Called { get; set; }
+    public string? Name2 { get; set; }
+    public string? PhoneNumber2 { get; set; }
 }

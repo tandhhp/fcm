@@ -2,8 +2,9 @@ import { apiContactImport } from "@/services/contact";
 import { apiGetTypeOfDataBySource, apiSourceOptions } from "@/services/settings/source";
 import { apiUserOptions } from "@/services/user";
 import { apiTeamOptions } from "@/services/users/team";
+import { DownloadOutlined } from "@ant-design/icons";
 import { ModalForm, ModalFormProps, ProFormInstance, ProFormSelect, ProFormText, ProFormUploadDragger } from "@ant-design/pro-components";
-import { Col, message, Row } from "antd";
+import { Alert, Col, message, Row } from "antd";
 import { useEffect, useRef, useState } from "react";
 
 type Props = ModalFormProps & {
@@ -17,6 +18,7 @@ const ContactImport: React.FC<Props> = (props) => {
     const [teamId, setTeamId] = useState<number>();
     const [sourceId, setSourceId] = useState<number>();
     const [typeOpData, setTypeOpData] = useState<any[]>([]);
+    const [errorDownloadLink, setErrorDownloadLink] = useState<string>();
 
     useEffect(() => {
         const fetchSourceOptions = async () => {
@@ -53,10 +55,15 @@ const ContactImport: React.FC<Props> = (props) => {
         formData.append('file', values.file[0].originFileObj);
         formData.append('sourceId', values.sourceId);
         formData.append('teleId', values.teleId);
-        await apiContactImport(formData);
+        const response = await apiContactImport(formData);
         message.success('Nhập dữ liệu thành công');
         formRef.current?.resetFields();
+        if (response.data) {
+            setErrorDownloadLink(response.data);
+            return false;
+        }
         props.reload?.();
+
         return true;
     }
 
@@ -113,6 +120,15 @@ const ContactImport: React.FC<Props> = (props) => {
                 title={"Kéo thả file vào đây hoặc click để chọn file"}
                 description={"Chỉ hỗ trợ file định dạng .xlsx"}
             />
+            {errorDownloadLink && (
+                <div className="mt-4">
+                    <Alert message="Có lỗi xảy ra trong quá trình nhập dữ liệu. Vui lòng tải file lỗi về để kiểm tra." type="error" showIcon />
+                    <div className="flex gap-2 items-center mt-2">
+                        <DownloadOutlined /> <a href={errorDownloadLink} className="text-blue-600 underline">Tải file lỗi</a>
+                    </div>
+                </div>
+            )}
+
         </ModalForm >
     )
 }

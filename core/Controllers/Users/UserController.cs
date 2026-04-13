@@ -347,7 +347,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                 user.ManagerId = args.DotId;
             }
             var result = await _userManager.CreateAsync(user, args.Password);
-            if (!result.Succeeded) return Ok(result);
+            if (!result.Succeeded) return BadRequest(result.Errors.FirstOrDefault()?.Description);
             result = await _userManager.AddToRoleAsync(user, args.Role);
             return Ok(result);
         }

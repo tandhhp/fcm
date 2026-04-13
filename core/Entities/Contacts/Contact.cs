@@ -38,6 +38,10 @@ public class Contact : AuditEntity
     [ForeignKey(nameof(CallStatus))]
     public int? CallStatusId { get; set; }
     public DateTime? FollowUpdate { get; set; }
+    [StringLength(20)]
+    public string? PhoneNumber2 { get; set; }
+    [StringLength(450)]
+    public string? Name2 { get; set; }
 
     public virtual Transport? Transport { get; set; }
     public virtual District? District { get; set; }

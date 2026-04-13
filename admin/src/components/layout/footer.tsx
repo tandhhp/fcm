@@ -15,13 +15,13 @@ const Footer: React.FC = () => {
         <>
             <DefaultFooter copyright={`${dayjs().year()} ${COMPANY_NAME}. All rights reserved.`} links={[
                 {
-                    key: 'Waffle',
+                    key: 'home-icon',
                     title: <HomeOutlined />,
                     href: 'https://defzone.net',
                     blankTarget: true,
                 },
                 {
-                    key: 'Waffle',
+                    key: 'home-text',
                     title: `Trang chủ`,
                     href: 'https://defzone.net',
                     blankTarget: true,

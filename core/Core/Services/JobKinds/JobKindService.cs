@@ -38,7 +38,7 @@ public class JobKindService(IJobKindRepository _jobKindRepository) : IJobKindSer
         });
     }
 
-    public Task<ListResult<object>> ListAsync(FilterOptions filterOptions) => _jobKindRepository.ListAsync(filterOptions);
+    public Task<ListResult<object>> ListAsync(JobKindFilterOptions filterOptions) => _jobKindRepository.ListAsync(filterOptions);
 
     public Task<object?> OptionsAsync() => _jobKindRepository.OptionsAsync();
 

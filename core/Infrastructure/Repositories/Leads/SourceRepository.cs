@@ -95,7 +95,7 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.SourceIds))
         {
-            var sourceIds = filterOptions.SourceIds.Split(',').Select(id => int.TryParse(id, out var parsedId) ? parsedId : (int?)null).Where(id => id.HasValue).Select(id => id.Value).ToList();
+            var sourceIds = filterOptions.SourceIds.Split(',').Select(id => int.TryParse(id, out var parsedId) ? parsedId : (int?)null).Where(id => id.HasValue).Select(id => id).ToList();
             query = query.Where(x => x.SourceId != null && sourceIds.Contains(x.SourceId.Value));
         }
         if (filterOptions.TeamId.HasValue)
@@ -405,5 +405,37 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
             Label = x.Name,
             Value = x.Id
         }).ToListAsync();
+    }
+
+    public async Task<TResult> TransferAsync(SourceTransferArgs args)
+    {
+        var query = _context.Contacts.Where(x => x.SourceId == args.FromSourceId);
+
+        // Nếu có danh sách ContactIds cụ thể
+        if (args.ContactIds != null && args.ContactIds.Any())
+        {
+            query = query.Where(x => args.ContactIds.Contains(x.Id));
+        }
+
+        // Nếu không transfer contacts đã được assign
+        if (!args.IncludeAssigned)
+        {
+            query = query.Where(x => x.UserId == null);
+        }
+
+        var contacts = await query.ToListAsync();
+
+        if (!contacts.Any())
+            return TResult.Failed("Không có contact nào để chuyển!");
+
+        foreach (var contact in contacts)
+        {
+            contact.SourceId = args.ToSourceId;
+            contact.ModifiedDate = DateTime.Now;
+        }
+
+        await _context.SaveChangesAsync();
+
+        return TResult.Ok($"Đã chuyển {contacts.Count} contact thành công!");
     }
 }

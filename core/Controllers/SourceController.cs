@@ -56,4 +56,7 @@ public class SourceController(ISourceService _sourceService) : BaseController
 
     [HttpPost("multiple-assign")]
     public async Task<IActionResult> MultipleAssignAsync([FromBody] SourceMultipleAssignArgs args) => Ok(await _sourceService.MultipleAssignAsync(args));
+
+    [HttpPost("transfer")]
+    public async Task<IActionResult> TransferAsync([FromBody] SourceTransferArgs args) => Ok(await _sourceService.TransferAsync(args));
 }
