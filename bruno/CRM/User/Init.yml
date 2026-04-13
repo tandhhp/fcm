@@ -1,0 +1,15 @@
+info:
+  name: Init
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{host}}/user/init"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

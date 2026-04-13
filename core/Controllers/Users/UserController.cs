@@ -1982,4 +1982,21 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
         query = query.OrderByDescending(x => x.CreatedDate);
         return Ok(await ListResult<object>.Success(query, filterOptions));
     }
+
+    [HttpPost("init"), AllowAnonymous]
+    public async Task<IActionResult> InitAsync()
+    {
+        var user = new ApplicationUser
+        {
+            UserName = "admin",
+            Name = "Chu Huy Hoàng",
+            Gender = false,
+            BranchId = 1,
+            CreatedDate = DateTime.Now,
+            Status = UserStatus.Working
+        };
+        var result = await _userManager.CreateAsync(user, "Lpg@2026");
+        await _userManager.AddToRoleAsync(user, RoleName.Admin);
+        return Ok(result);
+    }
 }

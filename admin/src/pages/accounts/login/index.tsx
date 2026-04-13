@@ -15,10 +15,10 @@ import { history, useModel } from '@umijs/max';
 import { message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
-import logo from '../../../assets/logo-icon.png';
 import '../index.css';
 import { Helmet } from '@umijs/max';
-import Settings from '../../../../config/defaultSetting';
+
+const { COMPANY_NAME } = process.env;
 
 const Login: React.FC = () => {
   const [type, setType] = useState<string>('account');
@@ -55,7 +55,7 @@ const Login: React.FC = () => {
   return (
     <div className='h-screen'>
       <Helmet>
-        <title>{intl.formatMessage({ id: 'menu.login', defaultMessage: 'Login', })} - {Settings.title}</title>
+        <title>Đăng nhập - {COMPANY_NAME || ''}</title>
       </Helmet>
       <div className='fixed' style={{
         left: 10,
@@ -67,8 +67,8 @@ const Login: React.FC = () => {
         <div className="flex items-center relative h-screen flex-col justify-center">
           <div className='flex flex-col items-center justify-center w-full'>
             <LoginForm
-              logo={<img alt="logo" src={logo} />}
-              title="First Class Membership"
+              logo={<img alt="logo" src={`${process.env.API_URL}/imgs/logo.png`} />}
+              title={COMPANY_NAME}
               subTitle="Thân tâm an trú - Cuộc sống thượng lưu"
               initialValues={{
                 autoLogin: true,
@@ -147,18 +147,18 @@ const Login: React.FC = () => {
             style={{
               background: 'none',
             }}
-            copyright="Powered by 1stClass Membership"
+            copyright={`${new Date().getFullYear()} ${COMPANY_NAME}. All rights reserved.`}
             links={[
               {
                 key: 'github',
                 title: <HomeOutlined />,
-                href: 'https://1stclass.com.vn',
+                href: 'https://defzone.net',
                 blankTarget: true,
               },
               {
                 key: 'home',
                 title: 'Trang chủ',
-                href: 'https://1stclass.com.vn',
+                href: 'https://defzone.net',
                 blankTarget: true,
               },
             ]}

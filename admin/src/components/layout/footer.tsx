@@ -3,6 +3,9 @@ import { DefaultFooter } from "@ant-design/pro-components";
 import { FloatButton, Drawer } from "antd";
 import { useState } from "react";
 import ChatAssistant from "../chat-assistant/ChatAssistant";
+import dayjs from "dayjs";
+
+const { COMPANY_NAME } = process.env;
 
 const Footer: React.FC = () => {
 
@@ -10,17 +13,17 @@ const Footer: React.FC = () => {
 
     return (
         <>
-            <DefaultFooter copyright="2025 First Class Membership. All rights reserved." links={[
+            <DefaultFooter copyright={`${dayjs().year()} ${COMPANY_NAME}. All rights reserved.`} links={[
                 {
                     key: 'Waffle',
                     title: <HomeOutlined />,
-                    href: 'https://1stclass.com.vn',
+                    href: 'https://defzone.net',
                     blankTarget: true,
                 },
                 {
                     key: 'Waffle',
                     title: `Trang chủ`,
-                    href: 'https://1stclass.com.vn',
+                    href: 'https://defzone.net',
                     blankTarget: true,
                 }
             ]} />

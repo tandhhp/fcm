@@ -9,6 +9,7 @@ import { message } from 'antd';
 import NotificationBadge from './components/right-content/notification-badge';
 import Footer from './components/layout/footer';
 
+const { API_URL } = process.env;
 const loginPath = '/accounts/login';
 
 export async function getInitialState(): Promise<{
@@ -51,12 +52,12 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     token: {
       sider: {
         colorMenuBackground: '#000305ff',
-        colorBgMenuItemHover: '#ca8a04',
+        colorBgMenuItemHover: '#085D46',
         colorTextMenu: '#FFF',
         colorTextMenuSelected: '#FFF',
         colorTextMenuItemHover: '#FFF',
         colorTextMenuActive: '#FFFFFF',
-        colorBgMenuItemSelected: '#d89a15ff',
+        colorBgMenuItemSelected: '#085D46',
         colorTextMenuSecondary: '#FFFFFF',
         colorTextMenuTitle: '#FFFFFF',
         colorTextSubMenuSelected: '#FFFFFF'
@@ -84,8 +85,7 @@ export const request: RequestConfig = {
   requestInterceptors: [
     (config: RequestOptions) => {
       const token = localStorage.getItem('wf_token');
-      config.baseURL = new URL(`api/`, 'https://api.1stclass.com.vn/').href;
-      //config.baseURL = new URL(`api/`, 'https://localhost:52588/').href;
+      config.baseURL = new URL(`api/`, API_URL).href;
       config.headers = {
         authorization: `Bearer ${token}`,
       };
