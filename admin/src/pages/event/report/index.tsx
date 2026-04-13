@@ -1,10 +1,11 @@
-import { apiEventSuReport } from "@/services/event";
+import { apiEventSuReport, apiExportEventSuReport } from "@/services/event";
 import { apiAttendanceOptions } from "@/services/event/attendance";
 import { apiDotOptions } from "@/services/role";
 import { apiDosOptions } from "@/services/user";
 import { ExportOutlined, ReloadOutlined } from "@ant-design/icons";
 import { PageContainer, ProCard, ProForm, ProFormDatePicker, ProFormSelect } from "@ant-design/pro-components"
-import { Button, Spin } from "antd";
+import { useAccess } from "@umijs/max";
+import { Button, Spin, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 
@@ -27,6 +28,7 @@ type SUAttendance = {
 
 const Index: React.FC = () => {
 
+    const access = useAccess();
     const [data, setData] = useState<SUReportResult[]>([]);
     const [fromDate, setFromDate] = useState<string>(dayjs().startOf('month').format('YYYY-MM-DD'));
     const [toDate, setToDate] = useState<string>(dayjs().endOf('month').format('YYYY-MM-DD'));
@@ -53,9 +55,31 @@ const Index: React.FC = () => {
         fetchData();
     }, [fromDate, toDate, dosId, dotId]);
 
+    const handleExport = async () => {
+        try {
+            setLoading(true);
+            const blob = await apiExportEventSuReport({ fromDate, toDate, dosId, dotId });
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Bao_cao_su_kien_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            message.success('Xuất dữ liệu thành công');
+        } catch (error) {
+            message.error('Xuất dữ liệu thất bại');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <PageContainer extra={(
-            <Button type="primary" icon={<ExportOutlined />} disabled>Xuất dữ liệu</Button>
+            <Button type="primary"
+                disabled={!access.em && !access.canAdmin}
+                icon={<ExportOutlined />} onClick={handleExport}>Xuất dữ liệu</Button>
         )}>
             <ProCard title="Báo cáo sự kiện" headerBordered extra={(
                 <Button icon={<ReloadOutlined />} onClick={() => {

@@ -22,6 +22,7 @@ public interface IEventService
     Task<object?> TableOptionsAsync(AllTableFilterOptions filterOptions);
     Task<TResult> CloseDealAsync(CloseDealArgs args);
     Task<List<SUReportResult>> SuReportAsync(SUFilterOptions filterOptions);
+    Task<TResult<byte[]?>> ExportSuReportAsync(SUFilterOptions filterOptions);
     Task<object> KeyInOptionsAsync(KeyInSelectOptions selectOptions);
     Task<object> ToOptionsAsync(SelectOptions selectOptions);
 }

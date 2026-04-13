@@ -1,5 +1,7 @@
 export default (initialState: { currentUser?: API.User }) => {
   const { currentUser } = initialState ?? {};
+
+  /** Quản trị viên */
   const canAdmin = currentUser && currentUser.roles.includes('admin');
   
   const canCX = currentUser && (currentUser.roles.includes('cx') || currentUser.roles.includes('cxtp') || canAdmin);
@@ -11,7 +13,7 @@ export default (initialState: { currentUser?: API.User }) => {
   const cxm = currentUser && currentUser.roles.includes('cxtp');
   const cx = currentUser && currentUser.roles.includes('cx');
 
-  // Quản lý nhân viên
+  /** Quản lý nhân viên (HR) */
   const canHR = currentUser && (currentUser.roles.includes('hr') || currentUser.roles.includes('admin'));
 
   const canComment = currentUser && (currentUser.roles.includes('cx') 
@@ -67,19 +69,33 @@ export default (initialState: { currentUser?: API.User }) => {
   || currentUser.roles.includes('dos')
   || currentUser.roles.includes('admin'));
 
+  /** Giám đốc kinh doanh */
   const dos = currentUser && currentUser.roles.includes('dos');
+  /** Trưởng phòng kinh doanh */
   const sm = currentUser && (currentUser.roles.includes('sm'));
+  /** Nhân viên kinh doanh */
   const sales = currentUser && (currentUser.roles.includes('sales'));
+  /** Nhân viên sự kiện */
   const event = currentUser && (currentUser.roles.includes('event') || canAdmin);
+  /** Quản lý nhân viên sự kiện */
   const em = currentUser && (currentUser.roles.includes('em') || canAdmin);
+  /** Telesales */
   const telesale = currentUser && (currentUser.roles.includes('Telesale'));
+  /** Quản lý Telesales */
   const telesaleManager = currentUser && (currentUser.roles.includes('TelesaleManager'));
+  /** Giám đốc Telesales */
   const dot = currentUser && currentUser.roles.includes('dot');
+  /** Nhân sự */
   const hr = currentUser && currentUser.roles.includes('hr');
+  /** Kế toán */
   const accountant = currentUser && (currentUser.roles.includes('accountant') || currentUser.roles.includes('ChiefAccountant'));
+  /** Kế toán trưởng */
   const chiefAccountant = currentUser && currentUser.roles.includes('ChiefAccountant');
+  /** Quản trị viên dữ liệu */
   const adminData = currentUser && currentUser.roles.includes('admindata');
+  /** Quản lý pháp lý */
   const legalExcutive = currentUser && currentUser.roles.includes('legalexecutive');
+  /** Trợ lý kinh doanh */
   const salesAdmin = currentUser && currentUser.roles.includes('salesadmin');
 
   const canEvent = currentUser && (sales || currentUser.roles.includes('event') || sm || dos || canAdmin);

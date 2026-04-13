@@ -37,6 +37,14 @@ public class EventController(IEventService _eventService) : BaseController
     [HttpGet("su-report")]
     public async Task<IActionResult> SuReportAsync([FromQuery] SUFilterOptions filterOptions) => Ok(await _eventService.SuReportAsync(filterOptions));
 
+    [HttpGet("export-su-report")]
+    public async Task<IActionResult> ExportSuReportAsync([FromQuery] SUFilterOptions filterOptions)
+    {
+        var result = await _eventService.ExportSuReportAsync(filterOptions);
+        if (!result.Succeeded) return BadRequest(result);
+        return File(result.Data!, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Bao_cao_su_kien_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+    }
+
     [HttpGet("key-in-options")]
     public async Task<IActionResult> KeyInOptionsAsync([FromQuery] KeyInSelectOptions selectOptions) => Ok(await _eventService.KeyInOptionsAsync(selectOptions));
 

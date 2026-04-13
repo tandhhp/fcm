@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using Waffle.Core.Constants;
 using Waffle.Core.Interfaces;
 using Waffle.Core.Interfaces.IRepository.Events;
@@ -217,5 +218,78 @@ public class EventService(ApplicationDbContext _context, IEventRepository _event
         data.ModifiedDate = DateTime.Now;
         await _eventRepository.UpdateAsync(data);
         return TResult.Success;
+    }
+
+    public async Task<TResult<byte[]?>> ExportSuReportAsync(SUFilterOptions filterOptions)
+    {
+        var data = await _eventRepository.SuReportAsync(filterOptions);
+        if (data == null || data.Count == 0) return TResult<byte[]?>.Failed("Không có dữ liệu để xuất.");
+
+        using var package = new ExcelPackage();
+        var worksheet = package.Workbook.Worksheets.Add("Báo cáo sự kiện");
+
+        // Get all unique attendance names from the data
+        var attendanceNames = data
+            .SelectMany(x => x.SalesReports)
+            .SelectMany(x => x.Attendances)
+            .Select(x => x.Name)
+            .Distinct()
+            .ToList();
+
+        // Create header row
+        worksheet.Cells[1, 1].Value = "Sales Manager";
+        worksheet.Cells[1, 2].Value = "Sales";
+        var col = 3;
+        foreach (var attendanceName in attendanceNames)
+        {
+            worksheet.Cells[1, col].Value = attendanceName;
+            col++;
+        }
+
+        // Fill data rows
+        var row = 2;
+        foreach (var item in data)
+        {
+            var startRow = row;
+            foreach (var salesReport in item.SalesReports)
+            {
+                worksheet.Cells[row, 1].Value = item.SalesManagerName;
+                worksheet.Cells[row, 2].Value = salesReport.SalesName;
+
+                col = 3;
+                foreach (var attendanceName in attendanceNames)
+                {
+                    var attendance = salesReport.Attendances.FirstOrDefault(x => x.Name == attendanceName);
+                    worksheet.Cells[row, col].Value = attendance?.Count ?? 0;
+                    col++;
+                }
+                row++;
+            }
+
+            // Merge Sales Manager cells if there are multiple sales under the same manager
+            if (item.SalesReports.Count > 1)
+            {
+                worksheet.Cells[startRow, 1, row - 1, 1].Merge = true;
+                worksheet.Cells[startRow, 1, row - 1, 1].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Top;
+            }
+        }
+
+        // Style the header row
+        worksheet.Row(1).Style.Font.Bold = true;
+        worksheet.Row(1).Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+        worksheet.Row(1).Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+
+        // Auto-fit columns
+        worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+        // Add borders to all cells
+        var totalCols = col - 1;
+        var cells = worksheet.Cells[1, 1, row - 1, totalCols];
+        cells.Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+        cells.Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+        cells.Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+        cells.Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+
+        return TResult<byte[]?>.Ok(await package.GetAsByteArrayAsync());
     }
 }

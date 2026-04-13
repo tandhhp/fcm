@@ -56,6 +56,13 @@ export async function apiEventSuReport(params: any) {
     return request('event/su-report', { params });
 }
 
+export async function apiExportEventSuReport(params: any) {
+    return request('event/export-su-report', { 
+        params,
+        responseType: 'blob'
+    });
+}
+
 export async function apiEventReinvite(data: any) {
     return request('contact/reinvite', {
         method: 'POST',

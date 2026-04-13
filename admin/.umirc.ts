@@ -6,8 +6,7 @@ export default defineConfig({
   antd: {
     theme: {
       token: {
-        // colorPrimary: '#ca8a04',
-        colorPrimary: '#085D46',
+        colorPrimary: process.env.PRIMARY_COLOR,
         fontFamily: '"Quicksand", sans-serif',
         fontOpticalSizing: 'auto',
         fontWeight: 500
@@ -38,7 +37,8 @@ export default defineConfig({
   define: {
     'process.env': {
       API_URL: process.env.API_URL,
-      COMPANY_NAME: process.env.COMPANY_NAME
+      COMPANY_NAME: process.env.COMPANY_NAME,
+      PRIMARY_COLOR: process.env.PRIMARY_COLOR
     }
   }
 });
