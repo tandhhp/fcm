@@ -435,6 +435,133 @@ public class ContactService(IContactRepository _contactRepository, ApplicationDb
 
     public Task<ListResult<object>> DialedCallsAsync(ContactFilterOptions filterOptions) => _contactRepository.DialedCallsAsync(filterOptions);
 
+    public async Task<ListResult<dynamic>> TransferSourceListAsync(ContactTransferFilterOptions filterOptions)
+    {
+        var query = from c in _context.Contacts
+                    join s in _context.Sources on c.SourceId equals s.Id into cs
+                    from s in cs.DefaultIfEmpty()
+                    join t in _context.Teams on s.TeamId equals t.Id into st
+                    from t in st.DefaultIfEmpty()
+                    join u in _context.Users on c.UserId equals u.Id into cu
+                    from u in cu.DefaultIfEmpty()
+                    where c.Status != ContactStatus.Blacklisted
+                    select new ContactTransferListItem
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        PhoneNumber = c.PhoneNumber,
+                        CreatedDate = c.CreatedDate,
+                        SourceId = c.SourceId,
+                        SourceName = s != null ? s.Name : null,
+                        GroupId = s != null ? s.TeamId : null,
+                        GroupName = t != null ? t.Name : null,
+                        TelesalesId = c.UserId,
+                        TelesalesName = u != null ? u.Name : null
+                    };
+
+        if (filterOptions.GroupId.HasValue)
+        {
+            query = query.Where(x => x.GroupId == filterOptions.GroupId);
+        }
+        if (filterOptions.SourceId.HasValue)
+        {
+            query = query.Where(x => x.SourceId == filterOptions.SourceId);
+        }
+        if (filterOptions.TelesalesId.HasValue)
+        {
+            query = query.Where(x => x.TelesalesId == filterOptions.TelesalesId);
+        }
+        if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
+        {
+            query = query.Where(x => !string.IsNullOrEmpty(x.PhoneNumber) && x.PhoneNumber.Contains(filterOptions.PhoneNumber));
+        }
+        if (!string.IsNullOrWhiteSpace(filterOptions.Name))
+        {
+            var keyword = filterOptions.Name.ToLower();
+            query = query.Where(x => x.Name.ToLower().Contains(keyword));
+        }
+
+        query = query.OrderByDescending(x => x.CreatedDate);
+        return await ListResult<dynamic>.Success(query, filterOptions);
+    }
+
+    public async Task<TResult> TransferSourceBySearchAsync(ContactTransferBySearchArgs args)
+    {
+        var validatePermission = ValidateTransferPermission();
+        if (!validatePermission.Succeeded) return validatePermission;
+        var validateDestination = await ValidateTransferDestinationAsync(args.Destination);
+        if (!validateDestination.Succeeded) return validateDestination;
+
+        var contacts = await BuildTransferQuery(args.Filter).ToListAsync();
+        return await ApplyTransferAsync(contacts, args.Destination, "search");
+    }
+
+    public async Task<TResult> TransferSourceByCaseAsync(ContactTransferByCaseArgs args)
+    {
+        var validatePermission = ValidateTransferPermission();
+        if (!validatePermission.Succeeded) return validatePermission;
+        if (args.ContactIds.Count == 0) return TResult.Failed("Vui lòng chọn contact cần chuyển!");
+        var validateDestination = await ValidateTransferDestinationAsync(args.Destination);
+        if (!validateDestination.Succeeded) return validateDestination;
+
+        var contacts = await _context.Contacts
+            .Where(x => x.Status != ContactStatus.Blacklisted)
+            .Where(x => args.ContactIds.Contains(x.Id))
+            .ToListAsync();
+
+        return await ApplyTransferAsync(contacts, args.Destination, "case");
+    }
+
+    public async Task<TResult> TransferSourceByFileAsync(ContactTransferByFileArgs args)
+    {
+        var validatePermission = ValidateTransferPermission();
+        if (!validatePermission.Succeeded) return validatePermission;
+        if (args.File is null || args.File.Length == 0) return TResult.Failed("Vui lòng chọn file Excel hợp lệ!");
+        if (!Path.GetExtension(args.File.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+        {
+            return TResult.Failed("Chỉ hỗ trợ file định dạng .xlsx");
+        }
+
+        var destination = new ContactTransferDestinationArgs
+        {
+            GroupId = args.GroupId,
+            SourceId = args.SourceId,
+            TeamId = args.TeamId,
+            TelesalesId = args.TelesalesId
+        };
+        var validateDestination = await ValidateTransferDestinationAsync(destination);
+        if (!validateDestination.Succeeded) return validateDestination;
+
+        using var package = new ExcelPackage(args.File.OpenReadStream());
+        var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+        if (worksheet?.Dimension is null) return TResult.Failed("File không có dữ liệu!");
+
+        var uploadRows = new List<(string Name, string PhoneNumber)>();
+        for (int row = 2; row <= worksheet.Dimension.Rows; row++)
+        {
+            var name = worksheet.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty;
+            var phoneNumber = worksheet.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(phoneNumber)) continue;
+            uploadRows.Add((name, phoneNumber));
+        }
+
+        if (uploadRows.Count == 0) return TResult.Failed("Không tìm thấy dữ liệu hợp lệ trong file!");
+
+        var phoneNumbers = uploadRows.Select(x => x.PhoneNumber).Distinct().ToList();
+        var candidates = await _context.Contacts
+            .Where(x => x.Status != ContactStatus.Blacklisted)
+            .Where(x => !string.IsNullOrEmpty(x.PhoneNumber) && phoneNumbers.Contains(x.PhoneNumber))
+            .ToListAsync();
+
+        var contacts = candidates
+            .Where(c => uploadRows.Any(x => x.PhoneNumber == c.PhoneNumber && x.Name.Equals(c.Name, StringComparison.CurrentCultureIgnoreCase)))
+            .GroupBy(x => x.Id)
+            .Select(x => x.First())
+            .ToList();
+
+        return await ApplyTransferAsync(contacts, destination, "file");
+    }
+
     public Task<TResult> GetReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions) => _contactRepository.GetReportDataSourceAsync(filterOptions);
 
     public Task<TResult<byte[]?>> ExportReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions) => _contactRepository.ExportReportDataSourceAsync(filterOptions);
@@ -446,4 +573,115 @@ public class ContactService(IContactRepository _contactRepository, ApplicationDb
     public Task<TResult<byte[]?>> ExportMultipleAssignReportAsync(MultipleAssignReportFilterOptions filterOptions) => _contactRepository.ExportMultipleAssignReportAsync(filterOptions);
 
     public Task<TResult> GetMultipleAssignReportAsync(MultipleAssignReportFilterOptions filterOptions) => _contactRepository.GetMultipleAssignReportAsync(filterOptions);
+
+    private IQueryable<Contact> BuildTransferQuery(ContactTransferFilterOptions filter)
+    {
+        var query = _context.Contacts.Where(x => x.Status != ContactStatus.Blacklisted);
+        if (filter.GroupId.HasValue)
+        {
+            query = query.Where(x => x.SourceId != null && _context.Sources.Any(s => s.Id == x.SourceId && s.TeamId == filter.GroupId));
+        }
+        if (filter.SourceId.HasValue)
+        {
+            query = query.Where(x => x.SourceId == filter.SourceId);
+        }
+        if (filter.TelesalesId.HasValue)
+        {
+            query = query.Where(x => x.UserId == filter.TelesalesId);
+        }
+        if (!string.IsNullOrWhiteSpace(filter.PhoneNumber))
+        {
+            query = query.Where(x => !string.IsNullOrEmpty(x.PhoneNumber) && x.PhoneNumber.Contains(filter.PhoneNumber));
+        }
+        if (!string.IsNullOrWhiteSpace(filter.Name))
+        {
+            var keyword = filter.Name.ToLower();
+            query = query.Where(x => x.Name.ToLower().Contains(keyword));
+        }
+        return query;
+    }
+
+    private TResult ValidateTransferPermission()
+    {
+        if (!_hcaService.IsUserInRole(RoleName.Admin))
+        {
+            return TResult.Failed("Bạn không có quyền thực hiện chức năng chuyển nguồn!");
+        }
+        return TResult.Success;
+    }
+
+    private async Task<TResult> ValidateTransferDestinationAsync(ContactTransferDestinationArgs destination)
+    {
+        if (!destination.SourceId.HasValue) return TResult.Failed("Vui lòng chọn nguồn đích!");
+
+        var source = await _context.Sources.AsNoTracking().FirstOrDefaultAsync(x => x.Id == destination.SourceId.Value);
+        if (source is null) return TResult.Failed("Nguồn đích không tồn tại!");
+
+        if (destination.GroupId.HasValue && source.TeamId != destination.GroupId.Value)
+        {
+            return TResult.Failed("Nguồn đích không thuộc group đã chọn!");
+        }
+
+        if (destination.TeamId.HasValue)
+        {
+            var teamExists = await _context.Teams.AnyAsync(x => x.Id == destination.TeamId.Value);
+            if (!teamExists) return TResult.Failed("Team đích không tồn tại!");
+        }
+
+        if (destination.TelesalesId.HasValue)
+        {
+            var telesales = await _userManager.FindByIdAsync(destination.TelesalesId.Value.ToString());
+            if (telesales is null) return TResult.Failed("Telesales đích không tồn tại!");
+            if (!await _userManager.IsInRoleAsync(telesales, RoleName.Telesale)) return TResult.Failed("Người dùng đích không phải telesales!");
+            if (destination.TeamId.HasValue && telesales.TeamId != destination.TeamId)
+            {
+                return TResult.Failed("Telesales đích không thuộc team đã chọn!");
+            }
+        }
+
+        return TResult.Success;
+    }
+
+    private async Task<TResult> ApplyTransferAsync(List<Contact> contacts, ContactTransferDestinationArgs destination, string transferType)
+    {
+        if (!contacts.Any()) return TResult.Failed("Không có contact nào phù hợp để chuyển!");
+
+        foreach (var contact in contacts)
+        {
+            contact.SourceId = destination.SourceId;
+            if (destination.TelesalesId.HasValue)
+            {
+                contact.UserId = destination.TelesalesId;
+            }
+            else if (destination.TeamId.HasValue)
+            {
+                contact.UserId = null;
+            }
+            contact.ModifiedDate = DateTime.Now;
+            contact.ModifiedBy = _hcaService.GetUserId();
+        }
+
+        _context.Contacts.UpdateRange(contacts);
+        await _context.SaveChangesAsync();
+
+        await _logService.AddAsync($"Chuyển nguồn {contacts.Count} contact theo hình thức {transferType}. Destination SourceId={destination.SourceId}, TeamId={destination.TeamId}, TelesalesId={destination.TelesalesId}");
+        return TResult.Ok(new
+        {
+            transferredCount = contacts.Count
+        });
+    }
+
+    private class ContactTransferListItem
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = default!;
+        public string? PhoneNumber { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public int? SourceId { get; set; }
+        public string? SourceName { get; set; }
+        public int? GroupId { get; set; }
+        public string? GroupName { get; set; }
+        public Guid? TelesalesId { get; set; }
+        public string? TelesalesName { get; set; }
+    }
 }

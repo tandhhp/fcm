@@ -124,6 +124,7 @@ export default (initialState: { currentUser?: API.User }) => {
   const can_read_page_finance_report = accountant || chiefAccountant || canAdmin;
   const can_read_page_finance_sales_admin = salesAdmin || canAdmin;
   const can_read_page_contact_source = adminData || dot || canAdmin;
+  const can_read_page_contact_transfer_source = adminData || dot || canAdmin;
   const can_read_page_event_voucher = event || em || canAdmin;
   const can_read_page_event_contract = event || em || canAdmin;
   const can_read_page_event_customer = dos || dot || event || canAdmin || em;
@@ -184,6 +185,7 @@ export default (initialState: { currentUser?: API.User }) => {
     can_read_page_finance_report,
     can_read_page_finance_sales_admin,
     can_read_page_contact_source,
+    can_read_page_contact_transfer_source,
     can_read_page_event,
     can_read_page_event_voucher,
     can_read_page_event_contract,

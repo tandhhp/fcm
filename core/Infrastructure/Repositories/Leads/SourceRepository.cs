@@ -74,6 +74,8 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
                     join t in _context.Teams on s.TeamId equals t.Id
                     join u in _context.Users on c.UserId equals u.Id into cu
                     from u in cu.DefaultIfEmpty()
+                    join cs in _context.CallStatuses on c.CallStatusId equals cs.Id into ccs
+                    from cs in ccs.DefaultIfEmpty()
                     where c.Status != ContactStatus.Blacklisted
                     select new
                     {
@@ -91,7 +93,8 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
                         c.LastCallTime,
                         TeleName = u.Name,
                         c.ExtraStatus,
-                        c.CallStatusId
+                        c.CallStatusId,
+                        CallStatusType = cs.Type
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.SourceIds))
         {
@@ -125,6 +128,10 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
         if (filterOptions.CallStatusId.HasValue)
         {
             query = query.Where(x => x.CallStatusId == filterOptions.CallStatusId);
+        }
+        if (filterOptions.CallStatusType.HasValue)
+        {
+            query = query.Where(x => x.CallStatusType == filterOptions.CallStatusType);
         }
         query = query.OrderByDescending(x => x.CreatedDate);
         return await ListResult<object>.Success(query, filterOptions);
@@ -210,6 +217,10 @@ public class SourceRepository(ApplicationDbContext context) : EfRepository<Sourc
         if (args.CallStatusId.HasValue)
         {
             queryContact = queryContact.Where(x => x.CallStatusId == args.CallStatusId);
+        }
+        if (args.CallStatusType.HasValue)
+        {
+            queryContact = queryContact.Where(x => x.CallStatusId != null && _context.CallStatuses.Any(s => s.Id == x.CallStatusId && s.Type == args.CallStatusType));
         }
         if (args.SourceIds != null && args.SourceIds.Count > 0)
         {

@@ -1189,6 +1189,18 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
     [HttpPost("assign-source")]
     public async Task<IActionResult> AssignSourceAsync([FromBody] ContactAssignSourceArgs args) => Ok(await _contactService.AssignSourceAsync(args));
 
+    [HttpGet("transfer-source/list")]
+    public async Task<IActionResult> TransferSourceListAsync([FromQuery] ContactTransferFilterOptions filterOptions) => Ok(await _contactService.TransferSourceListAsync(filterOptions));
+
+    [HttpPost("transfer-source/by-search")]
+    public async Task<IActionResult> TransferSourceBySearchAsync([FromBody] ContactTransferBySearchArgs args) => Ok(await _contactService.TransferSourceBySearchAsync(args));
+
+    [HttpPost("transfer-source/by-case")]
+    public async Task<IActionResult> TransferSourceByCaseAsync([FromBody] ContactTransferByCaseArgs args) => Ok(await _contactService.TransferSourceByCaseAsync(args));
+
+    [HttpPost("transfer-source/by-file")]
+    public async Task<IActionResult> TransferSourceByFileAsync([FromForm] ContactTransferByFileArgs args) => Ok(await _contactService.TransferSourceByFileAsync(args));
+
     [HttpPost("confirm1/{id}")]
     public async Task<IActionResult> Confirm1Async([FromRoute] Guid id) => Ok(await _contactService.Confirm1Async(id));
 

@@ -26,6 +26,10 @@ public interface IContactService
     Task<ListResult<object>> NeedConfirmsAsync(ContactFilterOptions filterOptions);
     Task<TResult<object>> GetTmrReportAsync();
     Task<ListResult<object>> DialedCallsAsync(ContactFilterOptions filterOptions);
+    Task<ListResult<dynamic>> TransferSourceListAsync(ContactTransferFilterOptions filterOptions);
+    Task<TResult> TransferSourceBySearchAsync(ContactTransferBySearchArgs args);
+    Task<TResult> TransferSourceByCaseAsync(ContactTransferByCaseArgs args);
+    Task<TResult> TransferSourceByFileAsync(ContactTransferByFileArgs args);
     Task<TResult> GetReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions);
     Task<TResult<byte[]?>> ExportReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions);
     Task<TResult> GetTmrDataReportAsync(TmrDataReportFilterOptions filterOptions);

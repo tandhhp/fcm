@@ -14,7 +14,7 @@ namespace Waffle.Controllers.Teles;
 public class CallController(ICallStatusService _callStatusService, ICallHistoryService _callHistoryService, ITel4vnService _tel4VnService) : BaseController
 {
     [HttpGet("status/options")]
-    public async Task<IActionResult> StatusOptionsAsync([FromQuery] SelectOptions options) => Ok(await _callStatusService.OptionsAsync(options));
+    public async Task<IActionResult> StatusOptionsAsync([FromQuery] CallStatusSelectOptions options) => Ok(await _callStatusService.OptionsAsync(options));
 
     [HttpPost("complete")]
     public async Task<IActionResult> CompleteAsync([FromBody] CallCompleteArgs args) => Ok(await _callHistoryService.CompleteAsync(args));

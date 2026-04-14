@@ -229,6 +229,36 @@ export async function apiContactAssignSource(data: any) {
   });
 }
 
+export async function apiContactTransferSourceList(params: any) {
+  return request('contact/transfer-source/list', {
+    params
+  });
+}
+
+export async function apiContactTransferBySearch(data: any) {
+  return request('contact/transfer-source/by-search', {
+    method: 'POST',
+    data
+  });
+}
+
+export async function apiContactTransferByCase(data: any) {
+  return request('contact/transfer-source/by-case', {
+    method: 'POST',
+    data
+  });
+}
+
+export async function apiContactTransferByFile(data: FormData) {
+  return request('contact/transfer-source/by-file', {
+    method: 'POST',
+    data,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+}
+
 export async function apiContactNeedConfirm2(params: any) {
   return request(`contact/need-confirms`, {
     params: {

@@ -34,12 +34,24 @@ public class CallStatusRepository(ApplicationDbContext context) : EfRepository<C
         return await ListResult<object>.Success(query, filterOptions);
     }
 
-    public async Task<object> OptionsAsync(SelectOptions options) => await _context.CallStatuses
-        .OrderBy(x => x.SortOrder)
-        .Select(x => new
+    public async Task<object> OptionsAsync(CallStatusSelectOptions options)
     {
-        Label = x.Name,
-        Value = x.Id,
-        x.Code
-    }).ToListAsync();
+        var query = from x in _context.CallStatuses
+                    select x;
+        if (options.Type.HasValue)
+        {
+            query = query.Where(x => x.Type == options.Type);
+        }
+        if (!string.IsNullOrWhiteSpace(options.KeyWords))
+        {
+            query = query.Where(x => x.Name.ToLower().Contains(options.KeyWords.ToLower()));
+        }
+        return await query.OrderBy(x => x.SortOrder).Select(x => new
+        {
+            Label = x.Name,
+            Value = x.Id,
+            x.Code,
+            x.Type
+        }).ToListAsync();
+    }
 }

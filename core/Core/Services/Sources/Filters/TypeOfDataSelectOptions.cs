@@ -41,6 +41,7 @@ public class SourceContactFilterOptions : FilterOptions
     public int? TeamId { get; set; }
     public string? SourceIds { get; set; }
     public int? CallStatusId { get; set; }
+    public CallStatusType? CallStatusType { get; set; }
     public string? ExtraStatus { get; set; }
     public string? PhoneNumber { get; set; }
 }
@@ -51,6 +52,7 @@ public class SourceMultipleAssignArgs
     public List<int>? SourceIds { get; set; }
     public TypeOfDataSelectType? TypeOfData { get; set; }
     public int? CallStatusId { get; set; }
+    public CallStatusType? CallStatusType { get; set; }
     public string? ExtraStatus { get; set; }
     public int ContactCount { get; set; }
     // Gán cho ai

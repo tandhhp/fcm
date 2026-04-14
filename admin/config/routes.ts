@@ -351,6 +351,12 @@ export default [
         component: './contact/source/assign'
       },
       {
+        name: 'Chuyển nguồn',
+        path: '/contact/transfer-source',
+        component: './contact/transfer-source',
+        access: 'can_read_page_contact_transfer_source'
+      },
+      {
         name: 'Tele Report',
         path: '/contact/report-tele',
         component: './contact/report/tele'

@@ -34,7 +34,7 @@ public class CallStatusService(ICallStatusRepository _callStatusRepository, ILog
 
     public Task<ListResult<object>> ListAsync(CallStatusFilterOptions filterOptions) => _callStatusRepository.ListAsync(filterOptions);
 
-    public Task<object> OptionsAsync(SelectOptions options) => _callStatusRepository.OptionsAsync(options);
+    public Task<object> OptionsAsync(CallStatusSelectOptions options) => _callStatusRepository.OptionsAsync(options);
 
     public async Task<TResult> UpdateAsync(CallStatusUpdateArgs args)
     {

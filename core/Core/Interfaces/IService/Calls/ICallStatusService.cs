@@ -9,6 +9,6 @@ public interface ICallStatusService
     Task<TResult> CreateAsync(CallStatusCreateArgs args);
     Task<TResult> DeleteAsync(int id);
     Task<ListResult<object>> ListAsync(CallStatusFilterOptions filterOptions);
-    Task<object> OptionsAsync(SelectOptions options);
+    Task<object> OptionsAsync(CallStatusSelectOptions options);
     Task<TResult> UpdateAsync(CallStatusUpdateArgs args);
 }

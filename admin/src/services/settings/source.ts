@@ -92,6 +92,7 @@ export async function apiSourceContactAssign(data: {
     sourceIds: number[];
     typeOfData: number;
     callStatusId?: number;
+    callStatusType?: number;
     extraStatus?: string;
     contactCount: number;
     teleIds: string[];

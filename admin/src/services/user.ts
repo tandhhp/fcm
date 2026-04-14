@@ -177,6 +177,10 @@ export const apiSendEmails = (data: any) => request(`user/send-emails`, {
   data
 })
 
+export const apiTelesalesOptions = (params?: any) => request(`user/telesales/options`, {
+  params
+});
+
 export const apiCardHolderOptions = () => request(`user/card-holder/options`);
 
 export const apiListTopSales = (params: any) => request(`user/list-top-sales`, { params });

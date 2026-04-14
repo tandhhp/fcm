@@ -9,5 +9,5 @@ public interface ICallStatusRepository : IAsyncRepository<CallStatus>
     Task<bool> IsExistAsync(string code);
     Task<bool> IsUsedAsync(int id);
     Task<ListResult<object>> ListAsync(CallStatusFilterOptions filterOptions);
-    Task<object> OptionsAsync(SelectOptions options);
+    Task<object> OptionsAsync(CallStatusSelectOptions options);
 }

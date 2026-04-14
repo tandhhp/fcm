@@ -1,6 +1,6 @@
-import { apiCallOptions } from "@/services/call";
 import { apiBranchOptions } from "@/services/settings/branch";
 import { apiSourceByTeamAndTypeOfData, apiSourceContactAssign, apiSourceContactList, apiSourceOptions, apiSourceTeamOptions } from "@/services/settings/source";
+import { apiCallOptions } from "@/services/call";
 import { apiCallCenterOptions } from "@/services/users/call-center";
 import { apiTeamOptions, apiTeamUsers } from "@/services/users/team";
 import { UserOutlined } from "@ant-design/icons";
@@ -22,6 +22,7 @@ const Index: React.FC = () => {
     const [teamIds, setTeamIds] = useState<number[]>([]);
     const [usersInTeam, setUsersInTeam] = useState<any[]>([]);
     const [sourceIds, setSourceIds] = useState<number[]>([]);
+    const [callStatusType, setCallStatusType] = useState<number>();
     const [callStatusId, setCallStatusId] = useState<number>();
     const [extraStatus, setExtraStatus] = useState<string>();
     const [selectedTelesalesIds, setSelectedTelesalesIds] = useState<string[]>([]);
@@ -81,6 +82,7 @@ const Index: React.FC = () => {
         await apiSourceContactAssign({
             sourceIds,
             typeOfData,
+            callStatusType,
             callStatusId,
             extraStatus,
             contactCount,
@@ -146,12 +148,63 @@ const Index: React.FC = () => {
                                 />
                             </Col>
                             <Col md={6} xs={24}>
-                                <ProFormSelect name="callStatusId"
+                                <ProFormSelect name="callStatusType"
                                     onChange={(value: number) => {
-                                        setCallStatusId(value);
+                                        setCallStatusType(value);
+                                        setCallStatusId(undefined);
+                                        formRef.current?.setFieldValue('callStatusId', undefined);
                                         actionContactRef.current?.reload();
                                     }}
-                                    label="Trạng thái cuộc gọi" request={apiCallOptions} showSearch />
+                                    label="Loại trạng thái cuộc gọi"
+                                    options={[
+                                        {
+                                            label: 'Không nghe máy',
+                                            value: 1
+                                        },
+                                        {
+                                            label: 'Thuê bao',
+                                            value: 2
+                                        },
+                                        {
+                                            label: 'Sai số',
+                                            value: 3
+                                        },
+                                        {
+                                            label: 'Ngoại tỉnh',
+                                            value: 4
+                                        },
+                                        {
+                                            label: 'Gọi lại sau',
+                                            value: 5
+                                        },
+                                        {
+                                            label: 'Khách đạt yêu cầu',
+                                            value: 6
+                                        },
+                                        {
+                                            label: 'Khách không đạt yêu cầu',
+                                            value: 7
+                                        }
+                                    ]}
+                                    showSearch />
+                            </Col>
+                            <Col md={6} xs={24}>
+                                <ProFormSelect
+                                    name="callStatusId"
+                                    label="Trạng thái cuộc gọi"
+                                    params={{ type: callStatusType }}
+                                    dependencies={['callStatusType']}
+                                    request={(params) => apiCallOptions(params)}
+                                    showSearch
+                                    disabled={!callStatusType}
+                                    fieldProps={{
+                                        allowClear: true,
+                                        onChange: (value: number) => {
+                                            setCallStatusId(value);
+                                            actionContactRef.current?.reload();
+                                        }
+                                    }}
+                                />
                             </Col>
                             <Col xs={24} md={6}>
                                 <ProFormSelect name={`extraStatus`} label="Extra Status" options={[
@@ -197,6 +250,7 @@ const Index: React.FC = () => {
                             typeOfData: typeOfData,
                             teamId: teamId,
                             sourceIds: sourceIds.join(','),
+                            callStatusType: callStatusType,
                             callStatusId: callStatusId,
                             extraStatus: extraStatus,
                             phoneNumber: phoneNumber
