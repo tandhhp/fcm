@@ -14,6 +14,7 @@ import BackToCheckinModal from "./components/back-to-checkin";
 import { apiEventDetail, apiEventOptions } from "@/services/event";
 import LeadCheckin from "./components/checkin";
 import LeadForm from "@/components/form/lead-form";
+import LeadStatusRender from "@/components/lead/status-render";
 
 const EventUserPage: React.FC = () => {
 
@@ -52,7 +53,9 @@ const EventUserPage: React.FC = () => {
                                 onChange: (date: any) => {
                                     setEventDate(date.format('YYYY-MM-DD'));
                                     actionRef.current?.reload();
-                                }
+                                },
+                                autoFocus: false,
+                                allowClear: false
                             }}
                             formItemProps={{
                                 className: 'mb-0'
@@ -65,7 +68,8 @@ const EventUserPage: React.FC = () => {
                                 onChange: (value: string) => {
                                     history.push(`/event/time-slot/center/${value}`);
                                     window.location.reload();
-                                }
+                                },
+                                allowClear: false
                             }}
                             formItemProps={{
                                 className: 'mb-0'
@@ -142,8 +146,9 @@ const EventUserPage: React.FC = () => {
                                 0: <Tag color="warning" className="w-full text-center">Check-In</Tag>,
                                 1: <Tag color="success" className="w-full text-center">Đã duyệt</Tag>
                             },
-                            width: 100,
-                            minWidth: 80
+                            width: 120,
+                            minWidth: 120,
+                            render: (_, record) => <LeadStatusRender status={record.status} />
                         },
                         {
                             title: 'Nguồn',

@@ -12,7 +12,7 @@ export enum LeadStatus {
   Pending,
   Approved,
   Checkin,
-  LeadAccept,
+  CloseDeal,
   LeadReject,
   ReInvite,
 }

@@ -1,3 +1,4 @@
+import LeadStatusRender from "@/components/lead/status-render";
 import { apiCalendarEvents } from "@/services/calendar";
 import { LeadStatus } from "@/utils/constants";
 import { ActionType, ProTable } from "@ant-design/pro-components";
@@ -61,12 +62,7 @@ const Event: React.FC<Props> = (props) => {
                             title: 'Trạng thái',
                             dataIndex: 'status',
                             search: false,
-                            render: (_, record) => {
-                                if (record.status === LeadStatus.Checkin) {
-                                    return <Tag color="success" className="text-center w-full">Check-In</Tag>
-                                }
-                                return <Tag color="warning" className="text-center w-full">Chờ duyệt</Tag>
-                            },
+                            render: (_, record) => <LeadStatusRender status={record.status} />,
                             width: 100
                         }
                     ]}

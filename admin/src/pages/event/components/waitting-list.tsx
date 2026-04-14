@@ -3,11 +3,12 @@ import { apiLeadWaitingList } from "@/services/users/lead";
 import { CheckOutlined, DeleteOutlined, EditOutlined, ManOutlined, MoreOutlined, PlusOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, ProTable } from "@ant-design/pro-components";
 import { useRef, useState } from "react";
-import { Button, Dropdown, message, Popconfirm } from "antd";
+import { Button, Dropdown, message, Popconfirm, Tag } from "antd";
 import { useAccess } from "@umijs/max";
 import { apiDeleteLead, apiUpdateLeadStatus } from "@/services/contact";
 import { LeadStatus } from "@/utils/constants";
 import LeadForm from "@/components/form/lead-form";
+import LeadStatusRender from "@/components/lead/status-render";
 
 const WaitingList: React.FC = () => {
 
@@ -108,7 +109,8 @@ const WaitingList: React.FC = () => {
                             1: { text: 'Đã duyệt', status: 'Success' },
                             5: { text: 'Mời lại', status: 'Warning' }
                         },
-                        search: false
+                        search: false,
+                        render: (_, record) => <LeadStatusRender status={record.status} />
                     },
                     {
                         title: 'Ngày tạo',
@@ -125,7 +127,7 @@ const WaitingList: React.FC = () => {
                         align: 'center',
                         render: (dom, entity) => [
                             <Popconfirm key={"approve"} title="Duyệt khách hàng này?" onConfirm={() => onApprove(entity.id)}>
-                                <Button type="primary" size="small" icon={<CheckOutlined />} hidden={!access.canSm && !access.event} disabled={entity.status === LeadStatus.Approved} />
+                                <Button type="primary" size="small" icon={<CheckOutlined />} hidden={!access.canSm && !access.event && !access.em} disabled={entity.status === LeadStatus.Approved} />
                             </Popconfirm>,
                             <Dropdown key={"more"} menu={{
                                 items: [

@@ -144,13 +144,13 @@ const CardHolderQueue: React.FC = () => {
                 <Popconfirm key="approe" title="Bạn có chắc chắn muốn phê duyệt?" onConfirm={async () => {
                     await apiUpdateLeadStatus({
                         id: entity.id,
-                        status: LeadStatus.DosApproved
+                        status: LeadStatus.CloseDeal
                     });
                     message.success('Phê duyệt thành công!');
                     actionRef.current?.reload();
                 }}>
                     <Tooltip title="GĐ Phê duyệt">
-                        <Button type="primary" icon={<CheckOutlined />} size="small" hidden={entity.status !== LeadStatus.LeadAccept || !access.dos}></Button>
+                        <Button type="primary" icon={<CheckOutlined />} size="small" hidden={entity.status !== LeadStatus.CloseDeal || !access.dos}></Button>
                     </Tooltip>
                 </Popconfirm>,
                 <Tooltip key="card-holder" title="Tạo chủ thẻ">
@@ -159,18 +159,18 @@ const CardHolderQueue: React.FC = () => {
                             setLead(entity);
                             setOpenCardHolder(true);
                         }}
-                        icon={<UserAddOutlined />} hidden={entity.status !== LeadStatus.AccountantApproved || !access.canCX} />
+                        icon={<UserAddOutlined />} hidden={entity.status !== LeadStatus.CloseDeal || !access.canCX} />
                 </Tooltip>,
                 <Popconfirm key="account" title="Bạn có chắc chắn muốn phê duyệt?" onConfirm={async () => {
                     await apiUpdateLeadStatus({
                         id: entity.id,
-                        status: LeadStatus.AccountantApproved
+                        status: LeadStatus.CloseDeal
                     });
                     message.success('Phê duyệt thành công!');
                     actionRef.current?.reload();
                 }}>
                     <Tooltip title="KT Phê duyệt">
-                        <Button type="primary" icon={<CheckOutlined />} size="small" hidden={entity.status !== LeadStatus.DosApproved || !access.canAccountant}></Button>
+                        <Button type="primary" icon={<CheckOutlined />} size="small" hidden={entity.status !== LeadStatus.CloseDeal || !access.canAccountant}></Button>
                     </Tooltip>
                 </Popconfirm>,
                 <Popconfirm key="delete" title="Bạn có chắc chắn muốn phê duyệt?" onConfirm={async () => {

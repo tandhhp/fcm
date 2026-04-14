@@ -506,7 +506,8 @@ export default [
       {
         name: 'Danh sách tham dự',
         path: '/event/participate',
-        component: './users/lead'
+        component: './users/lead',
+        access: 'can_read_page_event_checkin'
       },
       {
         name: 'Khung giờ trung tâm',

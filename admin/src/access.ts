@@ -127,6 +127,7 @@ export default (initialState: { currentUser?: API.User }) => {
   const can_read_page_event_voucher = event || em || canAdmin;
   const can_read_page_event_contract = event || em || canAdmin;
   const can_read_page_event_customer = dos || dot || event || canAdmin || em;
+  const can_read_page_event_checkin = event || em || canAdmin;
   const can_read_page_event_invoice = sm || dot || dos || event || canAdmin || em;
   const can_read_page_event = event || sales || sm || dos || dot || telesaleManager || telesale || cx || canAdmin || em;
   const can_read_page_event_showup_report = event || canAdmin || dot || dos || sm || cx || sales || em;
@@ -189,6 +190,7 @@ export default (initialState: { currentUser?: API.User }) => {
     can_read_page_event_customer,
     can_read_page_event_invoice,
     can_read_page_event_showup_report,
+    can_read_page_event_checkin,
     can_confirm2,
     can_read_page_user,
     can_read_page_department,

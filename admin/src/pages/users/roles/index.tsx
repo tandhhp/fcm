@@ -2,7 +2,7 @@ import { apiRoleInit, listRole } from "@/services/role"
 import { EditOutlined, ExportOutlined, MoreOutlined, ReloadOutlined, UserAddOutlined, UserDeleteOutlined } from "@ant-design/icons"
 import { ActionType, PageContainer, ProColumns, ProTable } from "@ant-design/pro-components"
 import { history, Link, useAccess } from "@umijs/max"
-import { Button, Dropdown, Space } from "antd"
+import { Button, Dropdown, Space, Tag } from "antd"
 import UserImport from "./components/import"
 import { useRef, useState } from "react"
 import RoleForm from "./components/form"
@@ -26,7 +26,8 @@ const RolePage: React.FC = () => {
             title: 'ID',
             dataIndex: 'name',
             width: 150,
-            search: false
+            search: false,
+            render: (dom) => <Tag color="success" className="uppercase w-full text-center font-semibold">{dom}</Tag>
         },
         {
             title: 'Quyền',

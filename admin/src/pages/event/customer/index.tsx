@@ -36,7 +36,7 @@ const Index: React.FC = () => {
                         width: 70,
                         render: (_, entity) => (
                             <Switch size="small" checked={!entity.duplicated} onClick={async () => {
-                                await apiLeadAllowDuplicate(entity.key);
+                                await apiLeadAllowDuplicate(entity.id);
                                 message.success('Cập nhật thành công');
                                 actionRef.current?.reload();
                             }} />
@@ -89,7 +89,7 @@ const Index: React.FC = () => {
                         render: (_, entity) => (
                             <div>
                                 {entity.subLeads?.map((sub: any) => (
-                                    <div key={sub.key} className="mb-1">
+                                    <div key={sub.id} className="mb-1">
                                         {sub.gender === false && (<ManOutlined className='text-blue-500' />)}{sub.gender === true && (<WomanOutlined className='text-red-500' />)} {sub.name} - {sub.phoneNumber} - {sub.identityNumber}
                                     </div>
                                 ))}

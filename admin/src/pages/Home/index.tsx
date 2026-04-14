@@ -5,6 +5,8 @@ import TopSales from './components/top-month';
 import { useAccess } from '@umijs/max';
 import LineBranch from './components/line-branch';
 import TeleReport from './components/tele';
+import DotDashboard from './components/dot-dashboard';
+import EventDashboard from './components/event-dashboard';
 import { apiBranchOptions } from '@/services/settings/branch';
 import { useState } from 'react';
 import dayjs from 'dayjs';
@@ -51,6 +53,12 @@ const HomePage: React.FC = () => {
           </Col>
         </Row>
       </ProCard>
+      {
+        access.dot && <DotDashboard />
+      }
+      {
+        (access.event || access.em) && <EventDashboard />
+      }
       {
         access.telesaleManager && <TeleReport />
       }

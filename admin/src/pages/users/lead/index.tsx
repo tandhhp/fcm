@@ -114,7 +114,7 @@ const LeadPage: React.FC = () => {
                                             setLead(entity);
                                             setOpenReject(true);
                                         },
-                                        disabled: true
+                                        disabled: !access.event && !access.em
                                     },
                                     {
                                         key: 'reinvite',

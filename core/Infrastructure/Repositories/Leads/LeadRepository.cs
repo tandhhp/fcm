@@ -367,6 +367,7 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
     public async Task<ListResult<object>> NoDupsAsync(LeadCheckinListFilterOptions filterOptions)
     {
         var query = from l in _context.Leads
+                    where l.Status != LeadStatus.Pending && l.Status != LeadStatus.Approved
                     orderby l.CreatedDate descending
                     select new
                     {
@@ -376,7 +377,8 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
                         l.IdentityNumber,
                         l.DateOfBirth,
                         l.Note,
-                        l.Duplicated
+                        l.Duplicated,
+                        Count = _context.Leads.Count(x => x.PhoneNumber == l.PhoneNumber || x.IdentityNumber == l.IdentityNumber)
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
         {
@@ -400,18 +402,7 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
         {
             query = query.Where(x => x.Name.ToLower().Contains(filterOptions.Name.ToLower()));
         }
-        var groups = await query.GroupBy(x => x.IdentityNumber).Skip((filterOptions.Current - 1) * filterOptions.PageSize).Take(filterOptions.PageSize)
-            .Select(x => new
-            {
-                IdentityNumber = x.Key,
-                x.First().Id,
-                x.First().Name,
-                x.First().PhoneNumber,
-                x.First().DateOfBirth,
-                x.First().Note,
-                Count = x.Count(g => !string.IsNullOrEmpty(x.Key)),
-                x.First().Duplicated
-            }).ToListAsync();
+        var groups = await query.Skip((filterOptions.Current - 1) * filterOptions.PageSize).Take(filterOptions.PageSize).ToListAsync();
         var leadIds = groups.Select(x => x.Id).ToList();
         var subLeads = await _context.SubLeads.Where(x => leadIds.Contains(x.LeadId)).ToListAsync();
         var data = new List<LeadCustomer>();
