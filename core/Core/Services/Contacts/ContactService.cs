@@ -603,7 +603,7 @@ public class ContactService(IContactRepository _contactRepository, ApplicationDb
 
     private TResult ValidateTransferPermission()
     {
-        if (!_hcaService.IsUserInRole(RoleName.Admin))
+        if (!_hcaService.IsUserInAnyRole(RoleName.Admin, RoleName.AdminData, RoleName.Dot))
         {
             return TResult.Failed("Bạn không có quyền thực hiện chức năng chuyển nguồn!");
         }
