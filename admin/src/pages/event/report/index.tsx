@@ -5,9 +5,9 @@ import { apiDosOptions } from "@/services/user";
 import { ExportOutlined, ReloadOutlined } from "@ant-design/icons";
 import { PageContainer, ProCard, ProForm, ProFormDatePicker, ProFormSelect } from "@ant-design/pro-components"
 import { useAccess } from "@umijs/max";
-import { Button, Spin, message } from "antd";
+import { Button, Empty, Spin, message } from "antd";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 
 type SUReportResult = {
@@ -18,6 +18,8 @@ type SUReportResult = {
 type SUSalesReport = {
     salesName: string;
     attendances: SUAttendance[];
+    totalKeyInCount: number;
+    totalRate: number;
 }
 
 type SUAttendance = {
@@ -36,6 +38,20 @@ const Index: React.FC = () => {
     const [atendanceOptions, setAttendanceOptions] = useState<any[]>([]);
     const [dotId, setDotId] = useState<string>('');
     const [dosId, setDosId] = useState<string>('');
+
+    const summary = useMemo(() => {
+        const totalSalesManager = data.length;
+        const salesReports = data.flatMap((item) => item.salesReports ?? []);
+        const totalSales = salesReports.length;
+        const totalKeyIn = salesReports.reduce((sum, report) => sum + (report.totalKeyInCount || 0), 0);
+        const totalRate = salesReports.reduce((sum, report) => sum + (report.totalRate || 0), 0);
+        return {
+            totalSalesManager,
+            totalSales,
+            totalKeyIn,
+            totalRate,
+        };
+    }, [data]);
 
     useEffect(() => {
         const fetchAttendanceOptions = async () => {
@@ -122,48 +138,81 @@ const Index: React.FC = () => {
                         />
                     </ProForm>
                 </div>
+                <div className="mb-4 rounded-xl border border-slate-200 bg-gradient-to-r from-cyan-50 via-white to-emerald-50 p-4">
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+                        <div className="rounded-lg bg-white p-3 shadow-sm ring-1 ring-slate-100">
+                            <div className="text-xs uppercase tracking-wide text-slate-500">Sales Manager</div>
+                            <div className="text-2xl font-semibold text-slate-800">{summary.totalSalesManager}</div>
+                        </div>
+                        <div className="rounded-lg bg-white p-3 shadow-sm ring-1 ring-slate-100">
+                            <div className="text-xs uppercase tracking-wide text-slate-500">Sales</div>
+                            <div className="text-2xl font-semibold text-slate-800">{summary.totalSales}</div>
+                        </div>
+                        <div className="rounded-lg bg-white p-3 shadow-sm ring-1 ring-slate-100">
+                            <div className="text-xs uppercase tracking-wide text-slate-500">Tong keyin</div>
+                            <div className="text-2xl font-semibold text-slate-800">{summary.totalKeyIn}</div>
+                        </div>
+                        <div className="rounded-lg bg-white p-3 shadow-sm ring-1 ring-slate-100">
+                            <div className="text-xs uppercase tracking-wide text-slate-500">Tong rate</div>
+                            <div className="text-2xl font-semibold text-slate-800">{summary.totalRate.toFixed(2)}</div>
+                        </div>
+                    </div>
+                </div>
                 <Spin spinning={loading}>
-                    <div className="overflow-x-auto">
-                        <div className="p-1 border-b font-semibold flex bg-slate-100 min-w-[1366px]">
-                            <div className="w-32">Sales Manager</div>
-                            <div className="w-40">Sales</div>
+                    {data.length === 0 ? (
+                        <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 py-10">
+                            <Empty description="Khong co du lieu trong khoang thoi gian da chon" />
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                            <div className="sticky top-0 z-10 flex min-w-[1366px] border-b bg-slate-100/95 px-3 py-2 text-sm font-semibold backdrop-blur">
+                                <div className="w-36">Sales Manager</div>
+                                <div className="w-48">Sales</div>
+                                {
+                                    atendanceOptions.map((option: any) => (
+                                        <div key={option.value} className="flex-1 text-right">
+                                            {option.label}
+                                        </div>
+                                    ))
+                                }
+                                <div className="w-28 text-right">Tong keyin</div>
+                                <div className="w-28 text-right">Rate</div>
+                            </div>
                             {
-                                atendanceOptions.map((option: any) => (
-                                    <div key={option.value} className="flex-1">
-                                        {option.label}
+                                data.map((item, index) => (
+                                    <div key={index} className="min-w-[1366px] border-b last:border-b-0">
+                                        <div className="flex">
+                                            <div className="w-36 bg-slate-50 px-3 py-2 font-medium text-slate-700">
+                                                {item.salesManagerName}
+                                            </div>
+                                            <div className="flex-1">
+                                                {
+                                                    item.salesReports.map((report: SUSalesReport, idx: number) => (
+                                                        <div key={idx} className="flex border-b border-dashed px-3 py-2 text-sm last:border-b-0 odd:bg-white even:bg-slate-50/50 hover:bg-cyan-50/60">
+                                                            <div className="w-48 font-medium text-slate-800">{report.salesName}</div>
+                                                            <div className="flex-1 flex">
+                                                                {report.attendances.map((attendance: SUAttendance, idx: number) => (
+                                                                    <div key={idx} className="flex-1 text-right tabular-nums text-slate-700">
+                                                                        {attendance.count}
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                            <div className="w-28 text-right font-semibold tabular-nums text-cyan-700">
+                                                                {report.totalKeyInCount}
+                                                            </div>
+                                                            <div className="w-28 text-right font-medium tabular-nums text-slate-800">
+                                                                {report.totalRate.toFixed(2)}
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                }
+                                            </div>
+                                        </div>
                                     </div>
                                 ))
                             }
-                            <div className="flex-1">
-                                Tổng
-                            </div>
                         </div>
-                        {
-                            data.map((item, index) => (
-                                <div key={index} className="border-b hover:bg-slate-50 min-w-[1366px]">
-                                    <div className="flex">
-                                        <div className="p-1 w-32 flex items-center">{item.salesManagerName}</div>
-                                        <div className="flex-1">
-                                            {
-                                                item.salesReports.map((report: SUSalesReport, idx: number) => (
-                                                    <div key={idx} className="border-b last:border-0 flex border-dashed">
-                                                        <div className="w-40 p-1">{report.salesName}</div>
-                                                        <div className="flex-1 flex">
-                                                            {report.attendances.map((attendance: SUAttendance, idx: number) => (
-                                                                <div key={idx} className="flex-1 p-1">
-                                                                    {attendance.count}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            ))
-                        }
-                    </div>
+                    )}
                 </Spin>
             </ProCard>
         </PageContainer>

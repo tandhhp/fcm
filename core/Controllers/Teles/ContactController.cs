@@ -552,7 +552,10 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
             {
                 query = query.Where(x => x.DosId == user.Id || x.CreatedBy == user.Id);
             }
-
+            if (filterOptions.BranchId.HasValue)
+            {
+                query = query.Where(x => x.BranchId == filterOptions.BranchId);
+            }
             query = query.OrderByDescending(x => x.EventDate);
             return Ok(await ListResult<object>.Success(query, filterOptions));
         }
@@ -1200,6 +1203,12 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
 
     [HttpPost("transfer-source/by-file")]
     public async Task<IActionResult> TransferSourceByFileAsync([FromForm] ContactTransferByFileArgs args) => Ok(await _contactService.TransferSourceByFileAsync(args));
+
+    [HttpGet("revoke-source/list")]
+    public async Task<IActionResult> RevokeSourceListAsync([FromQuery] ContactRevokeSourceFilterOptions filterOptions) => Ok(await _contactService.RevokeSourceListAsync(filterOptions));
+
+    [HttpPost("revoke-source/by-case")]
+    public async Task<IActionResult> RevokeSourceByCaseAsync([FromBody] ContactRevokeSourceByCaseArgs args) => Ok(await _contactService.RevokeSourceByCaseAsync(args));
 
     [HttpPost("confirm1/{id}")]
     public async Task<IActionResult> Confirm1Async([FromRoute] Guid id) => Ok(await _contactService.Confirm1Async(id));

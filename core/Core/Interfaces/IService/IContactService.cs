@@ -30,6 +30,8 @@ public interface IContactService
     Task<TResult> TransferSourceBySearchAsync(ContactTransferBySearchArgs args);
     Task<TResult> TransferSourceByCaseAsync(ContactTransferByCaseArgs args);
     Task<TResult> TransferSourceByFileAsync(ContactTransferByFileArgs args);
+    Task<ListResult<dynamic>> RevokeSourceListAsync(ContactRevokeSourceFilterOptions filterOptions);
+    Task<TResult> RevokeSourceByCaseAsync(ContactRevokeSourceByCaseArgs args);
     Task<TResult> GetReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions);
     Task<TResult<byte[]?>> ExportReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions);
     Task<TResult> GetTmrDataReportAsync(TmrDataReportFilterOptions filterOptions);

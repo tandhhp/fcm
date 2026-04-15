@@ -123,8 +123,11 @@ export default (initialState: { currentUser?: API.User }) => {
   const can_read_page_finance_bill = accountant || chiefAccountant || canAdmin;
   const can_read_page_finance_report = accountant || chiefAccountant || canAdmin;
   const can_read_page_finance_sales_admin = salesAdmin || canAdmin;
+
   const can_read_page_contact_source = adminData || dot || canAdmin;
   const can_read_page_contact_transfer_source = adminData || dot || canAdmin;
+  const can_read_page_contact_revoke_source = adminData || dot || canAdmin;
+
   const can_read_page_event_voucher = event || em || canAdmin;
   const can_read_page_event_contract = event || em || canAdmin;
   const can_read_page_event_customer = dos || dot || event || canAdmin || em;
@@ -132,6 +135,7 @@ export default (initialState: { currentUser?: API.User }) => {
   const can_read_page_event_invoice = sm || dot || dos || event || canAdmin || em;
   const can_read_page_event = event || sales || sm || dos || dot || telesaleManager || telesale || cx || canAdmin || em;
   const can_read_page_event_showup_report = event || canAdmin || dot || dos || sm || cx || sales || em;
+  
   const can_confirm2 = currentUser && (currentUser.claims?.some((claim) => claim.type === 'ACCESS' && claim.value === 'CONFIRM2') || false) || canAdmin;
   const can_read_page_user = canAdmin || hr || dot || adminData;
   const can_read_page_department = canAdmin || hr || dot || adminData;
@@ -186,6 +190,7 @@ export default (initialState: { currentUser?: API.User }) => {
     can_read_page_finance_sales_admin,
     can_read_page_contact_source,
     can_read_page_contact_transfer_source,
+    can_read_page_contact_revoke_source,
     can_read_page_event,
     can_read_page_event_voucher,
     can_read_page_event_contract,

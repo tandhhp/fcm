@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Waffle.Core.Constants;
 using Waffle.Core.Interfaces.IService.Events;
 using Waffle.Core.Services.Events.Args;
 using Waffle.Core.Services.Events.Filters;
@@ -9,7 +8,7 @@ using Waffle.Core.Services.Tables.Filters;
 using Waffle.Foundations;
 using Waffle.Models;
 
-namespace Waffle.Controllers;
+namespace Waffle.Controllers.Events;
 
 public class EventController(IEventService _eventService) : BaseController
 {

@@ -63,6 +63,7 @@ const LeadPage: React.FC = () => {
                 scroll={{
                     x: true
                 }}
+                size="small"
                 request={(params) => {
                     setFilterOptions(params);
                     return apiLeadCheckinList(params);
@@ -177,12 +178,12 @@ const LeadPage: React.FC = () => {
                         minWidth: 100
                     },
                     {
-                        title: 'Năm sinh',
+                        title: 'NSinh',
                         dataIndex: 'dateOfBirth',
                         valueType: 'dateYear',
                         search: false,
-                        width: 80,
-                        minWidth: 80
+                        width: 60,
+                        minWidth: 60
                     },
                     {
                         title: 'Số CCCD',
@@ -248,7 +249,7 @@ const LeadPage: React.FC = () => {
                             if (entity.eventName === '14:00') {
                                 return <Tag color="orange" className="w-full text-center">14:00</Tag>
                             }
-                            return <Tag color="yellow" className="w-full text-center">10:00</Tag>
+                            return <Tag color="green" className="w-full text-center">10:00</Tag>
                         }
                     },
                     {

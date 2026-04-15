@@ -6,7 +6,7 @@ using Waffle.Core.Services.Leads.Filters;
 using Waffle.Entities;
 using Waffle.Foundations;
 
-namespace Waffle.Controllers;
+namespace Waffle.Controllers.Events;
 
 public class LeadController(ILeadService _leadService) : BaseController
 {

@@ -1,6 +1,6 @@
 import { apiUpdateLeadStatus, apiUsersInEvent } from "@/services/contact";
 import { LeadStatus } from "@/utils/constants";
-import { CheckOutlined, CommentOutlined, CopyOutlined, EditOutlined, LeftOutlined, ManOutlined, MoreOutlined, PlusOutlined, SettingOutlined, UsergroupAddOutlined, WomanOutlined } from "@ant-design/icons";
+import { CheckOutlined, CommentOutlined, CopyOutlined, EditOutlined, KeyOutlined, LeftOutlined, ManOutlined, MoreOutlined, PlusOutlined, SettingOutlined, UsergroupAddOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProForm, ProFormDatePicker, ProFormSelect, ProTable } from "@ant-design/pro-components"
 import { Button, Dropdown, message, Popconfirm, Space, Tag } from "antd";
 import { useRef, useState } from "react";
@@ -15,6 +15,7 @@ import { apiEventDetail, apiEventOptions } from "@/services/event";
 import LeadCheckin from "./components/checkin";
 import LeadForm from "@/components/form/lead-form";
 import LeadStatusRender from "@/components/lead/status-render";
+import { apiBranchOptions } from "@/services/settings/branch";
 
 const EventUserPage: React.FC = () => {
 
@@ -42,7 +43,7 @@ const EventUserPage: React.FC = () => {
 
     return (
         <PageContainer title={`Khung giờ: ${data?.name}`}
-        onBack={() => history.back()}
+            onBack={() => history.back()}
             extra={(
                 <Space size="small">
                     <ProForm submitter={false} layout="inline">
@@ -105,16 +106,24 @@ const EventUserPage: React.FC = () => {
                             width: 20
                         },
                         {
+                            title: 'Chi nhánh',
+                            dataIndex: 'branchId',
+                            valueType: 'select',
+                            request: apiBranchOptions,
+                            width: 100,
+                            minWidth: 100
+                        },
+                        {
                             title: 'Họ và tên',
                             dataIndex: 'name',
                             render: (dom, entity) => {
                                 if (entity.gender === true) {
-                                    return <div><WomanOutlined className="text-pink-500 mr-2" />{dom}</div>
+                                    return <div><WomanOutlined className="text-pink-500 mr-1" />{dom}</div>
                                 }
                                 if (entity.gender === false) {
-                                    return <div><ManOutlined className="text-blue-500 mr-2" />{dom}</div>
+                                    return <div><ManOutlined className="text-blue-500 mr-1" />{dom}</div>
                                 }
-                                return <div>{dom}</div>;
+                                return <div><KeyOutlined className="text-gray-500 mr-1" />{dom}</div>;
                             },
                             minWidth: 250,
                             width: 250

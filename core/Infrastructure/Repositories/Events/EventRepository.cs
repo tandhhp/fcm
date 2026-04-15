@@ -185,24 +185,22 @@ public class EventRepository(ApplicationDbContext context, IHCAService _hcaServi
                 };
                 var suAttendances = new List<SUAttendance>();
                 var totalCountRate = 0f;
+                var totalKeyInCount = 0;
                 foreach (var attendance in attendances)
                 {
-                    float count = leads.Count(x => x.CreatedBy == sale.Id && x.AttendanceId == attendance.Id);
+                    var count = leads.Count(x => x.CreatedBy == sale.Id && x.AttendanceId == attendance.Id);
                     suAttendances.Add(new SUAttendance
                     {
                         AttendanceId = attendance.Id,
                         Count = count,
                         Name = attendance.Name
                     });
+                    totalKeyInCount += count;
                     totalCountRate += count * attendance.SuRate;
                 }
-                suAttendances.Add(new SUAttendance
-                {
-                    AttendanceId = 0,
-                    Count = totalCountRate,
-                    Name = "Tổng"
-                });
                 suSalesReport.Attendances = suAttendances;
+                suSalesReport.TotalKeyInCount = totalKeyInCount;
+                suSalesReport.TotalRate = totalCountRate;
                 salesReports.Add(suSalesReport);
             }
             suReport.SalesReports = salesReports;

@@ -9,6 +9,7 @@ import { apiDeleteLead, apiUpdateLeadStatus } from "@/services/contact";
 import { LeadStatus } from "@/utils/constants";
 import LeadForm from "@/components/form/lead-form";
 import LeadStatusRender from "@/components/lead/status-render";
+import { apiBranchOptions } from "@/services/settings/branch";
 
 const WaitingList: React.FC = () => {
 
@@ -39,12 +40,21 @@ const WaitingList: React.FC = () => {
                     setKeyInOpen(true);
                 }} icon={<PlusOutlined />} disabled={access.canAdmin || access.telesale || access.telesaleManager || access.dot || access.cx}>Tạo Key-In</Button>}
                 request={apiLeadWaitingList}
+                size="small"
                 columns={[
                     {
                         title: '#',
                         valueType: 'indexBorder',
                         width: 30,
                         align: 'center'
+                    },
+                    {
+                        title: 'Chi nhánh',
+                        dataIndex: 'branchId',
+                        valueType: 'select',
+                        request: apiBranchOptions,
+                        width: 100,
+                        minWidth: 100
                     },
                     {
                         title: 'Họ và tên',

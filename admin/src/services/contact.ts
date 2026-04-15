@@ -259,6 +259,19 @@ export async function apiContactTransferByFile(data: FormData) {
   });
 }
 
+export async function apiContactRevokeSourceList(params: any) {
+  return request('contact/revoke-source/list', {
+    params
+  });
+}
+
+export async function apiContactRevokeSourceByCase(data: { contactIds: string[] }) {
+  return request('contact/revoke-source/by-case', {
+    method: 'POST',
+    data
+  });
+}
+
 export async function apiContactNeedConfirm2(params: any) {
   return request(`contact/need-confirms`, {
     params: {

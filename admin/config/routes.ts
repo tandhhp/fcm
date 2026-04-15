@@ -357,6 +357,12 @@ export default [
         access: 'can_read_page_contact_transfer_source'
       },
       {
+        name: 'Thu hồi nguồn',
+        path: '/contact/revoke-source',
+        component: './contact/revoke-source',
+        access: 'can_read_page_contact_revoke_source'
+      },
+      {
         name: 'Tele Report',
         path: '/contact/report-tele',
         component: './contact/report/tele'

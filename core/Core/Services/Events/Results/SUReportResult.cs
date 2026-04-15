@@ -10,6 +10,8 @@ public class SUSalesReport
 {
     public string? SalesName { get; set; }
     public List<SUAttendance> Attendances { get; set; } = [];
+    public int TotalKeyInCount { get; set; }
+    public float TotalRate { get; set; }
 }
 
 public class SUAttendance

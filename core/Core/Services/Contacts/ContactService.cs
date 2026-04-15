@@ -562,6 +562,90 @@ public class ContactService(IContactRepository _contactRepository, ApplicationDb
         return await ApplyTransferAsync(contacts, destination, "file");
     }
 
+    public async Task<ListResult<dynamic>> RevokeSourceListAsync(ContactRevokeSourceFilterOptions filterOptions)
+    {
+        var validatePermission = ValidateRevokePermission();
+        if (!validatePermission.Succeeded) return ListResult<dynamic>.Failed(validatePermission.Message ?? "Bạn không có quyền thực hiện chức năng thu hồi nguồn!");
+
+        var query = from c in _context.Contacts
+                    join s in _context.Sources on c.SourceId equals s.Id into cs
+                    from s in cs.DefaultIfEmpty()
+                    join g in _context.Teams on s.TeamId equals g.Id into sg
+                    from g in sg.DefaultIfEmpty()
+                    join u in _context.Users on c.UserId equals u.Id
+                    join t in _context.Teams on u.TeamId equals t.Id into ut
+                    from t in ut.DefaultIfEmpty()
+                    where c.Status != ContactStatus.Blacklisted
+                    where !_context.CallHistories.Any(x => x.ContactId == c.Id)
+                    select new ContactRevokeListItem
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        PhoneNumber = c.PhoneNumber,
+                        CreatedDate = c.CreatedDate,
+                        SourceId = c.SourceId,
+                        SourceName = s != null ? s.Name : null,
+                        GroupId = s != null ? s.TeamId : null,
+                        GroupName = g != null ? g.Name : null,
+                        TeamId = u.TeamId,
+                        TeamName = t != null ? t.Name : null,
+                        TelesalesId = c.UserId,
+                        TelesalesName = u.Name
+                    };
+
+        if (filterOptions.GroupId.HasValue)
+        {
+            query = query.Where(x => x.GroupId == filterOptions.GroupId);
+        }
+        if (filterOptions.TeamId.HasValue)
+        {
+            query = query.Where(x => x.TeamId == filterOptions.TeamId);
+        }
+        if (filterOptions.SourceId.HasValue)
+        {
+            query = query.Where(x => x.SourceId == filterOptions.SourceId);
+        }
+        if (filterOptions.TelesalesId.HasValue)
+        {
+            query = query.Where(x => x.TelesalesId == filterOptions.TelesalesId);
+        }
+
+        query = query.OrderByDescending(x => x.CreatedDate);
+        return await ListResult<dynamic>.Success(query, filterOptions);
+    }
+
+    public async Task<TResult> RevokeSourceByCaseAsync(ContactRevokeSourceByCaseArgs args)
+    {
+        var validatePermission = ValidateRevokePermission();
+        if (!validatePermission.Succeeded) return validatePermission;
+        if (args.ContactIds.Count == 0) return TResult.Failed("Vui lòng chọn contact cần thu hồi!");
+
+        var contacts = await _context.Contacts
+            .Where(x => x.Status != ContactStatus.Blacklisted)
+            .Where(x => x.UserId != null)
+            .Where(x => args.ContactIds.Contains(x.Id))
+            .Where(x => !_context.CallHistories.Any(ch => ch.ContactId == x.Id))
+            .ToListAsync();
+
+        if (!contacts.Any()) return TResult.Failed("Không có contact phù hợp để thu hồi!");
+
+        foreach (var contact in contacts)
+        {
+            contact.UserId = null;
+            contact.ModifiedDate = DateTime.Now;
+            contact.ModifiedBy = _hcaService.GetUserId();
+        }
+
+        _context.Contacts.UpdateRange(contacts);
+        await _context.SaveChangesAsync();
+
+        await _logService.AddAsync($"Thu hồi nguồn {contacts.Count} contact chưa gọi.");
+        return TResult.Ok(new
+        {
+            revokedCount = contacts.Count
+        });
+    }
+
     public Task<TResult> GetReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions) => _contactRepository.GetReportDataSourceAsync(filterOptions);
 
     public Task<TResult<byte[]?>> ExportReportDataSourceAsync(ReportDataSourceFilterOptions filterOptions) => _contactRepository.ExportReportDataSourceAsync(filterOptions);
@@ -606,6 +690,15 @@ public class ContactService(IContactRepository _contactRepository, ApplicationDb
         if (!_hcaService.IsUserInAnyRole(RoleName.Admin, RoleName.AdminData, RoleName.Dot))
         {
             return TResult.Failed("Bạn không có quyền thực hiện chức năng chuyển nguồn!");
+        }
+        return TResult.Success;
+    }
+
+    private TResult ValidateRevokePermission()
+    {
+        if (!_hcaService.IsUserInAnyRole(RoleName.Admin, RoleName.AdminData, RoleName.Dot))
+        {
+            return TResult.Failed("Bạn không có quyền thực hiện chức năng thu hồi nguồn!");
         }
         return TResult.Success;
     }
@@ -681,6 +774,22 @@ public class ContactService(IContactRepository _contactRepository, ApplicationDb
         public string? SourceName { get; set; }
         public int? GroupId { get; set; }
         public string? GroupName { get; set; }
+        public Guid? TelesalesId { get; set; }
+        public string? TelesalesName { get; set; }
+    }
+
+    private class ContactRevokeListItem
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = default!;
+        public string? PhoneNumber { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public int? SourceId { get; set; }
+        public string? SourceName { get; set; }
+        public int? GroupId { get; set; }
+        public string? GroupName { get; set; }
+        public int? TeamId { get; set; }
+        public string? TeamName { get; set; }
         public Guid? TelesalesId { get; set; }
         public string? TelesalesName { get; set; }
     }

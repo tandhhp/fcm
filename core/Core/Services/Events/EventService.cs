@@ -245,6 +245,9 @@ public class EventService(ApplicationDbContext _context, IEventRepository _event
             worksheet.Cells[1, col].Value = attendanceName;
             col++;
         }
+        worksheet.Cells[1, col].Value = "Tổng keyin";
+        col++;
+        worksheet.Cells[1, col].Value = "Rate";
 
         // Fill data rows
         var row = 2;
@@ -263,6 +266,9 @@ public class EventService(ApplicationDbContext _context, IEventRepository _event
                     worksheet.Cells[row, col].Value = attendance?.Count ?? 0;
                     col++;
                 }
+                worksheet.Cells[row, col].Value = salesReport.TotalKeyInCount;
+                col++;
+                worksheet.Cells[row, col].Value = salesReport.TotalRate;
                 row++;
             }
 
@@ -283,7 +289,7 @@ public class EventService(ApplicationDbContext _context, IEventRepository _event
         worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
         // Add borders to all cells
-        var totalCols = col - 1;
+        var totalCols = attendanceNames.Count + 4;
         var cells = worksheet.Cells[1, 1, row - 1, totalCols];
         cells.Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
         cells.Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
