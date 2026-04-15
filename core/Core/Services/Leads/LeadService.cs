@@ -289,7 +289,7 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
 
     public async Task<TResult> UpdateFeedbackAsync(LeadUpdateFeedbackArgs args)
     {
-        if (string.IsNullOrWhiteSpace(args.IdentityNumber)) return TResult.Failed("Chưa nhập số ĐDCN!");
+        //if (string.IsNullOrWhiteSpace(args.IdentityNumber)) return TResult.Failed("Chưa nhập số CCCD!");
         var lead = await _leadRepository.FindAsync(args.Id);
         if (lead is null) return TResult.Failed("Không tìm thấy khách hàng!");
         var feedback = await _leadRepository.GetFeedbackAsync(lead.Id);

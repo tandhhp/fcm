@@ -172,9 +172,7 @@ const LeadFeedbackUpdateForm: React.FC<Props> = (props) => {
                     <ProFormText name={"name"} label="Họ và tên" rules={[{ required: true }]} />
                 </Col>
                 <Col md={6} xs={24}>
-                    <ProFormText name={"identityNumber"} label="Số CCCD" rules={[
-                        { required: true, message: 'Vui lòng nhập CCCD' }
-                    ]} />
+                    <ProFormText name={"identityNumber"} label="Số CCCD" />
                 </Col>
                 <Col md={6} xs={24}>
                     <ProFormDatePicker.Year label="Năm sinh" name="dateOfBirth" width="xl" rules={[{ required: true }]} />
