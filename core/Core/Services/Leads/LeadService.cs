@@ -364,7 +364,6 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
         {
             foreach (var subLead in args.SubLeads)
             {
-                if (string.IsNullOrWhiteSpace(subLead.IdentityNumber)) return TResult.Failed("Chưa nhập số ĐDCN cho khách phụ!");
                 if (await _leadRepository.IsCitizenIdExistAsync(subLead.IdentityNumber, lead.Id)) return TResult.Failed($"CCCD {subLead.IdentityNumber} của khách phụ đã tồn tại!");
                 if (await _leadRepository.IsPhoneExistAsync(subLead.PhoneNumber, lead.Id)) return TResult.Failed($"Số điện thoại {subLead.PhoneNumber} của khách phụ đã tồn tại!");
                 await _leadRepository.UpdateSubLeadsAsync(lead.Id, args.SubLeads);

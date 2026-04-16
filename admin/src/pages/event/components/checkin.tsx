@@ -153,7 +153,7 @@ const LeadCheckin: React.FC<Props> = (props) => {
                             pattern: /((09|03|07|08|05)+([0-9]{8})\b)/,
                             message: 'Số điện thoại không hợp lệ'
                         }]} />
-                    <ProFormText name="identityNumber" label="Số CCCD" rules={[{ required: true, message: 'Vui lòng nhập số CCCD' }]} />
+                    <ProFormText name="identityNumber" label="Số CCCD" />
                     <ProFormDatePicker name="dateOfBirth" label="Ngày sinh" />
                     <ProFormSelect name="gender" label="Giới tính" options={GENDER_OPTIONS} rules={[{ required: true, message: 'Vui lòng chọn giới tính' }]} />
                 </div>

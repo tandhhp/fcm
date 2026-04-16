@@ -18,7 +18,7 @@ public interface ILeadRepository : IAsyncRepository<Lead>
     Task<LeadFeedback?> GetFeedbackAsync(Guid id);
     Task<object> GetSubLeadsAsync(Guid id);
     Task<ListResult<object>> GetWaitingListAsync(LeadWaittingListFilterOptions filterOptions);
-    Task<bool> IsCitizenIdExistAsync(string citizenId, Guid leadId);
+    Task<bool> IsCitizenIdExistAsync(string? citizenId, Guid leadId);
     Task<bool> IsPhoneExistAsync(string phoneNumber, Guid id);
     Task<List<Lead>> ListByCitizenIdAsync(string citizenId);
     Task<ListResult<object>> NoDupsAsync(LeadCheckinListFilterOptions filterOptions);
