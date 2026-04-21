@@ -274,6 +274,8 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
     public async Task<ListResult<object>> ListAsync(ContractFilterOptions filterOptions)
     {
         var userId = _hcaService.GetUserId();
+        var user = await _context.Users.FindAsync(userId);
+        if (user is null) return ListResult<object>.Failed("User not found");
         var query = from c in _context.Contracts
                     join l in _context.Leads on c.LeadId equals l.Id
                     join sales in _context.Users on c.SalesId equals sales.Id into salesJoin
@@ -304,6 +306,7 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
                         SourceName = s.Name,
                         Dos = sales != null && sales.DosId != null ? _context.Users.First(x => x.Id == sales.DosId).Name : string.Empty,
                         SmName = sales != null && sales.SmId != null ? _context.Users.First(x => x.Id == sales.SmId).Name : string.Empty,
+                        l.BranchId
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.ContractCode))
         {
@@ -336,6 +339,14 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
         if (_hcaService.IsUserInRole(RoleName.SalesManager))
         {
             query = query.Where(c => c.SalesManagerId == userId);
+        }
+        if (_hcaService.IsUserInRole(RoleName.Cx))
+        {
+            query = query.Where(x => x.BranchId == user.BranchId);
+        }
+        if (filterOptions.BranchId.HasValue)
+        {
+            query = query.Where(c => c.BranchId == filterOptions.BranchId);
         }
         query = query.OrderByDescending(c => c.CreatedDate);
         return await ListResult<object>.Success(query, filterOptions);

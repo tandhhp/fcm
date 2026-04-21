@@ -27,6 +27,12 @@ const WaitingList: React.FC = () => {
         actionRef.current?.reload();
     }
 
+    const canDelete = (status: LeadStatus) => {
+        if (status !== LeadStatus.Approved) return false;
+        if (!access.canAdmin && !access.event && !access.em) return false;
+        return true;
+    }
+
     return (
         <>
             <ProTable
@@ -97,8 +103,8 @@ const WaitingList: React.FC = () => {
                         render: (dom, record) => (
                             <div className="flex gap-1 items-center"><Avatar size="small" src={record.avatar} />{dom}</div>
                         ),
-                        width: 180,
-                        minWidth: 180
+                        width: 200,
+                        minWidth: 200
                     },
                     {
                         title: 'Sự kiện',
@@ -110,7 +116,9 @@ const WaitingList: React.FC = () => {
                     {
                         title: 'Giờ',
                         dataIndex: 'eventName',
-                        search: false
+                        search: false,
+                        width: 50,
+                        minWidth: 50
                     },
                     {
                         title: 'Nguồn',
@@ -175,7 +183,7 @@ const WaitingList: React.FC = () => {
                                 message.success('Đã xóa');
                                 actionRef.current?.reload();
                             }}>
-                                <Button type="primary" danger size="small" icon={<DeleteOutlined />} disabled={entity.status === LeadStatus.Approved && !access.canAdmin && !access.event} />
+                                <Button type="primary" danger size="small" icon={<DeleteOutlined />} disabled={!canDelete(entity.status)} />
                             </Popconfirm>
                         ]
                     }
