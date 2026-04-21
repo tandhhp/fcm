@@ -23,6 +23,7 @@ const Index: React.FC = () => {
                 scroll={{
                     x: true
                 }}
+                size="small"
                 columns={[
                     {
                         title: '#',

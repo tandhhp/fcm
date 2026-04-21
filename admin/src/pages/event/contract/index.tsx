@@ -65,6 +65,7 @@ const Index: React.FC = () => {
                 scroll={{
                     x: true
                 }}
+                size="small"
                 columns={[
                     {
                         title: '#',
@@ -79,8 +80,8 @@ const Index: React.FC = () => {
                         render: (dom, record) => (
                             <div>
                                 <div className="font-semibold">{dom}</div>
-                                <div className="text-gray-500">Ngày tạo: {dayjs(record.createdDate).format('DD-MM-YYYY')}</div>
-                                <div className="text-gray-500">Nguồn: <span className="text-red-500 font-semibold">{record.sourceName}</span></div>
+                                <div className="text-gray-500 text-xs">Ngày tạo: {dayjs(record.createdDate).format('DD-MM-YYYY')}</div>
+                                <div className="text-gray-500 text-xs">Nguồn: <span className="text-red-500 font-semibold">{record.sourceName}</span></div>
                             </div>
                         )
                     },

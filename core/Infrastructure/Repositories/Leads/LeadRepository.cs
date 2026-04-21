@@ -302,7 +302,8 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
                         c.DotId,
                         CreatorName = c.Name,
                         SubLeads = _context.SubLeads.Where(x => x.LeadId == l.Id).Select(sub => $"{sub.Name} - {sub.PhoneNumber}").ToList(),
-                        l.BranchId
+                        l.BranchId,
+                        c.Avatar
                     };
         if (filterOptions.EventId.HasValue)
         {
@@ -383,7 +384,7 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
                         l.DateOfBirth,
                         l.Note,
                         l.Duplicated,
-                        Count = _context.Leads.Count(x => x.PhoneNumber == l.PhoneNumber || x.IdentityNumber == l.IdentityNumber)
+                        Count = _context.Leads.Count(x => !string.IsNullOrEmpty(l.PhoneNumber) && !string.IsNullOrEmpty(x.IdentityNumber) && (x.PhoneNumber == l.PhoneNumber || x.IdentityNumber == l.IdentityNumber))
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
         {

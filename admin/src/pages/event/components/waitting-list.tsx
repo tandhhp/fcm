@@ -1,9 +1,9 @@
 import { apiEventOptions } from "@/services/event";
 import { apiLeadWaitingList } from "@/services/users/lead";
-import { CheckOutlined, DeleteOutlined, EditOutlined, ManOutlined, MoreOutlined, PlusOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
+import { CheckOutlined, DeleteOutlined, EditOutlined, KeyOutlined, ManOutlined, MoreOutlined, PlusOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, ProTable } from "@ant-design/pro-components";
 import { useRef, useState } from "react";
-import { Button, Dropdown, message, Popconfirm, Tag } from "antd";
+import { Avatar, Button, Dropdown, message, Popconfirm, Tag } from "antd";
 import { useAccess } from "@umijs/max";
 import { apiDeleteLead, apiUpdateLeadStatus } from "@/services/contact";
 import { LeadStatus } from "@/utils/constants";
@@ -34,6 +34,9 @@ const WaitingList: React.FC = () => {
                 search={{
                     layout: 'vertical'
                 }}
+                scroll={{
+                    x: true
+                }}
                 actionRef={actionRef}
                 headerTitle={<Button type="primary" onClick={() => {
                     setSelectedRecord(null);
@@ -61,17 +64,20 @@ const WaitingList: React.FC = () => {
                         dataIndex: 'name',
                         render: (dom, entity) => {
                             if (entity.gender === true) {
-                                return <><WomanOutlined className="text-red-500 mr-2" />{dom}</>
+                                return <><WomanOutlined className="text-red-500 mr-1" />{dom}</>
                             }
                             if (entity.gender === false) {
-                                return <><ManOutlined className="text-blue-500 mr-2" />{dom}</>
+                                return <><ManOutlined className="text-blue-500 mr-1" />{dom}</>
                             }
-                            return <>{dom}</>
-                        }
+                            return <><KeyOutlined className="text-gray-500 mr-1" />{dom}</>
+                        },
+                        width: 180,
+                        minWidth: 180
                     },
                     {
                         title: 'SDT',
-                        dataIndex: 'phoneNumber'
+                        dataIndex: 'phoneNumber',
+                        width: 100
                     },
                     {
                         title: 'Khách phụ',
@@ -87,15 +93,22 @@ const WaitingList: React.FC = () => {
                     {
                         title: 'Key-In',
                         dataIndex: 'creatorName',
-                        search: false
+                        search: false,
+                        render: (dom, record) => (
+                            <div className="flex gap-1 items-center"><Avatar size="small" src={record.avatar} />{dom}</div>
+                        ),
+                        width: 180,
+                        minWidth: 180
                     },
                     {
-                        title: 'Ngày sự kiện',
+                        title: 'Sự kiện',
                         dataIndex: 'eventDate',
-                        valueType: 'date'
+                        valueType: 'date',
+                        width: 100,
+                        minWidth: 100
                     },
                     {
-                        title: 'Khung giờ',
+                        title: 'Giờ',
                         dataIndex: 'eventName',
                         search: false
                     },
@@ -120,6 +133,8 @@ const WaitingList: React.FC = () => {
                             5: { text: 'Mời lại', status: 'Warning' }
                         },
                         search: false,
+                        width: 100,
+                        minWidth: 100,
                         render: (_, record) => <LeadStatusRender status={record.status} />
                     },
                     {

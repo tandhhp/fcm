@@ -407,7 +407,8 @@ export default [
     icon: 'BellOutlined',
     name: 'Thông báo',
     path: '/notification',
-    component: './notification'
+    component: './notification',
+    hideInMenu: true
   },
   {
     icon: 'TeamOutlined',

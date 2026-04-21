@@ -11,6 +11,7 @@ const FeedbackPage: React.FC = () => {
                 scroll={{
                     x: true
                 }}
+                size="small"
                 request={apiLeadFeedback}
                 search={{
                     layout: 'vertical'

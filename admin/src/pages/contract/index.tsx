@@ -66,6 +66,7 @@ const Index: React.FC = () => {
                 search={{
                     layout: 'vertical'
                 }}
+                size="small"
                 scroll={{
                     x: true
                 }}

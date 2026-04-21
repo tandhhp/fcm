@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
 using OfficeOpenXml;
 using Waffle.Core.Constants;
 using Waffle.Core.Interfaces.IRepository.Leads;
@@ -289,7 +288,6 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
 
     public async Task<TResult> UpdateFeedbackAsync(LeadUpdateFeedbackArgs args)
     {
-        //if (string.IsNullOrWhiteSpace(args.IdentityNumber)) return TResult.Failed("Chưa nhập số CCCD!");
         var lead = await _leadRepository.FindAsync(args.Id);
         if (lead is null) return TResult.Failed("Không tìm thấy khách hàng!");
         var feedback = await _leadRepository.GetFeedbackAsync(lead.Id);
@@ -301,7 +299,7 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
             };
             await _leadRepository.AddFeedbackAsync(feedback);
         }
-        var creator = await _userManager.FindByIdAsync(lead.CreatedBy.ToString());
+        var creator = await _userManager.FindByIdAsync(args.CreatedBy.ToString());
         if (creator is null) return TResult.Failed("Không tìm thấy người tạo khách hàng!");
         if (args.Voucher1Id.HasValue)
         {

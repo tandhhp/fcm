@@ -150,12 +150,12 @@ const EventDashboard: React.FC = () => {
       <Row gutter={[16, 16]} className="mb-4">
         <Col xs={24} sm={12} md={8} xl={6}>
           <ProCard>
-            <Statistic title="Số Event Manager (SM)" value={metrics.salesManagers} />
+            <Statistic title="Số Sales Manager" value={metrics.salesManagers} />
           </ProCard>
         </Col>
         <Col xs={24} sm={12} md={8} xl={6}>
           <ProCard>
-            <Statistic title="Số nhân viên Event" value={metrics.totalSales} />
+            <Statistic title="Số nhân viên kinh doanh" value={metrics.totalSales} />
           </ProCard>
         </Col>
         <Col xs={24} sm={12} md={8} xl={6}>
@@ -165,14 +165,14 @@ const EventDashboard: React.FC = () => {
         </Col>
         <Col xs={24} sm={12} md={8} xl={6}>
           <ProCard>
-            <Statistic title="Trung bình mỗi Event" value={metrics.averagePerSales} />
+            <Statistic title="Trung bình mỗi Sales" value={metrics.averagePerSales} />
           </ProCard>
         </Col>
       </Row>
 
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={14}>
-          <ProCard title="Top Event theo sản lượng" headerBordered>
+          <ProCard title="Top Sales theo sản lượng" headerBordered>
             {metrics.topSaleLoadData.length ? (
               <Column
                 height={320}
@@ -188,6 +188,7 @@ const EventDashboard: React.FC = () => {
                     labelAutoRotate: true
                   }
                 }}
+                sizeField={50}
               />
             ) : (
               <Empty description="Không có dữ liệu" />
