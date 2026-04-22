@@ -38,6 +38,7 @@ const Index: React.FC = () => {
                 search={{
                     layout: 'vertical'
                 }}
+                size="small"
                 columns={[
                     {
                         title: '#',
@@ -87,12 +88,17 @@ const Index: React.FC = () => {
                         title: 'Trạng thái',
                         dataIndex: 'status',
                         valueEnum: {
-                            0: { text: 'Chờ duyệt', status: 'Default' },
+                            0: { text: 'Chờ duyệt', status: 'Warning' },
                             1: { text: 'Đã duyệt', status: 'Success' },
                             2: { text: 'Từ chối', status: 'Error' },
-                            3: { text: 'Đã hủy', status: 'Warning' },
+                            3: { text: 'Đã hủy', status: 'Default' },
                             4: { text: 'SA xác nhận', status: 'Processing' }
                         }
+                    },
+                    {
+                        title: 'Sales',
+                        dataIndex: 'salesName',
+                        search: false,
                     },
                     {
                         title: 'Ghi chú',
@@ -141,7 +147,7 @@ const Index: React.FC = () => {
                                 <Button type="dashed" icon={<MoreOutlined />} size="small" />
                             </Dropdown>,
                             <Popconfirm key={"delete"} title="Bạn có chắc chắn muốn xóa?" onConfirm={() => onDelete(record.id)}>
-                                <Button key={"delete"} type="primary" icon={<DeleteOutlined />} danger size="small" disabled={!access.event || record.status !== 0}></Button>
+                                <Button key={"delete"} type="primary" icon={<DeleteOutlined />} danger size="small" disabled={(!access.event && !access.em && !access.canAdmin) || record.status !== 0}></Button>
                             </Popconfirm>
                         ]
                     }

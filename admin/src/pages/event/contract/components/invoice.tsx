@@ -13,6 +13,7 @@ const ContractInvoice: React.FC<Props> = (props) => {
                 params={{
                     contractId: props.data?.id
                 }}
+                size="small"
                 rowKey={"id"}
                 search={false}
                 ghost
