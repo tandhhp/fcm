@@ -151,7 +151,7 @@ const Index: React.FC = () => {
                                         <Col md={8} xs={24}>
                                             <ProFormSelect
                                                 name="groupId"
-                                                label="Group"
+                                                label="Team"
                                                 options={groupOptions}
                                                 showSearch
                                                 fieldProps={{

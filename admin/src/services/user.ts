@@ -177,7 +177,10 @@ export const apiSendEmails = (data: any) => request(`user/send-emails`, {
   data
 })
 
-export const apiTelesalesOptions = (params?: any) => request(`user/telesales/options`, {
+export const apiTelesalesOptions = (params?: {
+  teamId?: number;
+  keyWord?: string;
+}) => request(`user/telesales/options`, {
   params
 });
 

@@ -6,4 +6,5 @@ public class SelectOptions : IILocale
 {
     public string? KeyWords { get; set; }
     public string Locale { get; set; } = "vi-VN";
+    public int? BranchId { get; set; }
 }

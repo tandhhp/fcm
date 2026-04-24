@@ -12,6 +12,7 @@ import { apiTeamOptions } from "@/services/users/team";
 import { apiTelesalesOptions } from "@/services/user";
 import { Button, Col, message, Modal, Row } from "antd";
 import { useEffect, useRef, useState } from "react";
+import { apiBranchOptions } from "@/services/settings/branch";
 
 type RevokeFilter = {
     groupId?: number;
@@ -24,7 +25,6 @@ const Index: React.FC = () => {
     const actionRef = useRef<ActionType>();
     const formRef = useRef<ProFormInstance>();
 
-    const [groupOptions, setGroupOptions] = useState<{ label: string; value: number }[]>([]);
     const [teamOptions, setTeamOptions] = useState<{ label: string; value: number }[]>([]);
     const [sourceOptions, setSourceOptions] = useState<{ label: string; value: string | number }[]>([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -34,18 +34,17 @@ const Index: React.FC = () => {
     useEffect(() => {
         const fetchOptions = async () => {
             const options = await apiTeamOptions({});
-            setGroupOptions(options || []);
             setTeamOptions(options || []);
         };
         fetchOptions();
     }, []);
 
-    const fetchSourceOptions = async (groupId?: number) => {
-        if (!groupId) {
+    const fetchSourceOptions = async (teamId?: number) => {
+        if (!teamId) {
             setSourceOptions([]);
             return;
         }
-        const options = await apiSourceOptions({ teamId: groupId });
+        const options = await apiSourceOptions({ teamId: teamId });
         setSourceOptions(options || []);
     };
 
@@ -83,26 +82,24 @@ const Index: React.FC = () => {
         <PageContainer>
             <ProForm formRef={formRef} submitter={false}>
                 <Row gutter={16}>
-                    <Col md={6} xs={24}>
+                    <Col md={4} xs={24}>
+                        <ProFormSelect name="branchId" 
+                        initialValue={1}
+                        label="Chi nhánh" request={apiBranchOptions} allowClear={false} />
+                    </Col>
+                    <Col md={4} xs={24}>
                         <ProFormSelect
-                            name="groupId"
-                            label="Group"
-                            options={groupOptions}
+                            name="teamId"
+                            label="Team"
+                            options={teamOptions}
                             showSearch
                             fieldProps={{
                                 onChange: (value: number) => {
                                     formRef.current?.setFieldValue("sourceId", undefined);
+                                    formRef.current?.setFieldValue("telesalesId", undefined);
                                     fetchSourceOptions(value);
                                 }
                             }}
-                        />
-                    </Col>
-                    <Col md={6} xs={24}>
-                        <ProFormSelect
-                            name="teamId"
-                            label="Team telesales"
-                            options={teamOptions}
-                            showSearch
                         />
                     </Col>
                     <Col md={6} xs={24}>
@@ -117,7 +114,8 @@ const Index: React.FC = () => {
                         <ProFormSelect
                             name="telesalesId"
                             label="Telesales"
-                            request={apiTelesalesOptions}
+                            dependencies={["teamId"]}
+                            request={async ({ teamId }) => apiTelesalesOptions({ teamId })}
                             showSearch
                         />
                     </Col>

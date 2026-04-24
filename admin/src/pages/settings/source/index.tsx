@@ -64,7 +64,7 @@ const Index: React.FC = () => {
                         request: apiTypeOfDataOptions
                     },
                     {
-                        title: 'Group',
+                        title: 'Team',
                         valueType: 'select',
                         dataIndex: 'teamId',
                         request: apiTeamOptions

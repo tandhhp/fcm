@@ -193,15 +193,25 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
                     {
                         a.Id,
                         a.Name,
-                        a.TmId
+                        a.TmId,
+                        a.TeamId,
+                        a.BranchId
                     };
         if (selectOptions.TelesalesManagerId != null)
         {
             query = query.Where(x => x.TmId == selectOptions.TelesalesManagerId);
         }
+        if (selectOptions.TeamId.HasValue)
+        {
+            query = query.Where(x => x.TeamId == selectOptions.TeamId);
+        }
         if (!string.IsNullOrWhiteSpace(selectOptions.KeyWords))
         {
             query = query.Where(x => x.Name.ToLower().Contains(selectOptions.KeyWords.ToLower()));
+        }
+        if (selectOptions.BranchId.HasValue)
+        {
+            query = query.Where(x => x.BranchId == selectOptions.BranchId);
         }
         return await query.Select(x => new
         {

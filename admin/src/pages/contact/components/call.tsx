@@ -15,6 +15,7 @@ type Props = DrawerFormProps & {
 const CallForm: React.FC<Props> = (props) => {
 
     const formRef = useRef<ProFormInstance>(null);
+    const [callStatusType, setCallStatusType] = useState<number>();
     const [selectedStatus, setSelectedStatus] = useState<string>();
 
     const onFinish = async (values: any) => {
@@ -49,11 +50,59 @@ const CallForm: React.FC<Props> = (props) => {
             <Button type="primary" icon={<PhoneOutlined />} block href={`tel:${props.data?.phoneNumber}`} className="mb-4">Gọi điện</Button>
             <Row gutter={16}>
                 <Col xs={24} md={12}>
+                    <ProFormSelect
+                        name="callStatusType"
+                        label="Loại trạng thái cuộc gọi"
+                        options={[
+                            {
+                                label: 'Không nghe máy',
+                                value: 1
+                            },
+                            {
+                                label: 'Thuê bao',
+                                value: 2
+                            },
+                            {
+                                label: 'Sai số',
+                                value: 3
+                            },
+                            {
+                                label: 'Ngoại tỉnh',
+                                value: 4
+                            },
+                            {
+                                label: 'Gọi lại sau',
+                                value: 5
+                            },
+                            {
+                                label: 'Khách đạt yêu cầu',
+                                value: 6
+                            },
+                            {
+                                label: 'Khách không đạt yêu cầu',
+                                value: 7
+                            }
+                        ]}
+                        fieldProps={{
+                            allowClear: true,
+                            onChange: (value: number) => {
+                                setCallStatusType(value);
+                                setSelectedStatus(undefined);
+                                formRef.current?.setFieldValue('callStatusId', undefined);
+                            }
+                        }}
+                        showSearch
+                    />
+                </Col>
+                <Col xs={24} md={12}>
                     <ProFormSelect name={`callStatusId`}
+                        params={{ type: callStatusType }}
+                        dependencies={['callStatusType']}
                         onChange={(_, option) => {
                             setSelectedStatus(option.code);
                         }}
-                        label="Trạng thái" request={apiCallOptions} showSearch
+                        label="Trạng thái" request={(params) => apiCallOptions(params)} showSearch
+                        disabled={!callStatusType}
                         rules={[
                             {
                                 required: true
@@ -79,13 +128,13 @@ const CallForm: React.FC<Props> = (props) => {
                 <Col xs={24} md={12}>
                     <ProFormDatePicker name="followUpDate" label="Follow up date" width="lg" />
                 </Col>
-                <Col xs={24} md={12}>
+                <Col xs={24} md={8}>
                     <ProFormTimePicker name="followUpTime" label="Follow up time" width="lg" />
                 </Col>
-                <Col xs={24} md={12}>
+                <Col xs={24} md={8}>
                     <ProFormText label="Nghề nghiệp" name="job" />
                 </Col>
-                <Col xs={24} md={12}>
+                <Col xs={24} md={8}>
                     <ProFormText label="Tuổi" name="age" />
                 </Col>
             </Row>

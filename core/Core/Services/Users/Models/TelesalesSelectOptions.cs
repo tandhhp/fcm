@@ -5,4 +5,5 @@ namespace Waffle.Core.Services.Users.Models;
 public class TelesalesSelectOptions : SelectOptions
 {
     public Guid? TelesalesManagerId { get; set; }
+    public int? TeamId { get; set; }
 }
