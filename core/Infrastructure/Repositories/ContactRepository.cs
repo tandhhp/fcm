@@ -396,6 +396,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         a.Email,
                         a.CreatedDate,
                         a.Name,
+                        a.Confirm2Reason,
                         a.Note,
                         TelesalesId = a.UserId,
                         TelesalesName = b.Name,

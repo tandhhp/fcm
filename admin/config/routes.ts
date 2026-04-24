@@ -457,6 +457,12 @@ export default [
         path: '/user/department/team/user/:id',
         component: './users/team/user',
         hideInMenu: true
+      },
+      {
+        name: 'Telesales',
+        path: '/user/telesale',
+        component: './users/telesale',
+        access: 'can_read_page_user_telesales'
       }
     ],
   },

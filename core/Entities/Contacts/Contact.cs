@@ -31,6 +31,8 @@ public class Contact : AuditEntity
     public int? SourceId { get; set; }
     public bool Confirm1 { get; set; }
     public Confirm2Status Confirm2Status { get; set; }
+    [StringLength(1000)]
+    public string? Confirm2Reason { get; set; }
     [Comment("Lần gọi gần nhất")]
     public DateTime? LastCallTime { get; set; }
     [StringLength(256)]

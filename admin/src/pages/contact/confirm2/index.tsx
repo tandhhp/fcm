@@ -1,14 +1,16 @@
 import { apiContactConfirm2, apiContactNeedConfirm2 } from "@/services/contact";
-import { ManOutlined, WomanOutlined } from "@ant-design/icons";
-import { ActionType, PageContainer, ProColumnType, ProForm, ProFormSelect, ProTable } from "@ant-design/pro-components"
+import { ManOutlined, MoreOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
+import { ActionType, ModalForm, PageContainer, ProColumnType, ProForm, ProFormSelect, ProFormTextArea, ProTable } from "@ant-design/pro-components"
 import { useAccess } from "@umijs/max";
-import { message } from "antd";
-import { useRef } from "react";
+import { Button, Dropdown, message, Tag } from "antd";
+import { useRef, useState } from "react";
 
 const Index: React.FC = () => {
 
     const access = useAccess();
     const actionRef = useRef<ActionType>();
+    const [selectedRecord, setSelectedRecord] = useState<any>(null);
+    const [modalVisible, setModalVisible] = useState(false);
 
     const confirm2Options = [
         {
@@ -32,6 +34,12 @@ const Index: React.FC = () => {
             value: 4
         }
     ];
+
+    const getConfirm2StatusTag = (status: number) => {
+        const option = confirm2Options.find(o => o.value === status);
+        const colors = ['default', 'success', 'error', 'warning', 'default'];
+        return <Tag color={colors[status] || 'default'}>{option?.label || 'Chưa xác nhận'}</Tag>;
+    };
 
     const columns: ProColumnType<any>[] = [
         {
@@ -65,7 +73,7 @@ const Index: React.FC = () => {
             width: 100
         },
         {
-            title: 'Phụ trách',
+            title: 'Nhân viên',
             dataIndex: 'telesalesName',
             search: false
         },
@@ -101,31 +109,48 @@ const Index: React.FC = () => {
             dataIndex: 'confirm2Status',
             render: (text, record) => {
                 return (
-                    <ProForm submitter={false} readonly={!access.can_confirm2}>
-                        <ProFormSelect name={"confirm2Status"} initialValue={record.confirm2Status} onChange={async (value) => {
-                            await apiContactConfirm2({
-                                contactId: record.id,
-                                confirm2Status: value
-                            });
-                            message.success('Xác nhận thành công!');
-                            actionRef.current?.reload();
-                        }} 
-                            formItemProps={{
-                                className: 'mb-0'
-                            }}
-                            options={confirm2Options}
-                            fieldProps={{
-                                autoFocus: false,
-                                variant: 'filled'
-                            }}
-                        />
-                    </ProForm>
+                    <div>
+                        {getConfirm2StatusTag(record.confirm2Status)}
+
+                    </div>
                 )
             },
             valueType: 'select',
             fieldProps: {
                 options: confirm2Options
             }
+        },
+        {
+            title: <SettingOutlined />,
+            dataIndex: 'actions',
+            valueType: 'option',
+            render: (_, record) => [
+                <Dropdown key="more"
+                menu={{
+                    items: [
+                        {
+                            key: 'update',
+                            label: 'Cập nhật trạng thái',
+                            onClick: () => {
+                                setSelectedRecord(record);
+                                setModalVisible(true);
+                            }
+                        }
+                    ]
+                }}
+                >
+                    <Button
+                    type="dashed"
+                    size="small"
+                    onClick={(e) => e.preventDefault()}
+                    icon={<MoreOutlined />}
+                >
+                    
+                </Button>
+                </Dropdown>
+            ],
+            width: 40,
+            align: 'center'
         }
     ]
 
@@ -143,6 +168,39 @@ const Index: React.FC = () => {
                 columns={columns}
                 size="small"
             />
+            <ModalForm
+                title="Cập nhật xác nhận 2"
+                open={modalVisible}
+                onOpenChange={setModalVisible}
+                onFinish={async (values) => {
+                    await apiContactConfirm2({
+                        contactId: selectedRecord?.id,
+                        confirm2Status: values.confirm2Status,
+                        reason: values.reason
+                    });
+                    message.success('Xác nhận thành công!');
+                    actionRef.current?.reload();
+                    return true;
+                }}
+                initialValues={{
+                    confirm2Status: selectedRecord?.confirm2Status
+                }}
+            >
+                <ProFormSelect
+                    name="confirm2Status"
+                    label="Trạng thái"
+                    options={confirm2Options}
+                    rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
+                />
+                <ProFormTextArea
+                    name="reason"
+                    label="Lý do"
+                    placeholder="Nhập lý do (nếu có)"
+                    fieldProps={{
+                        rows: 4
+                    }}
+                />
+            </ModalForm>
         </PageContainer>
     )
 }

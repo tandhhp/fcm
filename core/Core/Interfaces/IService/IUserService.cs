@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Waffle.Core.Services.Users.Args;
+using Waffle.Core.Services.Users.Filters;
 using Waffle.Core.Services.Users.Models;
 using Waffle.Models;
 using Waffle.Models.ViewModels.Users;
@@ -19,4 +20,8 @@ public interface IUserService
     Task<TResult<byte[]?>> ExportAsync(UserFilterOptions filterOptions);
     Task<ListResult<object>> ListDosAsync(FilterOptions filterOptions);
     Task<TResult> SetDosAsync(SetDosArgs args);
+    Task<ListResult<object>> ListTelesalesAsync(TelesaleFilterOptions filterOptions);
+    Task<TResult> CreateTelesaleAsync(CreateTelesaleArgs args);
+    Task<TResult> UpdateTelesaleAsync(UpdateTelesaleArgs args);
+    Task<TResult> DeleteTelesaleAsync(Guid id);
 }

@@ -1,10 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
-using OpenAI;
+﻿using OpenAI;
 using OpenAI.Chat;
-using Org.BouncyCastle.Asn1.Crmf;
-using Org.BouncyCastle.Ocsp;
-using SendGrid.Helpers.Mail;
-using System;
 using Waffle.Controllers;
 using Waffle.Core.Interfaces.IService;
 using Waffle.Models;
@@ -15,7 +10,6 @@ public class AIService : IAIService
 {
     private readonly ISettingService _settingService;
     private readonly ILogger<AIService> _logger;
-    private const string CHATGPT_SETTING_KEY = "CHATGPT";
     private readonly IConfiguration _configuration;
 
     public AIService(ISettingService settingService, ILogger<AIService> logger, IConfiguration configuration)

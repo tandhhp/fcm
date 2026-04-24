@@ -52,7 +52,9 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
                         Gender = contact.Gender,
                         Note = args.Note,
                         TelesaleId = contact.UserId,
-                        BranchId = telesales.BranchId
+                        BranchId = telesales.BranchId,
+                        CreatedBy = contact.UserId.GetValueOrDefault(),
+                        Status = LeadStatus.Pending
                     });
                 }
             }

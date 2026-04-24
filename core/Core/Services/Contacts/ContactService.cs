@@ -424,6 +424,7 @@ public class ContactService(IContactRepository _contactRepository, ApplicationDb
         var contact = await _contactRepository.FindAsync(args.ContactId);
         if (contact is null) return TResult.Failed("Không tìm thấy liên hệ!");
         contact.Confirm2Status = args.Confirm2Status;
+        contact.Confirm2Reason = args.Reason;
         await _logService.AddAsync($"Cập nhật xác nhận 2 cho liên hệ {contact.Name} - {contact.PhoneNumber} thành {EnumHelper.GetDisplayName(args.Confirm2Status)}");
         await _contactRepository.UpdateAsync(contact);
         return TResult.Success;

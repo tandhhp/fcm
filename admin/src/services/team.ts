@@ -45,3 +45,7 @@ export async function apiUnassignTeamUsers(params: any) {
         params
     });
 }
+
+export async function apiTeamOptions(params?: any) {
+    return request('team/options', { params });
+}

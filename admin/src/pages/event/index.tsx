@@ -1,11 +1,12 @@
 import { apiEventList } from "@/services/event";
 import { ActionType, ModalForm, PageContainer, ProFormInstance, ProFormText, ProList } from "@ant-design/pro-components"
-import { history } from "@umijs/max";
+import { history, useAccess } from "@umijs/max";
 import { useRef, useState } from "react";
 import WaitingList from "./components/waitting-list";
 
 const EventPage: React.FC = () => {
 
+    const access = useAccess();
     const actionRef = useRef<ActionType>();
     const [open, setOpen] = useState<boolean>(false);
     const formRef = useRef<ProFormInstance>();
@@ -31,11 +32,13 @@ const EventPage: React.FC = () => {
                 onItem={(record) => {
                     return {
                         onClick: () => {
+                            if (access.dot) return;
                             history.push(`/event/time-slot/center/${record.id}`);
                         }
                     }
                 }}
                 size="small"
+                rowKey="id"
             />
             <WaitingList />
             <ModalForm title="Sự kiện" open={open} onOpenChange={setOpen} formRef={formRef} disabled>

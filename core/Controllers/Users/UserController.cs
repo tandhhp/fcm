@@ -1072,7 +1072,6 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null || string.IsNullOrEmpty(user.Email)) continue;
-            await Sender.SendAsync(user.Email, args.Subject, args.Body);
         }
         return Ok();
     }
@@ -1999,4 +1998,16 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
         await _userManager.AddToRoleAsync(user, RoleName.Admin);
         return Ok(result);
     }
+
+    [HttpGet("telesales/list")]
+    public async Task<IActionResult> ListTelesalesAsync([FromQuery] TelesaleFilterOptions filterOptions) => Ok(await _userService.ListTelesalesAsync(filterOptions));
+
+    [HttpPost("telesales")]
+    public async Task<IActionResult> CreateTelesaleAsync([FromBody] CreateTelesaleArgs args) => Ok(await _userService.CreateTelesaleAsync(args));
+
+    [HttpPut("telesales")]
+    public async Task<IActionResult> UpdateTelesaleAsync([FromBody] UpdateTelesaleArgs args) => Ok(await _userService.UpdateTelesaleAsync(args));
+
+    [HttpDelete("telesales/{id}")]
+    public async Task<IActionResult> DeleteTelesaleAsync([FromRoute] Guid id) => Ok(await _userService.DeleteTelesaleAsync(id));
 }

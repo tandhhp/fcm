@@ -137,7 +137,10 @@ export default (initialState: { currentUser?: API.User }) => {
   const can_read_page_event_showup_report = event || canAdmin || dot || dos || sm || cx || sales || em;
   
   const can_confirm2 = currentUser && (currentUser.claims?.some((claim) => claim.type === 'ACCESS' && claim.value === 'CONFIRM2') || false) || canAdmin;
+  
   const can_read_page_user = canAdmin || hr || dot || adminData;
+  const can_read_page_user_telesales = canAdmin || hr || dot || adminData;
+
   const can_read_page_department = canAdmin || hr || dot || adminData;
   const can_read_page_report = canAdmin || dot || adminData;
   const can_read_page_report_data_source = can_read_page_report;
@@ -200,6 +203,7 @@ export default (initialState: { currentUser?: API.User }) => {
     can_read_page_event_checkin,
     can_confirm2,
     can_read_page_user,
+    can_read_page_user_telesales,
     can_read_page_department,
     can_read_page_report,
     can_read_page_report_data_source,

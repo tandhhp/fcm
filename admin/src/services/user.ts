@@ -333,3 +333,27 @@ export async function apiUserSetDos(data: any) {
 export async function apiUserListTele(params: any) {
   return request(`user/list-tele`, { params });
 }
+
+export async function apiTelesaleList(params: any) {
+  return request(`user/telesales/list`, { params });
+}
+
+export async function apiTelesaleCreate(data: any) {
+  return request(`user/telesales`, {
+    method: 'POST',
+    data
+  });
+}
+
+export async function apiTelesaleUpdate(data: any) {
+  return request(`user/telesales`, {
+    method: 'PUT',
+    data
+  });
+}
+
+export async function apiTelesaleDelete(id: string) {
+  return request(`user/telesales/${id}`, {
+    method: 'DELETE'
+  });
+}

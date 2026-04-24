@@ -6,6 +6,7 @@ using Waffle.Core.Constants;
 using Waffle.Core.Helpers;
 using Waffle.Core.Interfaces.IService;
 using Waffle.Core.Services.Users.Args;
+using Waffle.Core.Services.Users.Filters;
 using Waffle.Core.Services.Users.Models;
 using Waffle.Data;
 using Waffle.Entities;
@@ -458,6 +459,180 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
         if (!await _userManager.IsInRoleAsync(dos, RoleName.Dos)) return TResult.Failed("Người dùng không phải là giám đốc quan hệ khách hàng!");
         tele.DosId = dos.Id;
         await _userManager.UpdateAsync(tele);
+        return TResult.Success;
+    }
+
+    public async Task<ListResult<object>> ListTelesalesAsync(TelesaleFilterOptions filterOptions)
+    {
+        var query = from a in _context.Users
+                    join b in _context.UserRoles on a.Id equals b.UserId
+                    join c in _context.Roles on b.RoleId equals c.Id
+                    join d in _context.Branches on a.BranchId equals d.Id into branchGroup
+                    from branch in branchGroup.DefaultIfEmpty()
+                    join e in _context.Teams on a.TeamId equals e.Id into teamGroup
+                    from team in teamGroup.DefaultIfEmpty()
+                    where c.Name == RoleName.Telesale
+                    select new
+                    {
+                        a.Id,
+                        a.UserName,
+                        a.Name,
+                        a.Email,
+                        a.PhoneNumber,
+                        a.Gender,
+                        a.DateOfBirth,
+                        a.BranchId,
+                        BranchName = branch != null ? branch.Name : null,
+                        a.TeamId,
+                        TeamName = team != null ? team.Name : null,
+                        a.LineCode,
+                        a.Avatar,
+                        a.Status,
+                        a.CreatedDate
+                    };
+
+        if (!string.IsNullOrWhiteSpace(filterOptions.Name))
+        {
+            query = query.Where(x => !string.IsNullOrEmpty(x.Name) && x.Name.ToLower().Contains(filterOptions.Name.ToLower()));
+        }
+
+        if (!string.IsNullOrWhiteSpace(filterOptions.UserName))
+        {
+            query = query.Where(x => !string.IsNullOrEmpty(x.UserName) && x.UserName.ToLower().Contains(filterOptions.UserName.ToLower()));
+        }
+
+        if (!string.IsNullOrWhiteSpace(filterOptions.Email))
+        {
+            query = query.Where(x => !string.IsNullOrEmpty(x.Email) && x.Email.ToLower().Contains(filterOptions.Email.ToLower()));
+        }
+
+        if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
+        {
+            query = query.Where(x => !string.IsNullOrEmpty(x.PhoneNumber) && x.PhoneNumber.Contains(filterOptions.PhoneNumber));
+        }
+
+        if (filterOptions.BranchId.HasValue)
+        {
+            query = query.Where(x => x.BranchId == filterOptions.BranchId.Value);
+        }
+
+        if (filterOptions.TeamId.HasValue)
+        {
+            query = query.Where(x => x.TeamId == filterOptions.TeamId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(filterOptions.LineCode))
+        {
+            query = query.Where(x => !string.IsNullOrEmpty(x.LineCode) && x.LineCode.ToLower().Contains(filterOptions.LineCode.ToLower()));
+        }
+
+        query = query.OrderByDescending(x => x.CreatedDate);
+        return await ListResult<object>.Success(query, filterOptions);
+    }
+
+    public async Task<TResult> CreateTelesaleAsync(CreateTelesaleArgs args)
+    {
+        if (string.IsNullOrWhiteSpace(args.UserName)) return TResult.Failed("Tên đăng nhập không được để trống!");
+        if (string.IsNullOrWhiteSpace(args.Name)) return TResult.Failed("Họ tên không được để trống!");
+
+        var existingUser = await _userManager.FindByNameAsync(args.UserName);
+        if (existingUser != null) return TResult.Failed("Tên đăng nhập đã tồn tại!");
+
+        var branch = await _context.Branches.FindAsync(args.BranchId);
+        if (branch is null) return TResult.Failed("Không tìm thấy chi nhánh!");
+
+        if (args.TeamId.HasValue)
+        {
+            var team = await _context.Teams.FindAsync(args.TeamId.Value);
+            if (team is null) return TResult.Failed("Không tìm thấy nhóm!");
+        }
+
+        var user = new ApplicationUser
+        {
+            UserName = args.UserName,
+            Name = args.Name,
+            Email = args.Email,
+            PhoneNumber = args.PhoneNumber,
+            Gender = args.Gender,
+            DateOfBirth = args.DateOfBirth,
+            BranchId = args.BranchId,
+            TeamId = args.TeamId,
+            LineCode = args.LineCode,
+            CreatedDate = DateTime.Now,
+            Status = UserStatus.Working
+        };
+
+        var password = $"tele@{args.UserName}";
+        var result = await _userManager.CreateAsync(user, password);
+        if (!result.Succeeded) return TResult.Failed(string.Join(", ", result.Errors.Select(x => x.Description)));
+
+        var role = await _roleManager.FindByNameAsync(RoleName.Telesale);
+        if (role is null)
+        {
+            await _roleManager.CreateAsync(new ApplicationRole
+            {
+                DisplayName = "Telesale",
+                Name = RoleName.Telesale
+            });
+        }
+        await _userManager.AddToRoleAsync(user, RoleName.Telesale);
+
+        return TResult.Success;
+    }
+
+    public async Task<TResult> UpdateTelesaleAsync(UpdateTelesaleArgs args)
+    {
+        var user = await FindAsync(args.Id);
+        if (user is null) return TResult.Failed("Không tìm thấy người dùng!");
+
+        if (!await _userManager.IsInRoleAsync(user, RoleName.Telesale))
+            return TResult.Failed("Người dùng không phải là telesale!");
+
+        if (string.IsNullOrWhiteSpace(args.UserName)) return TResult.Failed("Tên đăng nhập không được để trống!");
+        if (string.IsNullOrWhiteSpace(args.Name)) return TResult.Failed("Họ tên không được để trống!");
+
+        if (user.UserName != args.UserName)
+        {
+            var existingUser = await _userManager.FindByNameAsync(args.UserName);
+            if (existingUser != null) return TResult.Failed("Tên đăng nhập đã tồn tại!");
+        }
+
+        var branch = await _context.Branches.FindAsync(args.BranchId);
+        if (branch is null) return TResult.Failed("Không tìm thấy chi nhánh!");
+
+        if (args.TeamId.HasValue)
+        {
+            var team = await _context.Teams.FindAsync(args.TeamId.Value);
+            if (team is null) return TResult.Failed("Không tìm thấy nhóm!");
+        }
+
+        user.UserName = args.UserName;
+        user.Name = args.Name;
+        user.Email = args.Email;
+        user.PhoneNumber = args.PhoneNumber;
+        user.Gender = args.Gender;
+        user.DateOfBirth = args.DateOfBirth;
+        user.BranchId = args.BranchId;
+        user.TeamId = args.TeamId;
+        user.LineCode = args.LineCode;
+
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded) return TResult.Failed(string.Join(", ", result.Errors.Select(x => x.Description)));
+
+        return TResult.Success;
+    }
+
+    public async Task<TResult> DeleteTelesaleAsync(Guid id)
+    {
+        var user = await FindAsync(id);
+        if (user is null) return TResult.Failed("Không tìm thấy người dùng!");
+
+        if (!await _userManager.IsInRoleAsync(user, RoleName.Telesale))
+            return TResult.Failed("Người dùng không phải là telesale!");
+
+        var result = await _userManager.DeleteAsync(user);
+        if (!result.Succeeded) return TResult.Failed(string.Join(", ", result.Errors.Select(x => x.Description)));
+
         return TResult.Success;
     }
 }

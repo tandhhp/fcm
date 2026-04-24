@@ -42,6 +42,7 @@ const Index: React.FC = () => {
                 actionRef={actionRef}
                 request={apiContactDialedCalls}
                 rowKey="id"
+                size="small"
                 scroll={{ x: true }}
                 columns={[
                     {
@@ -116,7 +117,7 @@ const Index: React.FC = () => {
                         width: 100,
                         render: (text, record) => {
                             return (
-                                <Button type="link" size="small" icon={<PhoneOutlined />} onClick={() => {
+                                <Button type="link" size="small" onClick={() => {
                                     setContact(record);
                                     setOpenCall(true);
                                 }}>{text}</Button>
@@ -124,9 +125,9 @@ const Index: React.FC = () => {
                         }
                     },
                     {
-                        title: 'Tên liên hệ',
+                        title: 'Tên khách hàng',
                         dataIndex: 'name',
-                        minWidth: 180,
+                        minWidth: 200,
                     },
                     {
                         title: 'Ngày gọi',
@@ -144,7 +145,7 @@ const Index: React.FC = () => {
                         fieldProps: {
                             showSearch: true
                         },
-                        minWidth: 150
+                        minWidth: 200
                     },
                     {
                         title: 'Nguồn',
@@ -153,7 +154,7 @@ const Index: React.FC = () => {
                         minWidth: 180
                     },
                     {
-                        title: 'Người gọi',
+                        title: 'Nhân viên',
                         dataIndex: 'teleName',
                         search: false,
                         minWidth: 150
@@ -218,7 +219,6 @@ const Index: React.FC = () => {
                 search={{
                     layout: 'vertical'
                 }}
-                size="small"
             />
             <ModalForm
                 open={openExport}

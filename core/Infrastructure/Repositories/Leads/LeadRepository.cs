@@ -277,7 +277,7 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
                     join telesales in _context.Users on l.TelesaleId equals telesales.Id into telesalesJoin
                     from telesales in telesalesJoin.DefaultIfEmpty()
                     join c in _context.Users on l.CreatedBy equals c.Id
-                    where l.Status == LeadStatus.Pending || l.Status == LeadStatus.Approved || l.Status == LeadStatus.ReInvite
+                    where l.Status == LeadStatus.Pending || l.Status == LeadStatus.Approved
                     select new
                     {
                         l.Id,
@@ -340,10 +340,6 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
         if (_hcaService.IsUserInRole(RoleName.Dos))
         {
             query = query.Where(x => x.DosId == userId);
-        }
-        if (_hcaService.IsUserInRole(RoleName.Dot))
-        {
-            query = query.Where(x => x.DotId == userId);
         }
         if (filterOptions.BranchId.HasValue)
         {

@@ -22,7 +22,9 @@ const Index: React.FC = () => {
     }
 
     return (
-        <PageContainer title={data?.name} extra={<Button icon={<LeftOutlined />} onClick={() => history.back()}>Quay lại</Button>}>
+        <PageContainer title={data?.name}
+            onBack={() => history.back()}
+        >
             <ProTable
                 request={apiTeamUsers}
                 headerTitle={<Button type="primary" onClick={() => setOpen(true)} icon={<UserOutlined />}>Thêm thành viên</Button>}
