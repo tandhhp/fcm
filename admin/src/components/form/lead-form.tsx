@@ -1,7 +1,7 @@
 import { apiAddLead } from "@/services/contact";
 import { apiEventKeyInOptions, apiEventOptions } from "@/services/event";
-import { apiSalesManagerOptions } from "@/services/role";
 import { apiBranchOptions } from "@/services/settings/branch";
+import { apiGetManagerOptions } from "@/services/user";
 import { apiLeadDetail, apiLeadUpdate } from "@/services/users/lead";
 import { GENDER_OPTIONS } from "@/utils/constants";
 import { DrawerForm, DrawerFormProps, ProFormDatePicker, ProFormInstance, ProFormList, ProFormSelect, ProFormText, ProFormTextArea } from "@ant-design/pro-components";
@@ -20,7 +20,7 @@ const LeadForm: React.FC<Props> = (props) => {
     const access = useAccess();
     const formRef = useRef<ProFormInstance>(null);
     const { initialState } = useModel('@@initialState');
-    const [salesManagerId, setSalesManagerId] = useState<string | undefined>(undefined);
+    const [managerId, setManagerId] = useState<string | undefined>(undefined);
     const [salesOptions, setSalesOptions] = useState<any[]>([]);
 
     useEffect(() => {
@@ -89,7 +89,7 @@ const LeadForm: React.FC<Props> = (props) => {
                         value: data.identityNumber
                     }
                 ]);
-                setSalesManagerId(data.creatorLeaderId);
+                setManagerId(data.creatorLeaderId);
             });
         }
         if (!props.data) {
@@ -103,12 +103,12 @@ const LeadForm: React.FC<Props> = (props) => {
     }, [props.data, props.open, access]);
 
     useEffect(() => {
-        if (salesManagerId && props.open) {
-            apiEventKeyInOptions({ salesManagerId }).then(response => {
+        if (managerId && props.open) {
+            apiEventKeyInOptions({ managerId }).then(response => {
                 setSalesOptions(response);
             });
         }
-    }, [salesManagerId, props.open]);
+    }, [managerId, props.open]);
 
     const onFinish = async (values: any) => {
         const body = {
@@ -168,10 +168,10 @@ const LeadForm: React.FC<Props> = (props) => {
                     ]} />
                 </Col>
                 <Col xs={12} md={6}>
-                    <ProFormSelect label="Team Key-In" name={"creatorLeaderId"} request={apiSalesManagerOptions} showSearch
+                    <ProFormSelect label="Team Key-In" name={"creatorLeaderId"} request={apiGetManagerOptions} showSearch
                         disabled={access.sales}
                         onChange={(value: string) => {
-                            setSalesManagerId(value);
+                            setManagerId(value);
                             formRef.current?.setFieldsValue({
                                 createdBy: undefined
                             });

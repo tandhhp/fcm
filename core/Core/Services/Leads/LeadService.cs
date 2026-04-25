@@ -37,7 +37,7 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
         {
             lead.SourceId = SourceConstant.PRIVATE;
         }
-        if (_hcaService.IsUserInRole(RoleName.Telesale))
+        if (_hcaService.IsUserInRole(RoleName.Telesales))
         {
             lead.SourceId = SourceConstant.TELE_OPC;
         }
@@ -164,7 +164,7 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
             sales.DosId,
             feedback?.TableId,
             SubLeads = await _leadRepository.GetSubLeadsAsync(lead.Id),
-            CreatorLeaderId = creator?.SmId,
+            CreatorLeaderId = creator?.ManagerId,
             lead.Voucher1Id,
             lead.Voucher2Id
         });

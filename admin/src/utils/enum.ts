@@ -19,3 +19,11 @@ export enum BillStatus
     Rejected,
     Cancelled
 }
+
+export enum CONFIRM2_STATUS {
+    UNCONFIRM = 0,
+    CONFIRM = 1,
+    REJECT = 2,
+    NOT_SURE = 3,
+    NO_ANSWER = 4
+}

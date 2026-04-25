@@ -272,8 +272,8 @@ export async function apiContactRevokeSourceByCase(data: { contactIds: string[] 
   });
 }
 
-export async function apiContactNeedConfirm2(params: any) {
-  return request(`contact/need-confirms`, {
+export async function apiAttendanceSchedules(params: any) {
+  return request(`contact/attendance-schedule-list`, {
     params: {
       ...params,
       fromDate: params?.dateRange ? params.dateRange[0] : undefined,

@@ -7,7 +7,6 @@ using Waffle.Core.Services.Calls.Models;
 using Waffle.ExternalAPI.Tel4vn;
 using Waffle.ExternalAPI.Tel4vn.Filters;
 using Waffle.Foundations;
-using Waffle.Models;
 
 namespace Waffle.Controllers.Teles;
 

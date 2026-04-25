@@ -104,7 +104,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         {
             query = query.Where(c => c.IsBooked == filterOptions.IsBooked);
         }
-        if (_hcaService.IsUserInRole(RoleName.Telesale))
+        if (_hcaService.IsUserInRole(RoleName.Telesales))
         {
             query = query.Where(c => c.UserId == userId);
         }
@@ -370,7 +370,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         {
             query = query.Where(x => x.TelesalesId == filterOptions.TelesalesId);
         }
-        if (_hcaService.IsUserInRole(RoleName.Telesale))
+        if (_hcaService.IsUserInRole(RoleName.Telesales))
         {
             query = query.Where(x => x.TelesalesId == userId);
         }
@@ -382,26 +382,24 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         return await ListResult<dynamic>.Success(query, filterOptions);
     }
 
-    public async Task<ListResult<object>> NeedConfirmsAsync(ContactFilterOptions filterOptions)
+    public async Task<ListResult<object>> GetAttendanceScheduleListAsync(ContactFilterOptions filterOptions)
     {
-        var query = from a in _context.Contacts
-                    join b in _context.Users on a.UserId equals b.Id
-                    join c in _context.Leads on a.PhoneNumber equals c.PhoneNumber
+        var query = from b in _context.Users
+                    join c in _context.Leads on b.Id equals c.CreatedBy
                     join d in _context.Events on c.EventId equals d.Id
-                    where a.Status != ContactStatus.Blacklisted
+                    where c.Confirm2 != null
                     select new
                     {
-                        a.Id,
-                        a.PhoneNumber,
-                        a.Email,
-                        a.CreatedDate,
-                        a.Name,
-                        a.Confirm2Reason,
-                        a.Note,
-                        TelesalesId = a.UserId,
-                        TelesalesName = b.Name,
-                        CallCount = _context.CallHistories.Count(x => x.ContactId == a.Id) + 1,
-                        a.Confirm2Status,
+                        c.Id,
+                        c.PhoneNumber,
+                        c.Email,
+                        c.CreatedDate,
+                        c.Name,
+                        c.Note,
+                        StaffId = c.CreatedBy,
+                        StaffName = b.Name,
+                        StaffAvatar = b.Avatar,
+                        c.Confirm2,
                         c.EventDate,
                         EventName = d.Name,
                         b.TmId
@@ -414,21 +412,13 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         {
             query = query.Where(x => !string.IsNullOrEmpty(x.Name) && x.Email.Contains(filterOptions.Name));
         }
-        if (filterOptions.Confirm2Status.HasValue)
+        if (filterOptions.Confirm2.HasValue)
         {
-            query = query.Where(x => x.Confirm2Status == filterOptions.Confirm2Status);
+            query = query.Where(x => x.Confirm2 == filterOptions.Confirm2);
         }
         if (filterOptions.FromDate.HasValue && filterOptions.ToDate.HasValue)
         {
             query = query.Where(x => x.EventDate.Date >= filterOptions.FromDate.Value.Date && x.EventDate.Date <= filterOptions.ToDate.Value.Date);
-        }
-        if (_hcaService.IsUserInRole(RoleName.Telesale))
-        {
-            var user = await _userManager.FindByIdAsync(_hcaService.GetUserId().ToString());
-            if (user is null) return ListResult<object>.Failed("User not found!");
-            var claims = await _userManager.GetClaimsAsync(user);
-            var hasAccessAll = claims.Any(c => c.Type == "ACCESS" && c.Value == "CONFIRM2");
-            query = query.Where(x => hasAccessAll || x.TelesalesId == _hcaService.GetUserId());
         }
         if (_hcaService.IsUserInRole(RoleName.TelesaleManager))
         {

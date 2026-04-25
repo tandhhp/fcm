@@ -272,7 +272,8 @@ const Index: React.FC = () => {
                             },
                             {
                                 title: 'Số điện thoại',
-                                dataIndex: 'phoneNumber'
+                                dataIndex: 'phoneNumber',
+                                copyable: true
                             },
                             {
                                 title: 'Ngày tạo',
@@ -286,7 +287,7 @@ const Index: React.FC = () => {
                                 request: apiSourceOptions,
                             },
                             {
-                                title: 'Group',
+                                title: 'Nhóm',
                                 dataIndex: 'teamId',
                                 valueType: 'select',
                                 fieldProps: {
@@ -294,7 +295,7 @@ const Index: React.FC = () => {
                                 },
                             },
                             {
-                                title: 'Telesales',
+                                title: 'Nhân viên',
                                 dataIndex: 'teleName'
                             },
                             {

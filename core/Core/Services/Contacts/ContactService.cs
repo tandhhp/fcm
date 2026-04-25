@@ -5,6 +5,7 @@ using Waffle.Core.Constants;
 using Waffle.Core.Helpers;
 using Waffle.Core.Interfaces.IRepository;
 using Waffle.Core.Interfaces.IRepository.Calls;
+using Waffle.Core.Interfaces.IRepository.Leads;
 using Waffle.Core.Interfaces.IService;
 using Waffle.Core.Services.Contacts.Args;
 using Waffle.Core.Services.Contacts.Filters;
@@ -19,7 +20,7 @@ using Waffle.Models.Filters;
 
 namespace Waffle.Core.Services.Contacts;
 
-public class ContactService(IContactRepository _contactRepository, ApplicationDbContext _context, IWebHostEnvironment _env, ICallStatusRepository _callStatusRepository, IProvinceService _provinceService, ISourceService _sourceService, IDistrictService _districtService, ILogService _logService, UserManager<ApplicationUser> _userManager, IHCAService _hcaService, ILeadService _leadService) : IContactService
+public class ContactService(IContactRepository _contactRepository, ILeadRepository _leadRepository, ApplicationDbContext _context, IWebHostEnvironment _env, ICallStatusRepository _callStatusRepository, IProvinceService _provinceService, ISourceService _sourceService, IDistrictService _districtService, ILogService _logService, UserManager<ApplicationUser> _userManager, IHCAService _hcaService, ILeadService _leadService) : IContactService
 {
     public async Task<TResult> BlockAsync(BlockContactArgs args)
     {
@@ -167,7 +168,7 @@ public class ContactService(IContactRepository _contactRepository, ApplicationDb
                 TransportId = args.TransportId,
                 SourceId = args.SourceId
             };
-            if (_hcaService.IsUserInRole(RoleName.Telesale))
+            if (_hcaService.IsUserInRole(RoleName.Telesales))
             {
                 contact.UserId = _hcaService.GetUserId();
             }
@@ -421,16 +422,16 @@ public class ContactService(IContactRepository _contactRepository, ApplicationDb
 
     public async Task<TResult> Confirm2Async(UpdateConfirm2Args args)
     {
-        var contact = await _contactRepository.FindAsync(args.ContactId);
-        if (contact is null) return TResult.Failed("Không tìm thấy liên hệ!");
-        contact.Confirm2Status = args.Confirm2Status;
-        contact.Confirm2Reason = args.Reason;
-        await _logService.AddAsync($"Cập nhật xác nhận 2 cho liên hệ {contact.Name} - {contact.PhoneNumber} thành {EnumHelper.GetDisplayName(args.Confirm2Status)}");
-        await _contactRepository.UpdateAsync(contact);
+        var lead = await _leadRepository.FindAsync(args.LeadId);
+        if (lead is null) return TResult.Failed("Không tìm thấy liên hệ!");
+        lead.Confirm2 = args.Confirm2;
+        lead.Note = args.Reason;
+        await _logService.AddAsync($"Cập nhật xác nhận 2 cho liên hệ {lead.Name} - {lead.PhoneNumber} thành {EnumHelper.GetDisplayName(args.Confirm2)}");
+        await _leadRepository.UpdateAsync(lead);
         return TResult.Success;
     }
 
-    public Task<ListResult<object>> NeedConfirmsAsync(ContactFilterOptions filterOptions) => _contactRepository.NeedConfirmsAsync(filterOptions);
+    public Task<ListResult<object>> GetAttendanceScheduleListAsync(ContactFilterOptions filterOptions) => _contactRepository.GetAttendanceScheduleListAsync(filterOptions);
 
     public Task<TResult<object>> GetTmrReportAsync() => _contactRepository.GetTmrReportAsync();
 
@@ -726,7 +727,7 @@ public class ContactService(IContactRepository _contactRepository, ApplicationDb
         {
             var telesales = await _userManager.FindByIdAsync(destination.TelesalesId.Value.ToString());
             if (telesales is null) return TResult.Failed("Telesales đích không tồn tại!");
-            if (!await _userManager.IsInRoleAsync(telesales, RoleName.Telesale)) return TResult.Failed("Người dùng đích không phải telesales!");
+            if (!await _userManager.IsInRoleAsync(telesales, RoleName.Telesales)) return TResult.Failed("Người dùng đích không phải telesales!");
             if (destination.TeamId.HasValue && telesales.TeamId != destination.TeamId)
             {
                 return TResult.Failed("Telesales đích không thuộc team đã chọn!");

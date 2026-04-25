@@ -70,7 +70,7 @@ const Index: React.FC = () => {
             setSelectedRow(null);
             formRef.current?.resetFields();
             setOpen(true);
-        }} disabled={!access.canAdmin}>Tạo group data</Button>}>
+        }} disabled={!access.canAdmin && !access.dot && !access.adminData}>Tạo group data</Button>}>
             <ProTable<GroupDataItem>
                 actionRef={actionRef}
                 rowKey={'id'}
@@ -110,14 +110,14 @@ const Index: React.FC = () => {
                                             setSelectedRow(record);
                                             setOpen(true);
                                         },
-                                        disabled: !access.canAdmin
+                                        disabled: !access.canAdmin && !access.dot && !access.adminData
                                     }
                                 ]
                             }}>
                                 <Button type="dashed" icon={<MoreOutlined />} size="small" />
                             </Dropdown>,
                             <Popconfirm key="delete" title="Bạn có chắc muốn xóa group data này?" onConfirm={() => onDelete(record.id)}>
-                                <Button type="primary" danger size="small" icon={<DeleteOutlined />} disabled={!access.canAdmin} />
+                                <Button type="primary" danger size="small" icon={<DeleteOutlined />} disabled={!access.canAdmin && !access.dot && !access.adminData} />
                             </Popconfirm>
                         ]
                     }

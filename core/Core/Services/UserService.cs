@@ -188,7 +188,7 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
         var query = from a in _context.Users
                     join b in _context.UserRoles on a.Id equals b.UserId
                     join c in _context.Roles on b.RoleId equals c.Id
-                    where c.Name == RoleName.Telesale
+                    where c.Name == RoleName.Telesales
                     where a.Status == UserStatus.Working
                     select new
                     {
@@ -343,7 +343,7 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
                     {
                         user.ManagerId = salesManagerId;
                     }
-                    if (RoleName.Telesale.Equals(roleName))
+                    if (RoleName.Telesales.Equals(roleName))
                     {
                         user.ManagerId = telesalesManagerId;
                     }
@@ -471,7 +471,7 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
                     from branch in branchGroup.DefaultIfEmpty()
                     join e in _context.Teams on a.TeamId equals e.Id into teamGroup
                     from team in teamGroup.DefaultIfEmpty()
-                    where c.Name == RoleName.Telesale
+                    where c.Name == RoleName.Telesales
                     select new
                     {
                         a.Id,
@@ -488,7 +488,8 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
                         a.LineCode,
                         a.Avatar,
                         a.Status,
-                        a.CreatedDate
+                        a.CreatedDate,
+                        a.ManagerId
                     };
 
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
@@ -526,7 +527,7 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
             query = query.Where(x => !string.IsNullOrEmpty(x.LineCode) && x.LineCode.ToLower().Contains(filterOptions.LineCode.ToLower()));
         }
 
-        query = query.OrderByDescending(x => x.CreatedDate);
+        query = query.OrderBy(x => x.Status).ThenByDescending(x => x.CreatedDate);
         return await ListResult<object>.Success(query, filterOptions);
     }
 
@@ -559,23 +560,24 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
             TeamId = args.TeamId,
             LineCode = args.LineCode,
             CreatedDate = DateTime.Now,
-            Status = UserStatus.Working
+            Status = UserStatus.Working,
+            ManagerId = args.ManagerId
         };
 
         var password = $"tele@{args.UserName}";
         var result = await _userManager.CreateAsync(user, password);
         if (!result.Succeeded) return TResult.Failed(string.Join(", ", result.Errors.Select(x => x.Description)));
 
-        var role = await _roleManager.FindByNameAsync(RoleName.Telesale);
+        var role = await _roleManager.FindByNameAsync(RoleName.Telesales);
         if (role is null)
         {
             await _roleManager.CreateAsync(new ApplicationRole
             {
                 DisplayName = "Telesale",
-                Name = RoleName.Telesale
+                Name = RoleName.Telesales
             });
         }
-        await _userManager.AddToRoleAsync(user, RoleName.Telesale);
+        await _userManager.AddToRoleAsync(user, RoleName.Telesales);
 
         return TResult.Success;
     }
@@ -585,7 +587,7 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
         var user = await FindAsync(args.Id);
         if (user is null) return TResult.Failed("Không tìm thấy người dùng!");
 
-        if (!await _userManager.IsInRoleAsync(user, RoleName.Telesale))
+        if (!await _userManager.IsInRoleAsync(user, RoleName.Telesales))
             return TResult.Failed("Người dùng không phải là telesale!");
 
         if (string.IsNullOrWhiteSpace(args.UserName)) return TResult.Failed("Tên đăng nhập không được để trống!");
@@ -615,6 +617,7 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
         user.BranchId = args.BranchId;
         user.TeamId = args.TeamId;
         user.LineCode = args.LineCode;
+        user.ManagerId = args.ManagerId;
 
         var result = await _userManager.UpdateAsync(user);
         if (!result.Succeeded) return TResult.Failed(string.Join(", ", result.Errors.Select(x => x.Description)));
@@ -627,12 +630,36 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
         var user = await FindAsync(id);
         if (user is null) return TResult.Failed("Không tìm thấy người dùng!");
 
-        if (!await _userManager.IsInRoleAsync(user, RoleName.Telesale))
+        if (!await _userManager.IsInRoleAsync(user, RoleName.Telesales))
             return TResult.Failed("Người dùng không phải là telesale!");
 
         var result = await _userManager.DeleteAsync(user);
         if (!result.Succeeded) return TResult.Failed(string.Join(", ", result.Errors.Select(x => x.Description)));
 
         return TResult.Success;
+    }
+
+    public async Task<object> GetManagerOptionsAsync(SelectOptions selectOptions)
+    {
+        var query = from u in _context.Users
+                    join ur in _context.UserRoles on u.Id equals ur.UserId
+                    join r in _context.Roles on ur.RoleId equals r.Id
+                    where (r.Name == RoleName.SalesManager || r.Name == RoleName.TelesaleManager) && u.Status == UserStatus.Working
+                    select new
+                    {
+                        u.Id,
+                        u.Name,
+                        u.BranchId,
+                        RoleName = r.Name
+                    };
+        if (!string.IsNullOrWhiteSpace(selectOptions.KeyWords))
+        {
+            query = query.Where(x => !string.IsNullOrEmpty(x.Name) && x.Name.ToLower().Contains(selectOptions.KeyWords.ToLower()));
+        }
+        return await query.Select(x => new
+        {
+            Label = x.Name,
+            Value = x.Id
+        }).ToListAsync();
     }
 }

@@ -43,6 +43,7 @@ public class Lead : BaseEntity
     public Guid? Voucher1Id { get; set; }
     [ForeignKey(nameof(Voucher2))]
     public Guid? Voucher2Id { get; set; }
+    public Confirm2? Confirm2 { get; set; }
 
     public virtual Event? Event { get; set; }
     public virtual Branch? Branch { get; set; }
@@ -71,4 +72,18 @@ public enum LeadStatus
     LeadReject,
     [Display(Name = "Mời lại")]
     ReInvite
+}
+
+public enum Confirm2
+{
+    [Display(Name = "Chưa xác nhận")]
+    UNCONFIRM,
+    [Display(Name = "Đồng ý")]
+    CONFIRM,
+    [Display(Name = "Hủy")]
+    REJECT,
+    [Display(Name = "Chưa chắc chắn")]
+    NOT_SURE,
+    [Display(Name = "Không nhấc máy")]
+    NO_ANSWER
 }

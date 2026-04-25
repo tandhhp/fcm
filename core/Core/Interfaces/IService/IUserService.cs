@@ -24,4 +24,5 @@ public interface IUserService
     Task<TResult> CreateTelesaleAsync(CreateTelesaleArgs args);
     Task<TResult> UpdateTelesaleAsync(UpdateTelesaleArgs args);
     Task<TResult> DeleteTelesaleAsync(Guid id);
+    Task<object> GetManagerOptionsAsync(SelectOptions selectOptions);
 }

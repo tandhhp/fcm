@@ -62,39 +62,23 @@ public class EventRepository(ApplicationDbContext context, IHCAService _hcaServi
     {
         var userId = _hcaService.GetUserId();
         var query = from u in _context.Users
+                    join ur in _context.UserRoles on u.Id equals ur.UserId
+                    join r in _context.Roles on ur.RoleId equals r.Id
+                    where r.Name == RoleName.Sales || r.Name == RoleName.Telesales
                     where u.Status == UserStatus.Working
                     select new
                     {
                         u.Id,
                         u.Name,
-                        u.SmId,
-                        u.DosId,
-                        u.DotId,
-                        u.TmId
+                        u.ManagerId
                     };
-        if (selectOptions.SalesManagerId.HasValue)
+        if (selectOptions.ManagerId.HasValue)
         {
-            query = query.Where(x => x.SmId == selectOptions.SalesManagerId || x.Id == selectOptions.SalesManagerId);
+            query = query.Where(x => x.ManagerId == selectOptions.ManagerId);
         }
         if (!string.IsNullOrWhiteSpace(selectOptions.KeyWords))
         {
             query = query.Where(x => x.Name.ToLower().Contains(selectOptions.KeyWords.ToLower()));
-        }
-        if (_hcaService.IsUserInRole(RoleName.SalesManager))
-        {
-            query = query.Where(x => x.SmId == userId || x.Id == userId);
-        }
-        if (_hcaService.IsUserInRole(RoleName.Dos))
-        {
-            query = query.Where(x => x.DosId == userId || x.Id == userId);
-        }
-        if (_hcaService.IsUserInRole(RoleName.Dot))
-        {
-            query = query.Where(x => x.DotId == userId || x.Id == userId);
-        }
-        if (_hcaService.IsUserInRole(RoleName.TelesaleManager))
-        {
-            query = query.Where(x => x.TmId == userId || x.Id == userId);
         }
         return await query.Select(x => new {
             Value = x.Id,

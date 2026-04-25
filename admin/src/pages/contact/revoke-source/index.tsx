@@ -90,7 +90,7 @@ const Index: React.FC = () => {
                     <Col md={4} xs={24}>
                         <ProFormSelect
                             name="teamId"
-                            label="Team"
+                            label="Nhóm"
                             options={teamOptions}
                             showSearch
                             fieldProps={{
@@ -104,18 +104,18 @@ const Index: React.FC = () => {
                     </Col>
                     <Col md={6} xs={24}>
                         <ProFormSelect
-                            name="sourceId"
-                            label="Nguồn"
-                            options={sourceOptions}
+                            name="telesalesId"
+                            label="Nhân viên"
+                            dependencies={["teamId"]}
+                            request={async ({ teamId }) => apiTelesalesOptions({ teamId })}
                             showSearch
                         />
                     </Col>
                     <Col md={6} xs={24}>
                         <ProFormSelect
-                            name="telesalesId"
-                            label="Telesales"
-                            dependencies={["teamId"]}
-                            request={async ({ teamId }) => apiTelesalesOptions({ teamId })}
+                            name="sourceId"
+                            label="Nguồn"
+                            options={sourceOptions}
                             showSearch
                         />
                     </Col>
@@ -159,6 +159,7 @@ const Index: React.FC = () => {
                     selectedRowKeys,
                     onChange: setSelectedRowKeys
                 }}
+                size="small"
                 request={async (params) => {
                     const response = await apiContactRevokeSourceList({
                         ...params,
@@ -185,11 +186,7 @@ const Index: React.FC = () => {
                         dataIndex: "phoneNumber"
                     },
                     {
-                        title: "Group",
-                        dataIndex: "groupName"
-                    },
-                    {
-                        title: "Team telesales",
+                        title: "Nhóm",
                         dataIndex: "teamName"
                     },
                     {
@@ -197,7 +194,7 @@ const Index: React.FC = () => {
                         dataIndex: "sourceName"
                     },
                     {
-                        title: "Telesales",
+                        title: "Nhân viên",
                         dataIndex: "telesalesName"
                     },
                     {

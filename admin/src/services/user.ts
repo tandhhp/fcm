@@ -357,3 +357,7 @@ export async function apiTelesaleDelete(id: string) {
     method: 'DELETE'
   });
 }
+
+export async function apiGetManagerOptions(params?: any) {
+  return request(`user/manager/options`, { params });
+}

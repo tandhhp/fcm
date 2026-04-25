@@ -30,7 +30,7 @@ public class Tel4vnService(HttpClient _client, ApplicationDbContext _context, IC
         var query = from u in _context.Users
                     join ur in _context.UserRoles on u.Id equals ur.UserId
                     join r in _context.Roles on ur.RoleId equals r.Id
-                    where r.Name == RoleName.Telesale
+                    where r.Name == RoleName.Telesales
                     select new
                     {
                         u.LineCode,

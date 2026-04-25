@@ -113,8 +113,8 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
         return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
 
-    [HttpGet("need-confirms")]
-    public async Task<IActionResult> NeedConfirmsAsync([FromQuery] ContactFilterOptions filterOptions) => Ok(await _contactService.NeedConfirmsAsync(filterOptions));
+    [HttpGet("attendance-schedule-list")]
+    public async Task<IActionResult> GetAttendanceScheduleListAsync([FromQuery] ContactFilterOptions filterOptions) => Ok(await _contactService.GetAttendanceScheduleListAsync(filterOptions));
 
     [HttpGet("statistics")]
     public async Task<IActionResult> StatisticsAsync()
@@ -141,21 +141,28 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync([FromRoute] Guid id)
     {
-        var contact = await _context.Contacts.FindAsync(id);
-        if (contact is null) return BadRequest("Không tìm thấy liên hệ!");
-        _context.Contacts.Remove(contact);
-        var activities = await _context.ContactActivities.Where(x => x.ContactId == id).ToListAsync();
-        if (activities.Any())
+        try
         {
-            _context.ContactActivities.RemoveRange(activities);
+            var contact = await _context.Contacts.FindAsync(id);
+            if (contact is null) return BadRequest("Không tìm thấy liên hệ!");
+            _context.Contacts.Remove(contact);
+            var activities = await _context.ContactActivities.Where(x => x.ContactId == id).ToListAsync();
+            if (activities.Count != 0)
+            {
+                _context.ContactActivities.RemoveRange(activities);
+            }
+
+            var admin = await _context.Users.FindAsync(User.GetId());
+            if (admin is null) return BadRequest("Bạn không có quyền thực hiện điều này!");
+
+            await _appLogService.AddAsync($"{admin.Name} - {admin.UserName} đã xóa liên hệ: {contact.Name} - {contact.PhoneNumber}");
+            await _context.SaveChangesAsync();
+            return Ok(TResult.Success);
         }
-
-        var admin = await _context.Users.FindAsync(User.GetId());
-        if (admin is null) return BadRequest("Bạn không có quyền thực hiện điều này!");
-
-        await _appLogService.AddAsync($"{admin.Name} - {admin.UserName} đã xóa liên hệ: {contact.Name} - {contact.PhoneNumber}");
-        await _context.SaveChangesAsync();
-        return Ok(IdentityResult.Success);
+        catch (Exception ex)
+        {
+            return BadRequest(ex.ToString());
+        }
     }
 
     [HttpGet("activity/list/{id}")]
@@ -312,7 +319,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
         {
             query = query.Where(x => x.SalesId == user.Id);
         }
-        if (User.IsInRole(RoleName.Telesale))
+        if (User.IsInRole(RoleName.Telesales))
         {
             query = query.Where(x => x.TelesaleId == user.Id);
         }
@@ -321,7 +328,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
             var teleIds = await (from a in _context.Users
                                  join b in _context.UserRoles on a.Id equals b.UserId
                                  join c in _context.Roles on b.RoleId equals c.Id
-                                 where c.Name == RoleName.Telesale && a.TmId == user.Id
+                                 where c.Name == RoleName.Telesales && a.TmId == user.Id
                                  select a.Id).ToListAsync();
             query = query.Where(x => x.TelesaleId != null && teleIds.Contains(x.TelesaleId.Value));
         }
@@ -336,10 +343,10 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
             var teleIds = await (from a in _context.Users
                                  join b in _context.UserRoles on a.Id equals b.UserId
                                  join c in _context.Roles on b.RoleId equals c.Id
-                                 where c.Name == RoleName.Telesale && a.TmId != null && tmIds.Contains(a.TmId.Value)
+                                 where c.Name == RoleName.Telesales && a.TmId != null && tmIds.Contains(a.TmId.Value)
                                  select a.Id).ToListAsync();
 
-            var telesales = await _userManager.GetUsersInRoleAsync(RoleName.Telesale);
+            var telesales = await _userManager.GetUsersInRoleAsync(RoleName.Telesales);
 
             query = query.Where(x => x.TelesaleId != null && teleIds.Contains(x.TelesaleId.Value));
         }
@@ -363,7 +370,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
         {
             query = query.Where(x => x.EventDate.Date >= filterOptions.FromDate.Value.Date && x.EventDate <= filterOptions.ToDate.Value.Date);
         }
-        if (!User.IsInRole(RoleName.Telesale) && !User.IsInRole(RoleName.TelesaleManager) && !User.IsInRole(RoleName.Dot) && !User.IsInRole(RoleName.Admin) && !User.IsInRole(RoleName.CxTP))
+        if (!User.IsInRole(RoleName.Telesales) && !User.IsInRole(RoleName.TelesaleManager) && !User.IsInRole(RoleName.Dot) && !User.IsInRole(RoleName.Admin) && !User.IsInRole(RoleName.CxTP))
         {
             query = query.Where(x => x.BranchId == user.BranchId);
         }
@@ -540,7 +547,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
             {
                 query = query.Where(x => x.SalesId == user.Id || x.CreatedBy == user.Id);
             }
-            if (User.IsInRole(RoleName.Telesale))
+            if (User.IsInRole(RoleName.Telesales))
             {
                 query = query.Where(x => x.TelesaleId == user.Id || x.CreatedBy == user.Id);
             }

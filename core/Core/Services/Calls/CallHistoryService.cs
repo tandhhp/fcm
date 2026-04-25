@@ -54,7 +54,9 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
                         TelesaleId = contact.UserId,
                         BranchId = telesales.BranchId,
                         CreatedBy = contact.UserId.GetValueOrDefault(),
-                        Status = LeadStatus.Pending
+                        Status = LeadStatus.Pending,
+                        Confirm2 = Confirm2.UNCONFIRM,
+                        SourceId = contact.SourceId
                     });
                 }
             }

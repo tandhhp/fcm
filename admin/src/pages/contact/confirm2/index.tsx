@@ -1,8 +1,9 @@
-import { apiContactConfirm2, apiContactNeedConfirm2 } from "@/services/contact";
+import { apiContactConfirm2, apiAttendanceSchedules } from "@/services/contact";
+import { CONFIRM2_OPTIONS } from "@/utils/constants";
 import { ManOutlined, MoreOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, ModalForm, PageContainer, ProColumnType, ProForm, ProFormSelect, ProFormTextArea, ProTable } from "@ant-design/pro-components"
 import { useAccess } from "@umijs/max";
-import { Button, Dropdown, message, Tag } from "antd";
+import { Avatar, Button, Dropdown, message, Tag } from "antd";
 import { useRef, useState } from "react";
 
 const Index: React.FC = () => {
@@ -12,31 +13,8 @@ const Index: React.FC = () => {
     const [selectedRecord, setSelectedRecord] = useState<any>(null);
     const [modalVisible, setModalVisible] = useState(false);
 
-    const confirm2Options = [
-        {
-            label: 'Chưa xác nhận',
-            value: 0
-        },
-        {
-            label: 'Đồng ý',
-            value: 1
-        },
-        {
-            label: 'Hủy',
-            value: 2
-        },
-        {
-            label: 'Chưa chắc chắn',
-            value: 3
-        },
-        {
-            label: 'Không nhấc máy',
-            value: 4
-        }
-    ];
-
     const getConfirm2StatusTag = (status: number) => {
-        const option = confirm2Options.find(o => o.value === status);
+        const option = CONFIRM2_OPTIONS.find(o => o.value === status);
         const colors = ['default', 'success', 'error', 'warning', 'default'];
         return <Tag color={colors[status] || 'default'}>{option?.label || 'Chưa xác nhận'}</Tag>;
     };
@@ -48,7 +26,7 @@ const Index: React.FC = () => {
             width: 50
         },
         {
-            title: 'Họ và tên',
+            title: 'Họ tên khách hàng',
             dataIndex: 'name',
             render: (text, record) => {
                 if (record.gender === true) {
@@ -58,12 +36,14 @@ const Index: React.FC = () => {
                     return <><ManOutlined className="text-blue-500" /> {text}</>
                 }
                 return text;
-            }
+            },
+            width: 200
         },
         {
             title: 'Số điện thoại',
             dataIndex: 'phoneNumber',
-            width: 110
+            width: 120,
+            copyable: true
         },
         {
             title: 'Ngày tạo',
@@ -74,24 +54,27 @@ const Index: React.FC = () => {
         },
         {
             title: 'Nhân viên',
-            dataIndex: 'telesalesName',
-            search: false
+            dataIndex: 'staffName',
+            search: false,
+            width: 200,
+            render: (text, record) => (
+                <div className="flex items-center gap-1">
+                    <Avatar size="small" src={record.staffAvatar} />{text}
+                </div>
+            )
         },
         {
-            title: 'Lượt gọi',
-            dataIndex: 'callCount',
-            search: false
-        },
-        {
-            title: 'Ngày hẹn',
+            title: 'Sự kiện',
             dataIndex: 'eventDate',
             valueType: 'date',
-            search: false
+            search: false,
+            width: 100
         },
         {
-            title: 'Khung giờ',
+            title: 'Giờ',
             dataIndex: 'eventName',
-            search: false
+            search: false,
+            width: 100
         },
         {
             title: 'Ngày sự kiện',
@@ -100,25 +83,26 @@ const Index: React.FC = () => {
             hideInTable: true
         },
         {
-            title: 'Ghi chú',
-            dataIndex: 'note',
-            search: false
-        },
-        {
             title: 'Xác nhận 2',
-            dataIndex: 'confirm2Status',
+            dataIndex: 'confirm2',
             render: (text, record) => {
                 return (
                     <div>
-                        {getConfirm2StatusTag(record.confirm2Status)}
+                        {getConfirm2StatusTag(record.confirm2)}
 
                     </div>
                 )
             },
             valueType: 'select',
             fieldProps: {
-                options: confirm2Options
-            }
+                options: CONFIRM2_OPTIONS
+            },
+            width: 120
+        },
+        {
+            title: 'Ghi chú',
+            dataIndex: 'note',
+            search: false
         },
         {
             title: <SettingOutlined />,
@@ -164,7 +148,7 @@ const Index: React.FC = () => {
                 search={{
                     layout: 'vertical'
                 }}
-                request={apiContactNeedConfirm2}
+                request={apiAttendanceSchedules}
                 columns={columns}
                 size="small"
             />
@@ -174,8 +158,8 @@ const Index: React.FC = () => {
                 onOpenChange={setModalVisible}
                 onFinish={async (values) => {
                     await apiContactConfirm2({
-                        contactId: selectedRecord?.id,
-                        confirm2Status: values.confirm2Status,
+                        leadId: selectedRecord?.id,
+                        confirm2: values.confirm2,
                         reason: values.reason
                     });
                     message.success('Xác nhận thành công!');
@@ -183,13 +167,13 @@ const Index: React.FC = () => {
                     return true;
                 }}
                 initialValues={{
-                    confirm2Status: selectedRecord?.confirm2Status
+                    confirm2: selectedRecord?.confirm2
                 }}
             >
                 <ProFormSelect
-                    name="confirm2Status"
+                    name="confirm2"
                     label="Trạng thái"
-                    options={confirm2Options}
+                    options={CONFIRM2_OPTIONS}
                     rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
                 />
                 <ProFormTextArea

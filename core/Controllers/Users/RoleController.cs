@@ -165,7 +165,7 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
         var query = from a in _context.Users
                     join b in _context.UserRoles on a.Id equals b.UserId
                     join c in _context.Roles on b.RoleId equals c.Id
-                    where c.Name == RoleName.Telesale //&& a.Status == UserStatus.Working
+                    where c.Name == RoleName.Telesales //&& a.Status == UserStatus.Working
                     select new
                     {
                         a.Name,
@@ -208,7 +208,7 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
             new() { Name = RoleName.Hr, DisplayName = "Nhân sự", Description = "Nhân sự" },
             new() { Name = RoleName.Event, DisplayName = "Sự kiện", Description = "Sự kiện" },
             new() { Name = RoleName.EM, DisplayName = "Quản lý sự kiện", Description = "Quản lý sự kiện" },
-            new() { Name = RoleName.Telesale, DisplayName = "Telesale", Description = "Telesale" },
+            new() { Name = RoleName.Telesales, DisplayName = "Telesale", Description = "Telesale" },
             new() { Name = RoleName.TelesaleManager, DisplayName = "Trưởng nhóm Telesale", Description = "Trưởng nhóm Telesale" },
             new() { Name = RoleName.Dot, DisplayName = "Giám đốc Telesale", Description = "Giám đốc Telesale" },
             new() { Name = RoleName.AdminData, DisplayName = "Quản trị dữ liệu", Description = "Quản trị dữ liệu" },
@@ -276,7 +276,7 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
             if (teamKeyIn is null) return BadRequest("Không tìm thấy trưởng nhóm!");
             if (await _userManager.IsInRoleAsync(teamKeyIn, RoleName.TelesaleManager))
             {
-                roleName = RoleName.Telesale;
+                roleName = RoleName.Telesales;
             }
         }
         var query = from a in _context.Users
@@ -296,7 +296,7 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
             {
                 query = query.Where(x => x.SmId == selectOptions.TeamKeyInId);
             }
-            if (roleName == RoleName.Telesale)
+            if (roleName == RoleName.Telesales)
             {
                 query = query.Where(x => x.TmId == selectOptions.TeamKeyInId);
             }

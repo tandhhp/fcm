@@ -52,6 +52,10 @@ const SourceForm: React.FC<Props> = (props) => {
                     {
                         name: 'protected',
                         value: data.protected
+                    },
+                    {
+                        name: 'teamId',
+                        value: data.teamId
                     }
                 ])
             });
@@ -107,7 +111,7 @@ const SourceForm: React.FC<Props> = (props) => {
                     ]} allowClear={false} />
                 </Col>
             </Row>
-            <ProFormSelect name="teamId" label="Group" request={apiTeamOptions} showSearch />
+            <ProFormSelect name="teamId" label="Nhóm" request={apiTeamOptions} showSearch />
             <ProFormText name="name" label="Tên nguồn" rules={[{ required: true, message: 'Vui lòng nhập tên nguồn' }]} />
         </ModalForm>
     )

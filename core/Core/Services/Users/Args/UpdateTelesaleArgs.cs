@@ -12,4 +12,5 @@ public class UpdateTelesaleArgs
     public int BranchId { get; set; }
     public int? TeamId { get; set; }
     public string? LineCode { get; set; }
+    public Guid? ManagerId { get; set; }
 }

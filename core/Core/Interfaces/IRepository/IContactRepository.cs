@@ -24,6 +24,6 @@ public interface IContactRepository : IAsyncRepository<Contact>
     Task<ListResult<object>> GetUnassignedListAsync(UnassignedFilterOptions filterOptions);
     Task<bool> IsPhoneExistAsync(string phoneNumber);
     Task<ListResult<dynamic>> ListAsync(ContactFilterOptions filterOptions);
-    Task<ListResult<object>> NeedConfirmsAsync(ContactFilterOptions filterOptions);
+    Task<ListResult<object>> GetAttendanceScheduleListAsync(ContactFilterOptions filterOptions);
     void Update(Contact contact);
 }

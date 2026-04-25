@@ -1,4 +1,4 @@
-import { apiLockUser, apiTelesaleCreate, apiTelesaleDelete, apiTelesaleList, apiTelesaleUpdate, apiUnLockUser } from "@/services/user";
+import { apiLockUser, apiTelesaleCreate, apiTelesaleDelete, apiTelesaleList, apiTelesaleUpdate, apiUnLockUser, apiGetManagerOptions } from "@/services/user";
 import { apiBranchOptions } from "@/services/settings/branch";
 import { apiTeamOptions } from "@/services/team";
 import { DeleteOutlined, EditOutlined, LockOutlined, ManOutlined, PlusOutlined, UnlockOutlined, UserOutlined, WomanOutlined } from "@ant-design/icons";
@@ -27,6 +27,7 @@ const Index: React.FC = () => {
                 branchId: telesale.branchId,
                 teamId: telesale.teamId,
                 lineCode: telesale.lineCode,
+                managerId: telesale.managerId,
             });
         } else if (open) {
             formRef.current?.resetFields();
@@ -82,6 +83,7 @@ const Index: React.FC = () => {
                 search={{
                     layout: 'vertical'
                 }}
+                size="small"
                 columns={[
                     {
                         title: '#',
@@ -93,8 +95,9 @@ const Index: React.FC = () => {
                         title: <UserOutlined />,
                         dataIndex: 'avatar',
                         valueType: 'avatar',
-                        width: 50,
-                        search: false
+                        width: 40,
+                        search: false,
+                        align: 'center'
                     },
                     {
                         title: 'Tài khoản',
@@ -112,9 +115,6 @@ const Index: React.FC = () => {
                             return (
                                 <>
                                     {genderIcon} {dom}
-                                    {entity.status === 1 && (
-                                        <Tag color="red" style={{ marginLeft: 8 }}>Đã nghỉ</Tag>
-                                    )}
                                 </>
                             )
                         }
@@ -161,7 +161,7 @@ const Index: React.FC = () => {
                             0: { text: 'Đang làm việc', status: 'Success' },
                             1: { text: 'Đã nghỉ việc', status: 'Error' }
                         },
-                        width: 120,
+                        width: 140,
                         search: false
                     },
                     {
@@ -271,10 +271,22 @@ const Index: React.FC = () => {
                         />
                     </Col>
                 </Row>
-                <ProFormText 
-                    name="lineCode" 
-                    label="Line Code" 
-                />
+                <Row gutter={16}>
+                    <Col md={12} xs={24}>
+                        <ProFormSelect 
+                            name="managerId" 
+                            label="Người quản lý" 
+                            request={apiGetManagerOptions}
+                            showSearch
+                        />
+                    </Col>
+                    <Col md={12} xs={24}>
+                        <ProFormText 
+                            name="lineCode" 
+                            label="Line Code" 
+                        />
+                    </Col>
+                </Row>
             </ModalForm>
         </PageContainer>
     )

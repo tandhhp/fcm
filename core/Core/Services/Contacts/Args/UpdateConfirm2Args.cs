@@ -1,10 +1,10 @@
-﻿using Waffle.Entities.Contacts;
+﻿using Waffle.Entities;
 
 namespace Waffle.Core.Services.Contacts.Args;
 
 public class UpdateConfirm2Args
 {
-    public Guid ContactId { get; set; }
-    public Confirm2Status Confirm2Status { get; set; }
+    public Guid LeadId { get; set; }
+    public Confirm2 Confirm2 { get; set; }
     public string? Reason { get; set; }
 }

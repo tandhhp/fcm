@@ -19,7 +19,6 @@ using Waffle.Entities;
 using Waffle.Entities.Contracts;
 using Waffle.Entities.Payments;
 using Waffle.Extensions;
-using Waffle.ExternalAPI;
 using Waffle.Foundations;
 using Waffle.Models;
 using Waffle.Models.Args;
@@ -416,7 +415,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                     }
                 }
             }
-            if (await _userManager.IsInRoleAsync(user, RoleName.Telesale))
+            if (await _userManager.IsInRoleAsync(user, RoleName.Telesales))
             {
                 if (args.TmId is null) return BadRequest("Vui lòng chọn Telesales Manager");
                 user.TmId = args.TmId;
@@ -1176,7 +1175,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                     join c in _context.Roles on b.RoleId equals c.Id
                     join d in _context.Users on a.TmId equals d.Id into ad
                     from d in ad.DefaultIfEmpty()
-                    where c.Name == RoleName.Telesale && a.TmId != null //&& a.Status == UserStatus.Working
+                    where c.Name == RoleName.Telesales && a.TmId != null //&& a.Status == UserStatus.Working
                     select new
                     {
                         label = $"{a.Name} - {a.UserName}",
@@ -1680,7 +1679,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
             var query = from a in _context.Users
                         join b in _context.UserRoles on a.Id equals b.UserId
                         join c in _context.Roles on b.RoleId equals c.Id
-                        where c.Name == RoleName.Telesale && a.TmId == user.Id && a.Status == UserStatus.Working
+                        where c.Name == RoleName.Telesales && a.TmId == user.Id && a.Status == UserStatus.Working
                         select a.Name;
             var telesales = await query.FirstOrDefaultAsync();
             if (!string.IsNullOrWhiteSpace(telesales))
@@ -1958,7 +1957,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
         var query = from a in _context.Users
                     join b in _context.UserRoles on a.Id equals b.UserId
                     join c in _context.Roles on b.RoleId equals c.Id
-                    where c.Name == RoleName.Telesale && a.Status == UserStatus.Working
+                    where c.Name == RoleName.Telesales && a.Status == UserStatus.Working
                     select new
                     {
                         a.Id,
@@ -2010,4 +2009,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
 
     [HttpDelete("telesales/{id}")]
     public async Task<IActionResult> DeleteTelesaleAsync([FromRoute] Guid id) => Ok(await _userService.DeleteTelesaleAsync(id));
+
+    [HttpGet("manager/options")]
+    public async Task<IActionResult> GetManagerOptionsAsync([FromQuery] SelectOptions selectOptions) => Ok(await _userService.GetManagerOptionsAsync(selectOptions));
 }

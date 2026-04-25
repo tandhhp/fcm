@@ -1,8 +1,8 @@
 import { apiCallOptions } from "@/services/call";
-import { apiContactDialedCalls, apiExportDialedCalls } from "@/services/contact";
-import { CalendarOutlined, EditOutlined, ExportOutlined, EyeOutlined, MoreOutlined, PhoneOutlined, SettingOutlined, StopOutlined } from "@ant-design/icons";
+import { apiContactDialedCalls, apiExportDialedCalls, deleteContact } from "@/services/contact";
+import { CalendarOutlined, DeleteOutlined, EditOutlined, ExclamationCircleFilled, ExportOutlined, EyeOutlined, MoreOutlined, PhoneOutlined, SettingOutlined, StopOutlined } from "@ant-design/icons";
 import { ActionType, ModalForm, PageContainer, ProFormDateRangePicker, ProTable } from "@ant-design/pro-components"
-import { Button, Dropdown } from "antd";
+import { Button, Dropdown, message, Modal } from "antd";
 import { useRef, useState } from "react";
 import CallForm from "../components/call";
 import BookingForm from "../components/booking";
@@ -35,6 +35,19 @@ const Index: React.FC = () => {
         window.URL.revokeObjectURL(url);
         return true;
     }
+
+    const showConfirm = (id: string) => {
+        Modal.confirm({
+            title: 'Xác nhận xóa?',
+            icon: <ExclamationCircleFilled />,
+            content: 'Bạn có chắc chắn muốn xóa các mục này?',
+            onOk: async () => {
+                await deleteContact(id);
+                message.success('Xóa thành công');
+                actionRef.current?.reload();
+            }
+        });
+    };
 
     return (
         <PageContainer extra={<Button onClick={() => setOpenExport(true)} type="primary" icon={<ExportOutlined />}>Xuất dữ liệu</Button>}>
@@ -102,6 +115,13 @@ const Index: React.FC = () => {
                                         },
                                         icon: <StopOutlined />,
                                         disabled: entity.isBlocked
+                                    },
+                                    {
+                                        key: 'delete',
+                                        label: 'Xóa',
+                                        icon: <DeleteOutlined />,
+                                        danger: true,
+                                        onClick: () => showConfirm(entity.id)
                                     }
                                 ]
                             }}>
@@ -113,16 +133,8 @@ const Index: React.FC = () => {
                     {
                         title: 'SDT',
                         dataIndex: 'phoneNumber',
-                        minWidth: 100,
-                        width: 100,
-                        render: (text, record) => {
-                            return (
-                                <Button type="link" size="small" onClick={() => {
-                                    setContact(record);
-                                    setOpenCall(true);
-                                }}>{text}</Button>
-                            )
-                        }
+                        minWidth: 90,
+                        width: 90
                     },
                     {
                         title: 'Tên khách hàng',

@@ -1,3 +1,5 @@
+import { CONFIRM2_STATUS } from "./enum";
+
 export enum FormType {
   Holtel,
   PrivateStay,
@@ -89,3 +91,26 @@ export const CALL_STATUS_CODE = {
   NOT_INTERESTED: 'NOT_INTERESTED',
   LOCATION: 'LOCATION'
 }
+
+export const CONFIRM2_OPTIONS = [
+  {
+    label: 'Chờ xác nhận',
+    value: CONFIRM2_STATUS.UNCONFIRM
+  },
+  {
+    label: 'Xác nhận',
+    value: CONFIRM2_STATUS.CONFIRM
+  },
+  {
+    label: 'Từ chối',
+    value: CONFIRM2_STATUS.REJECT
+  },
+  {
+    label: 'Không chắc',
+    value: CONFIRM2_STATUS.NOT_SURE
+  },
+  {
+    label: 'Không trả lời',
+    value: CONFIRM2_STATUS.NO_ANSWER
+  }
+]

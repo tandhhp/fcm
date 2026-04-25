@@ -28,13 +28,6 @@ type TransferFilter = {
     telesalesId?: string;
 };
 
-type TransferDestination = {
-    groupId?: number;
-    sourceId?: number;
-    teamId?: number;
-    telesalesId?: string;
-};
-
 const Index: React.FC = () => {
     const actionRef = useRef<ActionType>();
     const searchFormRef = useRef<ProFormInstance>();
@@ -214,6 +207,7 @@ const Index: React.FC = () => {
                                 </ProForm>
 
                                 <ProTable
+                                    size="small"
                                     rowKey="id"
                                     actionRef={actionRef}
                                     search={false}
@@ -236,7 +230,8 @@ const Index: React.FC = () => {
                                         {
                                             title: "#",
                                             valueType: "indexBorder",
-                                            width: 50
+                                            width: 30,
+                                            align: "center"
                                         },
                                         {
                                             title: "Họ tên",
@@ -244,21 +239,22 @@ const Index: React.FC = () => {
                                         },
                                         {
                                             title: "Số điện thoại",
-                                            dataIndex: "phoneNumber"
+                                            dataIndex: "phoneNumber",
+                                            copyable: true
                                         },
                                         {
-                                            title: "Group",
+                                            title: "Nhóm",
                                             dataIndex: "groupName",
+                                            search: false
+                                        },
+                                        {
+                                            title: "Nhân viên",
+                                            dataIndex: "telesalesName",
                                             search: false
                                         },
                                         {
                                             title: "Nguồn",
                                             dataIndex: "sourceName",
-                                            search: false
-                                        },
-                                        {
-                                            title: "Telesales",
-                                            dataIndex: "telesalesName",
                                             search: false
                                         },
                                         {

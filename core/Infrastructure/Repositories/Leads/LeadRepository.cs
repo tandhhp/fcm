@@ -155,7 +155,7 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
             {
                 query = query.Where(x => x.SalesId == userId || x.CreatedBy == userId);
             }
-            if (_hcaService.IsUserInRole(RoleName.Telesale))
+            if (_hcaService.IsUserInRole(RoleName.Telesales))
             {
                 query = query.Where(x => x.TelesaleId == userId || x.CreatedBy == userId);
             }
@@ -303,7 +303,8 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
                         CreatorName = c.Name,
                         SubLeads = _context.SubLeads.Where(x => x.LeadId == l.Id).Select(sub => $"{sub.Name} - {sub.PhoneNumber}").ToList(),
                         l.BranchId,
-                        c.Avatar
+                        c.Avatar,
+                        l.Confirm2
                     };
         if (filterOptions.EventId.HasValue)
         {
@@ -325,7 +326,7 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
         {
             query = query.Where(x => x.SalesId == userId || x.CreatedBy == userId);
         }
-        if (_hcaService.IsUserInRole(RoleName.Telesale))
+        if (_hcaService.IsUserInRole(RoleName.Telesales))
         {
             query = query.Where(x => x.TelesaleId == userId || x.CreatedBy == userId);
         }

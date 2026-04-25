@@ -19,9 +19,8 @@ public class CalendarController(ApplicationDbContext _context, IHCAService _hcaS
         var userId = _hcaService.GetUserId();
         var query = _context.Leads.AsNoTracking()
             .Where(x => x.BranchId == filterOptions.BranchId)
-            .Where(x => x.Status != LeadStatus.Pending)
             .Where(x => x.EventDate.Month == filterOptions.Month && x.EventDate.Year == filterOptions.Year);
-        if (_hcaService.IsUserInAnyRole(RoleName.Telesale, RoleName.Sales))
+        if (_hcaService.IsUserInAnyRole(RoleName.Telesales, RoleName.Sales))
         {
             query = query.Where(x => x.CreatedBy == userId);
         }
@@ -49,8 +48,7 @@ public class CalendarController(ApplicationDbContext _context, IHCAService _hcaS
         var userId = _hcaService.GetUserId();
         var query = from a in _context.Leads
                     join c in _context.Events on a.EventId equals c.Id
-                    join b in _context.Users on a.CreatedBy equals b.Id into ab
-                    from b in ab.DefaultIfEmpty()
+                    join b in _context.Users on a.CreatedBy equals b.Id
                     where a.BranchId == filterOptions.BranchId && a.EventDate.Date == filterOptions.Date.Date
                     select new
                     {
@@ -59,11 +57,16 @@ public class CalendarController(ApplicationDbContext _context, IHCAService _hcaS
                         a.Status,
                         EventName = c.Name,
                         KeyInName = b.Name,
-                        KeyInId = b.Id
+                        KeyInId = b.Id,
+                        b.ManagerId
                     };
-        if (_hcaService.IsUserInAnyRole(RoleName.Telesale, RoleName.Sales))
+        if (_hcaService.IsUserInAnyRole(RoleName.Telesales, RoleName.Sales))
         {
             query = query.Where(x => x.KeyInId == userId);
+        }
+        if (_hcaService.IsUserInAnyRole(RoleName.SalesManager, RoleName.TelesaleManager))
+        {
+            query = query.Where(x => x.ManagerId == userId);
         }
         return Ok(await ListResult<object>.Success(query, filterOptions));
     }

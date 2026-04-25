@@ -4,5 +4,5 @@ namespace Waffle.Core.Services.Leads.Filters;
 
 public class KeyInSelectOptions : SelectOptions
 {
-    public Guid? SalesManagerId { get; set; }
+    public Guid? ManagerId { get; set; }
 }

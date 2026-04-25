@@ -30,7 +30,7 @@ public class RoleName
     /// </summary>
     public const string SalesManager = "sm";
     public const string Event = "event";
-    public const string Telesale = nameof(Telesale);
+    public const string Telesales = "Telesale";
     public const string TelesaleManager = nameof(TelesaleManager);
     /// <summary>
     /// Director of Tele

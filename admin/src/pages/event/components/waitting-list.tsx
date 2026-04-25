@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import { Avatar, Button, Dropdown, message, Popconfirm, Tag } from "antd";
 import { useAccess } from "@umijs/max";
 import { apiDeleteLead, apiUpdateLeadStatus } from "@/services/contact";
-import { LeadStatus } from "@/utils/constants";
+import { CONFIRM2_OPTIONS, LeadStatus } from "@/utils/constants";
 import LeadForm from "@/components/form/lead-form";
 import LeadStatusRender from "@/components/lead/status-render";
 import { apiBranchOptions } from "@/services/settings/branch";
@@ -31,6 +31,18 @@ const WaitingList: React.FC = () => {
         if (status !== LeadStatus.Approved) return false;
         if (!access.canAdmin && !access.event && !access.em) return false;
         return true;
+    }
+
+    const getConfirm2StatusTag = (status: number) => {
+        const option = CONFIRM2_OPTIONS.find(o => o.value === status);
+        const colors = ['default', 'success', 'error', 'warning', 'default'];
+        return <Tag className="w-full text-center" color={colors[status] || 'default'}>{option?.label || 'Chưa xác nhận'}</Tag>;
+    };
+
+    const canEdit = (record: any) => {
+        if (record.status === LeadStatus.Approved) return false;
+        if (access.dot || access.telesaleManager) return false;
+        return (access.sales || access.telesale || access.cx);
     }
 
     return (
@@ -154,6 +166,24 @@ const WaitingList: React.FC = () => {
                         minWidth: 100
                     },
                     {
+                        title: 'Xác nhận 2',
+                        dataIndex: 'confirm2',
+                        valueType: 'select',
+                        search: false,
+                        width: 120,
+                        minWidth: 120,
+                        fieldProps: {
+                            options: CONFIRM2_OPTIONS
+                        },
+                        render: (text, record) => {
+                            return (
+                                <div>
+                                    {getConfirm2StatusTag(record.confirm2)}
+                                </div>
+                            )
+                        }
+                    },
+                    {
                         title: <SettingOutlined />,
                         valueType: 'option',
                         width: 60,
@@ -172,7 +202,7 @@ const WaitingList: React.FC = () => {
                                             setSelectedRecord(entity);
                                             setKeyInOpen(true);
                                         },
-                                        disabled: entity.status === LeadStatus.Approved && (access.sales || access.telesale || access.cx)
+                                        disabled: !canEdit(entity)
                                     }
                                 ]
                             }}>
