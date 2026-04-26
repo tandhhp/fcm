@@ -64,6 +64,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<CallStatus> CallStatuses { get; set; }
     public DbSet<Room> Rooms { get; set; }
     public virtual DbSet<CallHistory> CallHistories { get; set; }
+    public DbSet<CallWebhookLog> CallWebhookLogs { get; set; }
     public DbSet<Campaign> Campaigns { get; set; }
     public DbSet<Source> Sources { get; set; }
     public DbSet<CallCenter> CallCenters { get; set; }

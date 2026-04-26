@@ -1,4 +1,5 @@
-﻿using Waffle.Core.Interfaces.IRepository.Calls;
+﻿using System.Globalization;
+using Waffle.Core.Interfaces.IRepository.Calls;
 using Waffle.Core.Interfaces.IService;
 using Waffle.Core.Interfaces.IService.Calls;
 using Waffle.Core.Services.Calls.Args;
@@ -89,4 +90,56 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
     public Task<object?> TeleReportAsync(TeleReportFilterOptions filterOptions) => _callHistoryRepository.TeleReportAsync(filterOptions);
 
     public Task<ListResult<object>> GetStatusDetailsAsync(CallStatusDetailFilterOptions filterOptions) => _callHistoryRepository.GetStatusDetailsAsync(filterOptions);
+
+    public async Task<TResult> CdrWebhookAsync(CdrWebhookCreateArgs args)
+    {
+        try
+        {
+            await _context.CallWebhookLogs.AddAsync(new()
+            {
+                Application = args.Application,
+                Billsec = args.Billsec,
+                CallId = args.CallId,
+                CampaignUuid = args.CampaignUuid,
+                Direction = args.Direction,
+                Domain = args.Domain,
+                DomainUuid = args.DomainUuid,
+                Duration = args.Duration,
+                FromNumber = args.FromNumber,
+                Hotline = args.Hotline,
+                LeadUuid = args.LeadUuid,
+                PressKey = args.PressKey,
+                ReceiveDest = args.ReceiveDest,
+                RecordingUrl = args.RecordingUrl,
+                RefId = args.RefId,
+                SipCallId = args.SipCallId,
+                SipHangupDisposition = args.SipHangupDisposition,
+                State = args.State,
+                Status = args.Status,
+                TimeAnswered = ParseDateTime(args.TimeAnswered),
+                TimeEnded = ParseDateTime(args.TimeEnded),
+                TimeStarted = ParseDateTime(args.TimeStarted),
+                ToNumber = args.ToNumber,
+                ReceivedDate = DateTime.Now
+            });
+            await _context.SaveChangesAsync();
+            return TResult.Success;
+        }
+        catch (Exception ex)
+        {
+            return TResult.Failed(ex.ToString());
+        }
+    }
+
+    private static DateTime? ParseDateTime(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return null;
+        if (DateTime.TryParseExact(value, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
+        {
+            return parsed;
+        }
+
+        if (DateTime.TryParse(value, out parsed)) return parsed;
+        return null;
+    }
 }

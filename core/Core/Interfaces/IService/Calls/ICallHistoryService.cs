@@ -10,6 +10,7 @@ public interface ICallHistoryService
 {
     Task<ListResult<object>> HistoriesAsync(CallHistoryFilterOptions filterOptions);
     Task<TResult> CompleteAsync(CallCompleteArgs args);
+    Task<TResult> CdrWebhookAsync(CdrWebhookCreateArgs args);
     Task<TResult<object>> StatisticsAsync();
     Task<object?> TeleReportAsync(TeleReportFilterOptions filterOptions);
     Task<ListResult<object>> GetStatusDetailsAsync(CallStatusDetailFilterOptions filterOptions);

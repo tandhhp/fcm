@@ -42,6 +42,9 @@ public class CallController(ICallStatusService _callStatusService, ICallHistoryS
     [HttpGet("cdr"), AllowAnonymous]
     public async Task<IActionResult> GetCdrAsync([FromQuery] CdrFilterOptions filterOptions) => Ok(await _tel4VnService.GetCdrAsync(filterOptions));
 
+    [HttpPost("cdr/webhook"), AllowAnonymous]
+    public async Task<IActionResult> CdrWebhookAsync([FromBody] CdrWebhookCreateArgs args) => Ok(await _callHistoryService.CdrWebhookAsync(args));
+
     [HttpGet("status-details")]
     public async Task<IActionResult> GetStatusDetailsAsync([FromQuery] CallStatusDetailFilterOptions filterOptions) => Ok(await _callHistoryService.GetStatusDetailsAsync(filterOptions));
 }

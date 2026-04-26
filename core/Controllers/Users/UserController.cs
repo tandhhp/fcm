@@ -1657,7 +1657,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
     [HttpPost("leave/{id}")]
     public async Task<IActionResult> LockAsync([FromRoute] Guid id)
     {
-        if (!User.IsInRole(RoleName.Hr) && !User.IsInRole(RoleName.Admin)) return BadRequest("Truy cập bị từ chối!");
+        if (!_hcaService.IsUserInAnyRole(RoleName.Hr, RoleName.Admin, RoleName.Dot)) return BadRequest("Truy cập bị từ chối!");
         var user = await _context.Users.FindAsync(id);
         if (user is null) return BadRequest("User not found!");
         if (user.Status == UserStatus.Leave) return BadRequest("User đã nghỉ việc rồi!");
