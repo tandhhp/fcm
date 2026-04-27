@@ -1,5 +1,5 @@
 import { apiDeleteLead } from "@/services/contact";
-import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, ExportOutlined, ManOutlined, MoreOutlined, ReloadOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
+import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, ExportOutlined, ManOutlined, MoreOutlined, ReloadOutlined, SettingOutlined, TeamOutlined, UserOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { useAccess } from "@umijs/max";
 import { Button, Dropdown, message, Popconfirm, Tag } from "antd";
@@ -166,24 +166,19 @@ const LeadPage: React.FC = () => {
                         title: 'Họ và tên',
                         dataIndex: 'name',
                         render: (dom, entity) => (
-                            <div>{entity.gender === false && (<ManOutlined className='text-blue-500' />)}{entity.gender === true && (<WomanOutlined className='text-red-500' />)} {dom}</div>
+                            <div>
+                                <div>{entity.gender === false && (<ManOutlined className='text-blue-500' />)}{entity.gender === true && (<WomanOutlined className='text-red-500' />)} {dom}</div>
+                                <div className="text-xs text-gray-500">Năm sinh: {dayjs(entity.dateOfBirth).format('YYYY')}</div>                                
+                                </div>
                         ),
-                        minWidth: 180,
-                        width: 180
+                        minWidth: 200,
+                        width: 200
                     },
                     {
                         title: 'Điện thoại',
                         dataIndex: 'phoneNumber',
                         width: 100,
                         minWidth: 100
-                    },
-                    {
-                        title: 'NSinh',
-                        dataIndex: 'dateOfBirth',
-                        valueType: 'dateYear',
-                        search: false,
-                        width: 60,
-                        minWidth: 60
                     },
                     {
                         title: 'Số CCCD',
@@ -201,24 +196,30 @@ const LeadPage: React.FC = () => {
                         minWidth: 200,
                     },
                     {
-                        title: 'Team Key-In',
-                        dataIndex: 'teamKeyIn',
-                        search: false,
-                        minWidth: 160,
-                        width: 160
-                    },
-                    {
                         title: 'Key-In',
                         dataIndex: 'creatorName',
                         search: false,
-                        minWidth: 160,
-                        width: 160
+                        minWidth: 200,
+                        width: 200,
+                        render: (_, entity) => (
+                            <div>
+                                <div><UserOutlined /> {entity.creatorName}</div>
+                                <div className="text-xs text-gray-500"><TeamOutlined /> {entity.teamKeyIn}</div>
+                            </div>
+                        )
                     },
                     {
                         title: 'Rep',
                         dataIndex: 'salesName',
                         search: false,
-                        minWidth: 160
+                        minWidth: 200,
+                        width: 200,
+                        render: (_, entity) => (
+                            <div>
+                                <div><UserOutlined /> {entity.salesName}</div>
+                                <div className="text-xs text-gray-500"><TeamOutlined /> {entity.salesManagerName}</div>
+                            </div>
+                        )
                     },
                     {
                         title: 'Người T.O',
@@ -265,13 +266,6 @@ const LeadPage: React.FC = () => {
                         dataIndex: 'dateRange',
                         hideInTable: true,
                         valueType: 'dateRange'
-                    },
-                    {
-                        title: 'Sales Manager',
-                        dataIndex: 'salesManagerName',
-                        search: false,
-                        minWidth: 160,
-                        width: 160
                     },
                     {
                         title: 'Trạng thái',

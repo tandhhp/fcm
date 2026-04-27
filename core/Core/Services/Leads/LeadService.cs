@@ -131,11 +131,21 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
         var lead = await _leadRepository.FindAsync(id);
         if (lead == null) return TResult<object>.Failed("Không tìm thấy khách hàng!");
         var sales = new ApplicationUser();
+        Guid? dosId = null;
         if (lead.SalesId.HasValue)
         {
             sales = await _userManager.FindByIdAsync(lead.SalesId.GetValueOrDefault().ToString());
             if (sales == null) return TResult<object>.Failed("Không tìm thấy nhân viên kinh doanh!");
+            if (sales.ManagerId.HasValue)
+            {
+                var sm = await _userManager.FindByIdAsync(sales.ManagerId.GetValueOrDefault().ToString());
+                if (sm != null)
+                {
+                    dosId = sm.ManagerId;
+                }
+            }
         }
+        
         var feedback = await _leadRepository.GetFeedbackAsync(lead.Id);
         var creator = await _userManager.FindByIdAsync(lead.CreatedBy.ToString());
         return TResult<object>.Ok(new
@@ -161,7 +171,7 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
             lead.AttendanceId,
             lead.ToById,
             SalesManagerId = sales.SmId,
-            sales.DosId,
+            DosId = dosId,
             feedback?.TableId,
             SubLeads = await _leadRepository.GetSubLeadsAsync(lead.Id),
             CreatorLeaderId = creator?.ManagerId,

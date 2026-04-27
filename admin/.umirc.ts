@@ -33,6 +33,7 @@ export default defineConfig({
   tailwindcss: {},
   hash: true,
   mako: {},
+  esbuildMinifyIIFE: true,
   define: {
     'process.env': {
       API_URL: process.env.API_URL,

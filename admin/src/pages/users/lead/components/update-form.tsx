@@ -34,7 +34,7 @@ const LeadFeedbackUpdateForm: React.FC<Props> = (props) => {
     }, [props.data, props.open]);
 
     useEffect(() => {
-        if (dosId && props.open) {
+        if (props.open) {
             apiSmOptions(dosId).then(response => {
                 setSmOptions(response);
             });
