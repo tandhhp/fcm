@@ -22,18 +22,18 @@ public class RoleName
     /// </summary>
     public const string Cx = "cx";
     /// <summary>
-    /// GĐQHKH (Giám đốc quan hệ khách hàng)
+    /// Giám đốc kinh doanh (Director of Sales)
     /// </summary>
-    public const string Dos = "dos";
+    public const string DOS = "dos";
     /// <summary>
-    /// QLQHKH (Quản lí quan hệ khách hàng)
+    /// Quản lý kinh doanh (Sales Manager)
     /// </summary>
     public const string SalesManager = "sm";
     public const string Event = "event";
     public const string Telesales = "Telesale";
     public const string TelesaleManager = nameof(TelesaleManager);
     /// <summary>
-    /// Director of Tele
+    /// Giám đốc telesales (Director of Telesales)
     /// </summary>
     public const string Dot = "dot";
     public const string AdminData = "admindata";
@@ -46,7 +46,7 @@ public class RoleName
     /// </summary>
     public const string LegalExecutive = "legalexecutive";
     /// <summary>
-    /// Event Manager
+    /// Sự kiện (Event Manager)
     /// </summary>
     public const string EM = "em";
 }

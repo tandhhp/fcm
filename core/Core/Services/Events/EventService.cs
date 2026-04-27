@@ -188,7 +188,7 @@ public class EventService(ApplicationDbContext _context, IEventRepository _event
         {
             query = query.Where(x => x.SaleName.ToLower().Contains(filterOptions.SaleName.ToLower()));
         }
-        if (_hcaService.IsUserInAnyRole(RoleName.Accountant, RoleName.Dos))
+        if (_hcaService.IsUserInAnyRole(RoleName.Accountant, RoleName.DOS))
         {
             query = query.Where(x => x.BranchId == user.BranchId);
         }

@@ -61,7 +61,7 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
             }
             lead.Status = LeadStatus.Approved;
         }
-        if (_hcaService.IsUserInAnyRole(RoleName.Dos, RoleName.Dot))
+        if (_hcaService.IsUserInAnyRole(RoleName.DOS, RoleName.Dot))
         {
             var currentUser = await _userManager.FindByIdAsync(currentUserId.ToString());
             if (currentUser == null) return TResult.Failed("Người dùng không tồn tại!");

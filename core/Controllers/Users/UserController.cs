@@ -190,7 +190,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
             user.TmId,
             user.DotId,
             user.BranchId,
-            user.DosId,
+            user.ManagerId,
             user.SmId,
             claims
         }));
@@ -309,14 +309,10 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                 PhoneNumber = args.PhoneNumber,
                 Name = args.Name,
                 DateOfBirth = args.DateOfBirth,
-                DosId = args.DosId,
-                SmId = args.SmId,
                 BranchId = args.BranchId,
-                TmId = args.TmId,
                 SourceId = args.SourceId,
                 ContractDate = args.ContractDate,
                 Position = args.Position,
-                DotId = args.DotId,
                 LineCode = args.LineCode,
             };
             if (args.DosId.HasValue)
@@ -330,20 +326,10 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
             if (args.TmId.HasValue)
             {
                 user.ManagerId = args.TmId;
-                var team = await _context.Teams.FirstOrDefaultAsync(x => x.LeaderId == args.TmId);
-                if (team != null)
-                {
-                    user.TeamId = team.Id;
-                }
             }
             if (args.SmId.HasValue)
             {
                 user.ManagerId = args.SmId;
-                var team = await _context.Teams.FirstOrDefaultAsync(x => x.LeaderId == args.SmId);
-                if (team != null)
-                {
-                    user.TeamId = team.Id;
-                }
             }
             var result = await _userManager.CreateAsync(user, args.Password);
             if (!result.Succeeded) return BadRequest(result.Errors.FirstOrDefault()?.Description);
@@ -400,20 +386,8 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
             }
             if (await _userManager.IsInRoleAsync(user, RoleName.SalesManager))
             {
-                if (args.DosId == null) return BadRequest("Vui lòng chọn DOS");
                 user.DosId = args.DosId;
                 user.ManagerId = args.DosId;
-                if (user.SmId != null)
-                {
-                    var smUsers = await _userManager.Users.Where(x => x.SmId == user.SmId).ToListAsync();
-                    if (smUsers.Count != 0)
-                    {
-                        foreach (var item in smUsers)
-                        {
-                            item.DosId = args.DosId;
-                        }
-                    }
-                }
             }
             if (await _userManager.IsInRoleAsync(user, RoleName.Telesales))
             {
@@ -1036,7 +1010,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
     [HttpGet("dos/options")]
     public async Task<IActionResult> GetDosOptionsAsync()
     {
-        var query = await _userManager.GetUsersInRoleAsync(RoleName.Dos);
+        var query = await _userManager.GetUsersInRoleAsync(RoleName.DOS);
         var user = await _userManager.FindByIdAsync(User.GetId().ToString());
         if (user is null) return Unauthorized();
 
@@ -1414,7 +1388,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                             Type = a.Type,
                             BranchId = cardHolder.BranchId
                         };
-            if (User.IsInRole(RoleName.Dos))
+            if (User.IsInRole(RoleName.DOS))
             {
                 query = query.Where(x => x.Status != TopupStatus.DirectorApproved && x.Status != TopupStatus.Rejected);
             }
@@ -1511,19 +1485,18 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                           {
                               s.Id,
                               s.Name,
-                              s.SmId,
-                              s.DosId,
+                              s.ManagerId,
                               i.Amount,
                               i.CreatedAt
                           };
 
         if (User.IsInRole(RoleName.SalesManager))
         {
-            prevMonthsQ = prevMonthsQ.Where(x => x.SmId == user.Id);
+            prevMonthsQ = prevMonthsQ.Where(x => x.ManagerId == user.Id);
         }
-        if (User.IsInRole(RoleName.Dos))
+        if (User.IsInRole(RoleName.DOS))
         {
-            prevMonthsQ = prevMonthsQ.Where(x => x.DosId == user.DosId);
+            prevMonthsQ = prevMonthsQ.Where(x => _context.Users.Any(u => u.Id == x.ManagerId));
         }
 
         var prevMonths = await prevMonthsQ.ToListAsync();
@@ -1536,18 +1509,17 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                              {
                                  s.Id,
                                  s.Name,
-                                 s.SmId,
-                                 s.DosId,
+                                 s.ManagerId,
                                  i.Amount,
                                  i.CreatedAt
                              };
         if (User.IsInRole(RoleName.SalesManager))
         {
-            currentMonthsQ = currentMonthsQ.Where(x => x.SmId == user.Id);
+            currentMonthsQ = currentMonthsQ.Where(x => x.ManagerId == user.Id);
         }
-        if (User.IsInRole(RoleName.Dos))
+        if (User.IsInRole(RoleName.DOS))
         {
-            currentMonthsQ = currentMonthsQ.Where(x => x.DosId == user.Id);
+            currentMonthsQ = currentMonthsQ.Where(x => _context.Users.Any(u => u.Id == x.ManagerId));
         }
 
         var currentMonths = await currentMonthsQ.ToListAsync();
@@ -1627,7 +1599,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
     [HttpGet("sm-dos-options")]
     public async Task<IActionResult> GetSmDosOptionsAsync()
     {
-        var dos = await _userManager.GetUsersInRoleAsync(RoleName.Dos);
+        var dos = await _userManager.GetUsersInRoleAsync(RoleName.DOS);
         //dos = [.. dos.Where(x => x.Status == UserStatus.Working)];
         var sm = await _userManager.GetUsersInRoleAsync(RoleName.SalesManager);
         //sm = [.. sm.Where(x => x.Status == UserStatus.Working)];

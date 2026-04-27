@@ -290,6 +290,13 @@ export async function apiContactConfirm2(data: any) {
   })
 }
 
+export async function apiUpdateAttendanceSchedule(data: any) {
+  return request(`contact/attendance-schedule`, {
+    method: 'PUT',
+    data
+  })
+}
+
 export async function apiContactDialedCalls(params: any) {
   return request(`contact/dialed-calls`, { params });
 }

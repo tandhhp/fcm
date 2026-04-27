@@ -106,25 +106,21 @@ public class EventRepository(ApplicationDbContext context, IHCAService _hcaServi
                                 u.Id,
                                 u.Name,
                                 u.DotId,
-                                u.DosId
+                                u.ManagerId
                             };
         if (filterOptions.SalesManagerId.HasValue)
         {
             salesManagersQuery = salesManagersQuery.Where(x => x.Id == filterOptions.SalesManagerId);
         }
-        if (filterOptions.DotId.HasValue)
-        {
-            salesManagersQuery = salesManagersQuery.Where(x => x.DotId == filterOptions.DotId);
-        }
         if (filterOptions.DosId.HasValue)
         {
-            salesManagersQuery = salesManagersQuery.Where(x => x.DosId == filterOptions.DosId);
+            salesManagersQuery = salesManagersQuery.Where(x => x.ManagerId == filterOptions.DosId);
         }
         if (_hcaService.IsUserInRole(RoleName.Sales))
         {
             var currentUser = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == currentUserId);
             if (currentUser is null) return [];
-            salesManagersQuery = salesManagersQuery.Where(x => x.DosId == currentUser.DosId);
+            salesManagersQuery = salesManagersQuery.Where(x => x.ManagerId == currentUser.ManagerId);
         }
         var salesManagers = await salesManagersQuery.AsNoTracking().ToListAsync();
         var salesQuery = from u in _context.Users

@@ -30,7 +30,6 @@ export default defineConfig({
   },
   routes,
   npmClient: "yarn",
-  esbuildMinifyIIFE: true,
   tailwindcss: {},
   hash: true,
   mako: {},

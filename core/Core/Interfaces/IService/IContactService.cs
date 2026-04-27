@@ -23,6 +23,7 @@ public interface IContactService
     Task<TResult> AssignSourceAsync(ContactAssignSourceArgs args);
     Task<TResult> Confirm1Async(Guid id);
     Task<TResult> Confirm2Async(UpdateConfirm2Args args);
+    Task<TResult> UpdateAttendanceScheduleAsync(UpdateAttendanceScheduleArgs args);
     Task<ListResult<object>> GetAttendanceScheduleListAsync(ContactFilterOptions filterOptions);
     Task<TResult<object>> GetTmrReportAsync();
     Task<ListResult<object>> DialedCallsAsync(ContactFilterOptions filterOptions);

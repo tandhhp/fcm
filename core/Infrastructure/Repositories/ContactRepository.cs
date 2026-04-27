@@ -148,7 +148,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         var callStatuses = await _context.CallStatuses.ToListAsync();
         var contacts = await _context.Contacts.ToListAsync();
         var sources = await _context.Sources.Include(s => s.TypeOfData).ToListAsync();
-        var showUps = await _context.Leads.Select(x => new
+        var showUps = await _context.Leads.Where(l => l.Confirm2 == Confirm2.CONFIRM).Select(x => new
         {
             x.Id,
             x.Duplicated,
@@ -441,7 +441,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         var callStatuses = await _context.CallStatuses.ToListAsync();
         var contacts = await _context.Contacts.ToListAsync();
         var sources = await _context.Sources.Include(s => s.TypeOfData).ToListAsync();
-        var showUps = await _context.Leads.Select(x => new
+        var showUps = await _context.Leads.Where(x => x.Confirm2 == Confirm2.CONFIRM).Select(x => new
         {
             x.Id,
             x.Duplicated,

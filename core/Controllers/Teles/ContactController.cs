@@ -227,7 +227,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
             if (await _context.SubLeads.AnyAsync(x => !string.IsNullOrEmpty(args.IdentityNumber) && x.IdentityNumber == args.IdentityNumber)) return BadRequest($"Khách hàng đi cùng với CCCD {args.IdentityNumber} đã tồn tại!");
 
             var status = LeadStatus.Pending;
-            if (_hcaService.IsUserInAnyRole(RoleName.Admin, RoleName.SalesManager, RoleName.Dos, RoleName.Event, RoleName.TelesaleManager, RoleName.EM))
+            if (_hcaService.IsUserInAnyRole(RoleName.Admin, RoleName.SalesManager, RoleName.DOS, RoleName.Event, RoleName.TelesaleManager, RoleName.EM))
             {
                 status = LeadStatus.Approved;
             }
@@ -296,7 +296,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
                         a.Status,
                         SalesName = b.Name,
                         b.SmId,
-                        b.DosId,
+                        b.ManagerId,
                         a.SalesId,
                         a.EventDate,
                         SaleName = b.Name,
@@ -311,9 +311,9 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
         {
             query = query.Where(x => x.SmId == user.Id);
         }
-        if (User.IsInRole(RoleName.Dos))
+        if (User.IsInRole(RoleName.DOS))
         {
-            query = query.Where(x => x.DosId == user.Id);
+            query = query.Where(x => x.ManagerId == user.Id);
         }
         if (User.IsInRole(RoleName.Sales))
         {
@@ -509,7 +509,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
                             SourceName = _context.Sources.First(x => x.Id == a.SourceId).Name,
                             ToName = d.Name,
                             a.CreatedBy,
-                            c.DosId,
+                            c.ManagerId,
                             c.DotId,
                             e.SmId,
                             c.TmId,
@@ -555,9 +555,9 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
             {
                 query = query.Where(x => x.SmId == user.Id || x.CreatedBy == user.Id);
             }
-            if (User.IsInRole(RoleName.Dos))
+            if (User.IsInRole(RoleName.DOS))
             {
-                query = query.Where(x => x.DosId == user.Id || x.CreatedBy == user.Id);
+                query = query.Where(x => x.ManagerId == user.Id || x.CreatedBy == user.Id);
             }
             if (filterOptions.BranchId.HasValue)
             {
@@ -914,7 +914,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
                         b.SalesId,
                         d.SmId,
                         d.TmId,
-                        d.DosId,
+                        d.ManagerId,
                         d.DotId
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
@@ -929,9 +929,9 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
         {
             query = query.Where(x => x.SmId == userId);
         }
-        if (_hcaService.IsUserInRole(RoleName.Dos))
+        if (_hcaService.IsUserInRole(RoleName.DOS))
         {
-            query = query.Where(x => x.DosId == userId);
+            query = query.Where(x => x.ManagerId == userId);
         }
         if (_hcaService.IsUserInRole(RoleName.Dot))
         {
@@ -1222,6 +1222,9 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
 
     [HttpPost("confirm2")]
     public async Task<IActionResult> Confirm2Async([FromBody] UpdateConfirm2Args args) => Ok(await _contactService.Confirm2Async(args));
+
+    [HttpPut("attendance-schedule")]
+    public async Task<IActionResult> UpdateAttendanceScheduleAsync([FromBody] UpdateAttendanceScheduleArgs args) => Ok(await _contactService.UpdateAttendanceScheduleAsync(args));
 
     [HttpGet("tmr-report")]
     public async Task<IActionResult> GetTmrReportAsync() => Ok(await _contactService.GetTmrReportAsync());

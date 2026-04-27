@@ -36,7 +36,6 @@ const Index: React.FC = () => {
     const [toDate, setToDate] = useState<string>(dayjs().endOf('month').format('YYYY-MM-DD'));
     const [loading, setLoading] = useState<boolean>(false);
     const [atendanceOptions, setAttendanceOptions] = useState<any[]>([]);
-    const [dotId, setDotId] = useState<string>('');
     const [dosId, setDosId] = useState<string>('');
 
     const summary = useMemo(() => {
@@ -64,17 +63,17 @@ const Index: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const result = await apiEventSuReport({ fromDate, toDate, dosId, dotId });
+            const result = await apiEventSuReport({ fromDate, toDate, dosId });
             setData(result);
             setLoading(false);
         };
         fetchData();
-    }, [fromDate, toDate, dosId, dotId]);
+    }, [fromDate, toDate, dosId]);
 
     const handleExport = async () => {
         try {
             setLoading(true);
-            const blob = await apiExportEventSuReport({ fromDate, toDate, dosId, dotId });
+            const blob = await apiExportEventSuReport({ fromDate, toDate, dosId });
             const url = window.URL.createObjectURL(new Blob([blob]));
             const link = document.createElement('a');
             link.href = url;
@@ -102,7 +101,6 @@ const Index: React.FC = () => {
                     setFromDate(dayjs().startOf('month').format('YYYY-MM-DD'));
                     setToDate(dayjs().endOf('month').format('YYYY-MM-DD'));
                     setDosId('');
-                    setDotId('');
                 }}>
                     Làm mới
                 </Button>
@@ -124,14 +122,6 @@ const Index: React.FC = () => {
                             fieldProps={{
                                 onChange: (value: string) => {
                                     setDosId(value);
-                                },
-                                popupMatchSelectWidth: false
-                            }}
-                        />
-                        <ProFormSelect name="dotId" label="DOT" placeholder="Chọn DOT" request={apiDotOptions}
-                            fieldProps={{
-                                onChange: (value: string) => {
-                                    setDotId(value);
                                 },
                                 popupMatchSelectWidth: false
                             }}

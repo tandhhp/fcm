@@ -299,13 +299,16 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
                         SalesName = sales.Name,
                         PendingAmount = _context.Invoices.Where(i => i.ContractId == c.Id && (i.Status == InvoiceStatus.Pending || i.Status == InvoiceStatus.SAConfirmed)).Sum(i => i.Amount),
                         c.SalesId,
-                        SalesManagerId = sales.SmId,
+                        SalesManagerId = sales.ManagerId,
                         GiftCount = _context.Gifts.Count(g => g.ContractId == c.Id),
                         Discount = _context.Coupons.Where(cp => cp.ContractId == c.Id).Sum(cp => cp.Discount),
                         c.LeadId,
                         SourceName = s.Name,
-                        Dos = sales != null && sales.DosId != null ? _context.Users.First(x => x.Id == sales.DosId).Name : string.Empty,
-                        SmName = sales != null && sales.SmId != null ? _context.Users.First(x => x.Id == sales.SmId).Name : string.Empty,
+                        Dos = sales != null && sales.DosId != null ? (from sm in _context.Users
+                                                                      join dos in _context.Users on sm.ManagerId equals dos.Id
+                                                                      where sales.ManagerId == sm.Id
+                                                                      select dos.Name).FirstOrDefault() : string.Empty,
+                        SmName = sales != null && sales.SmId != null ? _context.Users.First(x => x.Id == sales.ManagerId).Name : string.Empty,
                         l.BranchId
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.ContractCode))

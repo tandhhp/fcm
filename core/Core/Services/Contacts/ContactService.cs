@@ -431,6 +431,24 @@ public class ContactService(IContactRepository _contactRepository, ILeadReposito
         return TResult.Success;
     }
 
+    public async Task<TResult> UpdateAttendanceScheduleAsync(UpdateAttendanceScheduleArgs args)
+    {
+        var lead = await _leadRepository.FindAsync(args.LeadId);
+        if (lead is null) return TResult.Failed("Không tìm thấy lịch hẹn!");
+        if (lead.EventDate.Date <= DateTime.Now.Date)
+            return TResult.Failed("Chỉ được chỉnh sửa lịch hẹn với sự kiện chưa diễn ra!");
+        var eventExists = await _context.Events.AnyAsync(e => e.Id == args.EventId);
+        if (!eventExists) return TResult.Failed("Sự kiện không tồn tại!");
+        lead.Name = args.Name;
+        lead.EventDate = args.EventDate;
+        lead.EventId = args.EventId;
+        lead.Note = args.Note;
+        lead.Confirm2 = args.Confirm2;
+        await _leadRepository.UpdateAsync(lead);
+        await _logService.AddAsync($"Cập nhật lịch hẹn cho {lead.PhoneNumber} - {lead.Name}: ngày {lead.EventDate:dd/MM/yyyy}");
+        return TResult.Success;
+    }
+
     public Task<ListResult<object>> GetAttendanceScheduleListAsync(ContactFilterOptions filterOptions) => _contactRepository.GetAttendanceScheduleListAsync(filterOptions);
 
     public Task<TResult<object>> GetTmrReportAsync() => _contactRepository.GetTmrReportAsync();

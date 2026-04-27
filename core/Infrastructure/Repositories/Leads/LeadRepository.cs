@@ -167,7 +167,7 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
             {
                 query = query.Where(x => x.TmId == userId);
             }
-            if (_hcaService.IsUserInRole(RoleName.Dos))
+            if (_hcaService.IsUserInRole(RoleName.DOS))
             {
                 query = query.Where(x => x.DosId == userId);
             }
@@ -338,7 +338,7 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
         {
             query = query.Where(x => x.TmId == userId);
         }
-        if (_hcaService.IsUserInRole(RoleName.Dos))
+        if (_hcaService.IsUserInRole(RoleName.DOS))
         {
             query = query.Where(x => x.DosId == userId);
         }

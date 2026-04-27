@@ -8,5 +8,4 @@ public class SUFilterOptions : FilterOptions
     public DateTime ToDate { get; set; }
     public Guid? SalesManagerId { get; set; }
     public Guid? DosId { get; set; }
-    public Guid? DotId { get; set; }
 }

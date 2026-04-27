@@ -37,7 +37,7 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
                                  select a1.UserId).Count(),
                         a.Description
                     };
-        if (User.IsInRole(RoleName.Dos))
+        if (User.IsInRole(RoleName.DOS))
         {
             query = query.Where(x => x.Name == RoleName.Sales || x.Name == RoleName.SalesManager);
         }
@@ -202,7 +202,7 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
             new() { Name = RoleName.Accountant, DisplayName = "Kế toán", Description = "Kế toán" },
             new() { Name = RoleName.Sales, DisplayName = "Nhân viên kinh doanh", Description = "Nhân viên kinh doanh" },
             new() { Name = RoleName.SalesManager, DisplayName = "Quản lý kinh doanh", Description = "Quản lý kinh doanh" },
-            new() { Name = RoleName.Dos, DisplayName = "Giám đốc quan hệ khách hàng", Description = "Giám đốc quan hệ khách hàng" },
+            new() { Name = RoleName.DOS, DisplayName = "Giám đốc quan hệ khách hàng", Description = "Giám đốc quan hệ khách hàng" },
             new() { Name = RoleName.CxTP, DisplayName = "Trưởng phòng chăm sóc khách hàng", Description = "Trưởng phòng chăm sóc khách hàng" },
             new() { Name = RoleName.Cx, DisplayName = "Nhân viên chăm sóc khách hàng", Description = "Nhân viên chăm sóc khách hàng" },
             new() { Name = RoleName.Hr, DisplayName = "Nhân sự", Description = "Nhân sự" },

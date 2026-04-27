@@ -18,4 +18,5 @@ public class InvoiceListItem : BaseEntity
     public string SalesName { get; set; } = default!;
     public Guid? SaleManagerId { get; set; }
     public Guid? DosId { get; set; }
+    public Guid? ManagerId { get; set; }
 }

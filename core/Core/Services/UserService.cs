@@ -236,7 +236,7 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
 
             var salesManagers = await _userManager.GetUsersInRoleAsync(RoleName.SalesManager);
             var telesalesManagers = await _userManager.GetUsersInRoleAsync(RoleName.TelesaleManager);
-            var directorsOfSales = await _userManager.GetUsersInRoleAsync(RoleName.Dos);
+            var directorsOfSales = await _userManager.GetUsersInRoleAsync(RoleName.DOS);
             var directorsOfTele = await _userManager.GetUsersInRoleAsync(RoleName.Dot);
 
             for (int i = 2; i <= rowCount; i++)
@@ -439,7 +439,7 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
         var query = from a in _context.Users
                     join b in _context.UserRoles on a.Id equals b.UserId
                     join c in _context.Roles on b.RoleId equals c.Id
-                    where c.Name == RoleName.Dos && a.Status == UserStatus.Working
+                    where c.Name == RoleName.DOS && a.Status == UserStatus.Working
                     select new
                     {
                         a.Id,
@@ -456,7 +456,7 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
         if (tele is null) return TResult.Failed("Không tìm thấy người dùng!");
         var dos = await FindAsync(args.DosId);
         if (dos is null) return TResult.Failed("Không tìm thấy giám đốc quan hệ khách hàng!");
-        if (!await _userManager.IsInRoleAsync(dos, RoleName.Dos)) return TResult.Failed("Người dùng không phải là giám đốc quan hệ khách hàng!");
+        if (!await _userManager.IsInRoleAsync(dos, RoleName.DOS)) return TResult.Failed("Người dùng không phải là giám đốc quan hệ khách hàng!");
         tele.DosId = dos.Id;
         await _userManager.UpdateAsync(tele);
         return TResult.Success;

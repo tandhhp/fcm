@@ -30,7 +30,10 @@ export async function apiSourceDetail(id: string) {
     return request(`source/${id}`);
 }
 
-export async function apiSourceOptions(params?: any) {
+export async function apiSourceOptions(params?: {
+    keyWord?: string;
+    teamId?: number;
+}) {
     return request<{
         label: string;
         value: string;

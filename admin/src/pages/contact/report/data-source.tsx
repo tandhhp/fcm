@@ -5,15 +5,31 @@ import { ExportOutlined } from "@ant-design/icons";
 import { PageContainer, ProCard, ProFormDateRangePicker, ProFormSelect } from "@ant-design/pro-components";
 import { Button, Col, Form, Row, Space, Spin, Table, Typography, message } from "antd";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const { Title, Text } = Typography;
 
 const Index: React.FC = () => {
     const [form] = Form.useForm();
+    const selectedTeamId = Form.useWatch<number | undefined>('teamId', form);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<any>(null);
     const [exporting, setExporting] = useState(false);
+
+    const [sourceOptions, setSourceOptions] = useState<{ label: string; value: string }[]>([]);
+
+    useEffect(() => {
+        const fetchSourceOptions = async () => {
+            try {
+                const response = await apiSourceOptions({ teamId: selectedTeamId });
+                setSourceOptions(response);
+            } catch (error) {
+                message.error('Lỗi khi tải danh sách nguồn');
+            }
+        };
+
+        fetchSourceOptions();
+    }, [selectedTeamId]);
 
     const handleSearch = async () => {
         try {
@@ -144,14 +160,34 @@ const Index: React.FC = () => {
     return (
         <PageContainer>
             <ProCard style={{ marginBottom: 16 }}>
-                <Form form={form} layout="vertical">
+                <Form
+                    form={form}
+                    layout="vertical"
+                    onValuesChange={(changedValues) => {
+                        if (Object.prototype.hasOwnProperty.call(changedValues, 'teamId')) {
+                            form.setFieldValue('sourceId', undefined);
+                        }
+                    }}
+                >
                     <Row gutter={16}>
                         <Col span={6}>
                             <ProFormSelect
                                 name="teamId"
-                                label="Đội nhóm"
-                                placeholder="Chọn đội nhóm"
+                                label="Nhóm"
+                                placeholder="Chọn nhóm"
                                 request={apiTeamOptions}
+                                fieldProps={{
+                                    allowClear: true,
+                                }}
+                                showSearch
+                            />
+                        </Col>
+                        <Col span={6}>
+                            <ProFormSelect
+                                name="sourceId"
+                                label="Nguồn"
+                                placeholder="Chọn nguồn"
+                                options={sourceOptions}
                                 fieldProps={{
                                     allowClear: true,
                                 }}
@@ -167,18 +203,6 @@ const Index: React.FC = () => {
                                     format: 'DD/MM/YYYY',
                                 }}
                                 width={"xl"}
-                            />
-                        </Col>
-                        <Col span={6}>
-                            <ProFormSelect
-                                name="sourceId"
-                                label="Nguồn"
-                                placeholder="Chọn nguồn"
-                                request={apiSourceOptions}
-                                fieldProps={{
-                                    allowClear: true,
-                                }}
-                                showSearch
                             />
                         </Col>
                         <Col span={6} style={{ display: 'flex', alignItems: 'flex-end' }}>

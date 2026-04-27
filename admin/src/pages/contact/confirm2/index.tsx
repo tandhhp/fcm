@@ -1,10 +1,11 @@
-import { apiContactConfirm2, apiAttendanceSchedules } from "@/services/contact";
+import { apiContactConfirm2, apiAttendanceSchedules, apiUpdateAttendanceSchedule } from "@/services/contact";
 import { CONFIRM2_OPTIONS } from "@/utils/constants";
-import { ManOutlined, MoreOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
-import { ActionType, ModalForm, PageContainer, ProColumnType, ProForm, ProFormSelect, ProFormTextArea, ProTable } from "@ant-design/pro-components"
+import { EditOutlined, ManOutlined, MoreOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
+import { ActionType, ModalForm, PageContainer, ProColumnType, ProFormDatePicker, ProFormSelect, ProFormText, ProFormTextArea, ProTable } from "@ant-design/pro-components"
 import { useAccess } from "@umijs/max";
 import { Avatar, Button, Dropdown, message, Tag } from "antd";
 import { useRef, useState } from "react";
+import { apiEventOptions } from "@/services/event";
 
 const Index: React.FC = () => {
 
@@ -12,6 +13,7 @@ const Index: React.FC = () => {
     const actionRef = useRef<ActionType>();
     const [selectedRecord, setSelectedRecord] = useState<any>(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [editModalVisible, setEditModalVisible] = useState(false);
 
     const getConfirm2StatusTag = (status: number) => {
         const option = CONFIRM2_OPTIONS.find(o => o.value === status);
@@ -113,6 +115,16 @@ const Index: React.FC = () => {
                 menu={{
                     items: [
                         {
+                            key: 'edit',
+                            label: 'Chỉnh sửa lịch hẹn',
+                            icon: <EditOutlined />,
+                            disabled: record.eventDate && new Date(record.eventDate) <= new Date(),
+                            onClick: () => {
+                                setSelectedRecord(record);
+                                setEditModalVisible(true);
+                            }
+                        },
+                        {
                             key: 'update',
                             label: 'Cập nhật trạng thái',
                             onClick: () => {
@@ -183,6 +195,60 @@ const Index: React.FC = () => {
                     fieldProps={{
                         rows: 4
                     }}
+                />
+            </ModalForm>
+            <ModalForm
+                title="Chỉnh sửa lịch hẹn"
+                open={editModalVisible}
+                onOpenChange={setEditModalVisible}
+                onFinish={async (values) => {
+                    await apiUpdateAttendanceSchedule({
+                        leadId: selectedRecord?.id,
+                        name: values.name,
+                        eventDate: values.eventDate,
+                        eventId: values.eventId,
+                        note: values.note,
+                        confirm2: values.confirm2
+                    });
+                    message.success('Cập nhật lịch hẹn thành công!');
+                    actionRef.current?.reload();
+                    return true;
+                }}
+                initialValues={{
+                    name: selectedRecord?.name,
+                    eventDate: selectedRecord?.eventDate,
+                    eventId: selectedRecord?.eventId,
+                    note: selectedRecord?.note,
+                    confirm2: selectedRecord?.confirm2
+                }}
+            >
+                <ProFormText
+                    name="name"
+                    label="Họ tên khách hàng"
+                    rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
+                />
+                <ProFormDatePicker
+                    name="eventDate"
+                    label="Ngày sự kiện"
+                    rules={[{ required: true, message: 'Vui lòng chọn ngày sự kiện!' }]}
+                    fieldProps={{ className: 'w-full', format: 'DD-MM-YYYY' }}
+                />
+                <ProFormSelect
+                    name="eventId"
+                    label="Sự kiện (Giờ)"
+                    request={apiEventOptions}
+                    rules={[{ required: true, message: 'Vui lòng chọn giờ sự kiện!' }]}
+                />
+                <ProFormSelect
+                    name="confirm2"
+                    label="Trạng thái xác nhận 2"
+                    options={CONFIRM2_OPTIONS}
+                />
+                <ProFormTextArea
+                    name="note"
+                    label="Ghi chú"
+                    placeholder="Nhập ghi chú (nếu có)"
+                    fieldProps={{ rows: 3 }}
                 />
             </ModalForm>
         </PageContainer>

@@ -133,7 +133,7 @@ public class InvoiceRepository(ApplicationDbContext context, IHCAService _hcaSer
         {
             query = query.Where(i => i.SaleManagerId == userId);
         }
-        if (_hcaService.IsUserInRole(RoleName.Dos))
+        if (_hcaService.IsUserInRole(RoleName.DOS))
         {
             query = query.Where(i => i.DosId == userId);
         }

@@ -568,12 +568,6 @@ export default [
         path: '/event/customer',
         component: './event/customer',
         access: 'can_read_page_event_customer'
-      },
-      {
-        name: 'Show Up Report',
-        path: '/event/report',
-        component: './event/report',
-        access: 'can_read_page_event_showup_report'
       }
     ]
   },
@@ -600,6 +594,12 @@ export default [
         path: '/report/multiple-assign',
         component: './contact/report/multiple-assign',
         access: 'can_read_page_report_multiple_assign'
+      },
+      {
+        name: 'Show Up Report',
+        path: '/report/showup',
+        component: './event/report',
+        access: 'can_read_page_event_showup_report'
       }
     ]
   },
