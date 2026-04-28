@@ -222,7 +222,19 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
             var phoneNumber = args.PhoneNumber.Trim();
             if (!PhoneNumberValidator.IsValidVietnamPhoneNumber(phoneNumber)) return BadRequest("Số điện thoại không hợp lệ");
             var lead = await _leadService.FindByPhoneNumberAsync(phoneNumber);
-            if (lead != null && !lead.Duplicated) return BadRequest($"Khách hàng {lead.Name} với SDT {args.PhoneNumber} đã tồn tại, ngày tham gia {lead.EventDate:dd-MM-yyyy}!");
+            if (lead != null && !lead.Duplicated)
+            {
+                if (lead.Status == LeadStatus.Checkin || lead.Status == LeadStatus.CloseDeal)
+                {
+                    return BadRequest($"Khách hàng {lead.Name} với SDT {args.PhoneNumber} đã tồn tại, ngày tham gia {lead.EventDate:dd-MM-yyyy}!");
+                }
+                // Nếu lead đã tồn tại và có trạng thái Approved trong vòng 7 ngày gần đây thì không cho tạo mới
+                if (lead.Status == LeadStatus.Approved && DateTime.Today.AddDays(-7) <= lead.CreatedDate.Date)
+                {
+                    return BadRequest($"Khách hàng {lead.Name} với SDT {args.PhoneNumber} đã tồn tại, ngày tham gia {lead.EventDate:dd-MM-yyyy}!");
+                }
+            } 
+                
             if (await _context.SubLeads.AnyAsync(x => !string.IsNullOrEmpty(args.PhoneNumber) && x.PhoneNumber == args.PhoneNumber)) return BadRequest($"Khách hàng đi cùng với số điện thoại {args.PhoneNumber} đã tồn tại!");
             if (await _context.SubLeads.AnyAsync(x => !string.IsNullOrEmpty(args.IdentityNumber) && x.IdentityNumber == args.IdentityNumber)) return BadRequest($"Khách hàng đi cùng với CCCD {args.IdentityNumber} đã tồn tại!");
 

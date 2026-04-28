@@ -1,0 +1,43 @@
+info:
+  name: webhook
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: https://api.lpgroup.com.vn/api/call/cdr/webhook
+  body:
+    type: json
+    data: |-
+      {
+        "application": "dial",
+        "billsec": 0,
+        "call_id": "2eed8411-b634-4a5b-8307-512856c8c393",
+        "campaign_uuid": "37f41c50-48b6-4b7d-8774-bf530e6cc58c",
+        "direction": "outbound",
+        "domain": "lpg.vn",
+        "domain_uuid": "5f474db0-ea96-4307-abb6-a08688c4f99a",
+        "duration": 54,
+        "from_number": "118",
+        "hotline": "0660000756",
+        "lead_uuid": "89c878ad-2c87-42ae-a5ed-e4dde90b9a50",
+        "press_key": "",
+        "receive_dest": "",
+        "recording_url": "",
+        "ref_id": "",
+        "sip_call_id": "246962539126995-93983003914144@222.252.21.50",
+        "sip_hangup_disposition": "recv_cancel",
+        "state": "cdr",
+        "status": "no-answered",
+        "time_answered": "",
+        "time_ended": "2026-04-24 15:20:43",
+        "time_started": "2026-04-24 15:19:49",
+        "to_number": "0962624582"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

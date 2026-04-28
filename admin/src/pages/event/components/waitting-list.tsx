@@ -40,9 +40,11 @@ const WaitingList: React.FC = () => {
     };
 
     const canEdit = (record: any) => {
-        if (record.status === LeadStatus.Approved) return false;
-        if (access.dot || access.telesaleManager) return false;
-        return (access.sales || access.telesale || access.cx);
+        if (record.status === LeadStatus.Approved && access.sales) return false;
+        if (access.dot || access.telesaleManager || access.telesale) return false;
+        if (access.adminData) return false;
+        if (access.legalExcutive) return false;
+        return true;
     }
 
     return (
