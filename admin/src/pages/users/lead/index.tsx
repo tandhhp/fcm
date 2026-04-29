@@ -95,7 +95,7 @@ const LeadPage: React.FC = () => {
                                             setLead(entity);
                                             setOpenForm(true);
                                         },
-                                        disabled: access.cx || access.sales
+                                        disabled: access.cx || access.sales || access.dot || access.telesaleManager
                                     },
                                     {
                                         key: 'close-deal',
@@ -105,7 +105,7 @@ const LeadPage: React.FC = () => {
                                             setLead(entity);
                                             setOpenCloseDeal(true);
                                         },
-                                        disabled: access.cx || access.sales
+                                        disabled: access.cx || access.sales || access.dot || access.telesaleManager
                                     },
                                     {
                                         key: 'reject',
