@@ -45,6 +45,18 @@ public class CallController(ICallStatusService _callStatusService, ICallHistoryS
     [HttpPost("cdr/webhook"), AllowAnonymous]
     public async Task<IActionResult> CdrWebhookAsync([FromBody] CdrWebhookCreateArgs args) => Ok(await _callHistoryService.CdrWebhookAsync(args));
 
+    [HttpGet("webhook-logs")]
+    public async Task<IActionResult> WebhookLogsAsync([FromQuery] CallWebhookLogFilterOptions filterOptions) => Ok(await _callHistoryService.WebhookLogsAsync(filterOptions));
+
+    [HttpGet("webhook-logs/export")]
+    public async Task<IActionResult> ExportWebhookLogsAsync([FromQuery] CallWebhookLogFilterOptions filterOptions)
+    {
+        var result = await _callHistoryService.ExportWebhookLogsAsync(filterOptions);
+        if (!result.Succeeded) return BadRequest(result.Message);
+        if (result.Data == null) return NotFound();
+        return File(result.Data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"call_webhook_logs_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+    }
+
     [HttpGet("status-details")]
     public async Task<IActionResult> GetStatusDetailsAsync([FromQuery] CallStatusDetailFilterOptions filterOptions) => Ok(await _callHistoryService.GetStatusDetailsAsync(filterOptions));
 }

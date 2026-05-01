@@ -65,3 +65,14 @@ export async function apiCallStatusDetails(params: any) {
 export async function apiCallTMRReport() {
     return request('contact/tmr-report');
 }
+
+export async function apiCallWebhookLogs(params: any) {
+    return request('call/webhook-logs', { params });
+}
+
+export async function apiCallWebhookLogsExport(params: any) {
+    return request('call/webhook-logs/export', {
+        params,
+        responseType: 'blob'
+    });
+}

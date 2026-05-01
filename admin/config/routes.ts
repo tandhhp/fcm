@@ -373,6 +373,11 @@ export default [
         component: './contact/report/cdr'
       },
       {
+        name: 'Call webhook log',
+        path: '/contact/call-webhook-log',
+        component: './contact/call-webhook-log'
+      },
+      {
         name: 'Call Center',
         path: '/contact/call-center',
         component: './contact/call-center'

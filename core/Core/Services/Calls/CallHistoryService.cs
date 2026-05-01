@@ -1,4 +1,6 @@
 ﻿using System.Globalization;
+using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using Waffle.Core.Interfaces.IRepository.Calls;
 using Waffle.Core.Interfaces.IService;
 using Waffle.Core.Interfaces.IService.Calls;
@@ -15,6 +17,14 @@ namespace Waffle.Core.Services.Calls;
 public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, ILeadService _leadService, ApplicationDbContext _context, IContactService _contactService, IHCAService _hcaService) : ICallHistoryService
 {
     public Task<ListResult<object>> HistoriesAsync(CallHistoryFilterOptions filterOptions) => _callHistoryRepository.HistoriesAsync(filterOptions);
+
+    public async Task<ListResult<CallWebhookLog>> WebhookLogsAsync(CallWebhookLogFilterOptions filterOptions)
+    {
+        var query = BuildWebhookLogQuery(filterOptions)
+            .OrderByDescending(x => x.ReceivedDate)
+            .ThenByDescending(x => x.TimeStarted);
+        return await ListResult<CallWebhookLog>.Success(query, filterOptions);
+    }
 
     public async Task<TResult> CompleteAsync(CallCompleteArgs args)
     {
@@ -131,6 +141,83 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
         }
     }
 
+    public async Task<TResult<byte[]?>> ExportWebhookLogsAsync(CallWebhookLogFilterOptions filterOptions)
+    {
+        var query = BuildWebhookLogQuery(filterOptions)
+            .OrderByDescending(x => x.ReceivedDate)
+            .ThenByDescending(x => x.TimeStarted);
+        var records = await query.ToListAsync();
+
+        using var package = new ExcelPackage();
+        var worksheet = package.Workbook.Worksheets.Add("CallWebhookLogs");
+
+        worksheet.Cells[1, 1].Value = "STT";
+        worksheet.Cells[1, 2].Value = "Application";
+        worksheet.Cells[1, 3].Value = "Billsec";
+        worksheet.Cells[1, 4].Value = "CallId";
+        worksheet.Cells[1, 5].Value = "CampaignUuid";
+        worksheet.Cells[1, 6].Value = "Direction";
+        worksheet.Cells[1, 7].Value = "Domain";
+        worksheet.Cells[1, 8].Value = "DomainUuid";
+        worksheet.Cells[1, 9].Value = "Duration";
+        worksheet.Cells[1, 10].Value = "FromNumber";
+        worksheet.Cells[1, 11].Value = "Hotline";
+        worksheet.Cells[1, 12].Value = "LeadUuid";
+        worksheet.Cells[1, 13].Value = "PressKey";
+        worksheet.Cells[1, 14].Value = "ReceiveDest";
+        worksheet.Cells[1, 15].Value = "RecordingUrl";
+        worksheet.Cells[1, 16].Value = "RefId";
+        worksheet.Cells[1, 17].Value = "SipCallId";
+        worksheet.Cells[1, 18].Value = "SipHangupDisposition";
+        worksheet.Cells[1, 19].Value = "State";
+        worksheet.Cells[1, 20].Value = "Status";
+        worksheet.Cells[1, 21].Value = "TimeAnswered";
+        worksheet.Cells[1, 22].Value = "TimeEnded";
+        worksheet.Cells[1, 23].Value = "TimeStarted";
+        worksheet.Cells[1, 24].Value = "ToNumber";
+        worksheet.Cells[1, 25].Value = "ReceivedDate";
+
+        var row = 2;
+        foreach (var item in records)
+        {
+            worksheet.Cells[row, 1].Value = row - 1;
+            worksheet.Cells[row, 2].Value = item.Application;
+            worksheet.Cells[row, 3].Value = item.Billsec;
+            worksheet.Cells[row, 4].Value = item.CallId;
+            worksheet.Cells[row, 5].Value = item.CampaignUuid;
+            worksheet.Cells[row, 6].Value = item.Direction;
+            worksheet.Cells[row, 7].Value = item.Domain;
+            worksheet.Cells[row, 8].Value = item.DomainUuid;
+            worksheet.Cells[row, 9].Value = item.Duration;
+            worksheet.Cells[row, 10].Value = item.FromNumber;
+            worksheet.Cells[row, 11].Value = item.Hotline;
+            worksheet.Cells[row, 12].Value = item.LeadUuid;
+            worksheet.Cells[row, 13].Value = item.PressKey;
+            worksheet.Cells[row, 14].Value = item.ReceiveDest;
+            worksheet.Cells[row, 15].Value = item.RecordingUrl;
+            worksheet.Cells[row, 16].Value = item.RefId;
+            worksheet.Cells[row, 17].Value = item.SipCallId;
+            worksheet.Cells[row, 18].Value = item.SipHangupDisposition;
+            worksheet.Cells[row, 19].Value = item.State;
+            worksheet.Cells[row, 20].Value = item.Status;
+            worksheet.Cells[row, 21].Value = item.TimeAnswered?.ToString("yyyy-MM-dd HH:mm:ss");
+            worksheet.Cells[row, 22].Value = item.TimeEnded?.ToString("yyyy-MM-dd HH:mm:ss");
+            worksheet.Cells[row, 23].Value = item.TimeStarted?.ToString("yyyy-MM-dd HH:mm:ss");
+            worksheet.Cells[row, 24].Value = item.ToNumber;
+            worksheet.Cells[row, 25].Value = item.ReceivedDate.ToString("yyyy-MM-dd HH:mm:ss");
+            row++;
+        }
+
+        worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+        var cells = worksheet.Cells[1, 1, Math.Max(1, row - 1), 25];
+        cells.Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+        cells.Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+        cells.Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+        cells.Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+
+        return TResult<byte[]?>.Ok(await package.GetAsByteArrayAsync());
+    }
+
     private static DateTime? ParseDateTime(string? value)
     {
         if (string.IsNullOrWhiteSpace(value)) return null;
@@ -141,5 +228,43 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
 
         if (DateTime.TryParse(value, out parsed)) return parsed;
         return null;
+    }
+
+    private IQueryable<CallWebhookLog> BuildWebhookLogQuery(CallWebhookLogFilterOptions filterOptions)
+    {
+        var query = _context.CallWebhookLogs.AsNoTracking().AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(filterOptions.Application)) query = query.Where(x => x.Application != null && x.Application.Contains(filterOptions.Application));
+        if (filterOptions.BillsecFrom.HasValue) query = query.Where(x => x.Billsec >= filterOptions.BillsecFrom);
+        if (filterOptions.BillsecTo.HasValue) query = query.Where(x => x.Billsec <= filterOptions.BillsecTo);
+        if (!string.IsNullOrWhiteSpace(filterOptions.CallId)) query = query.Where(x => x.CallId != null && x.CallId.Contains(filterOptions.CallId));
+        if (!string.IsNullOrWhiteSpace(filterOptions.CampaignUuid)) query = query.Where(x => x.CampaignUuid != null && x.CampaignUuid.Contains(filterOptions.CampaignUuid));
+        if (!string.IsNullOrWhiteSpace(filterOptions.Direction)) query = query.Where(x => x.Direction != null && x.Direction.Contains(filterOptions.Direction));
+        if (!string.IsNullOrWhiteSpace(filterOptions.Domain)) query = query.Where(x => x.Domain != null && x.Domain.Contains(filterOptions.Domain));
+        if (!string.IsNullOrWhiteSpace(filterOptions.DomainUuid)) query = query.Where(x => x.DomainUuid != null && x.DomainUuid.Contains(filterOptions.DomainUuid));
+        if (filterOptions.DurationFrom.HasValue) query = query.Where(x => x.Duration >= filterOptions.DurationFrom);
+        if (filterOptions.DurationTo.HasValue) query = query.Where(x => x.Duration <= filterOptions.DurationTo);
+        if (!string.IsNullOrWhiteSpace(filterOptions.FromNumber)) query = query.Where(x => x.FromNumber != null && x.FromNumber.Contains(filterOptions.FromNumber));
+        if (!string.IsNullOrWhiteSpace(filterOptions.Hotline)) query = query.Where(x => x.Hotline != null && x.Hotline.Contains(filterOptions.Hotline));
+        if (!string.IsNullOrWhiteSpace(filterOptions.LeadUuid)) query = query.Where(x => x.LeadUuid != null && x.LeadUuid.Contains(filterOptions.LeadUuid));
+        if (!string.IsNullOrWhiteSpace(filterOptions.PressKey)) query = query.Where(x => x.PressKey != null && x.PressKey.Contains(filterOptions.PressKey));
+        if (!string.IsNullOrWhiteSpace(filterOptions.ReceiveDest)) query = query.Where(x => x.ReceiveDest != null && x.ReceiveDest.Contains(filterOptions.ReceiveDest));
+        if (!string.IsNullOrWhiteSpace(filterOptions.RecordingUrl)) query = query.Where(x => x.RecordingUrl != null && x.RecordingUrl.Contains(filterOptions.RecordingUrl));
+        if (!string.IsNullOrWhiteSpace(filterOptions.RefId)) query = query.Where(x => x.RefId != null && x.RefId.Contains(filterOptions.RefId));
+        if (!string.IsNullOrWhiteSpace(filterOptions.SipCallId)) query = query.Where(x => x.SipCallId != null && x.SipCallId.Contains(filterOptions.SipCallId));
+        if (!string.IsNullOrWhiteSpace(filterOptions.SipHangupDisposition)) query = query.Where(x => x.SipHangupDisposition != null && x.SipHangupDisposition.Contains(filterOptions.SipHangupDisposition));
+        if (!string.IsNullOrWhiteSpace(filterOptions.State)) query = query.Where(x => x.State != null && x.State.Contains(filterOptions.State));
+        if (!string.IsNullOrWhiteSpace(filterOptions.Status)) query = query.Where(x => x.Status != null && x.Status.Contains(filterOptions.Status));
+        if (filterOptions.TimeAnsweredFrom.HasValue) query = query.Where(x => x.TimeAnswered >= filterOptions.TimeAnsweredFrom);
+        if (filterOptions.TimeAnsweredTo.HasValue) query = query.Where(x => x.TimeAnswered <= filterOptions.TimeAnsweredTo);
+        if (filterOptions.TimeEndedFrom.HasValue) query = query.Where(x => x.TimeEnded >= filterOptions.TimeEndedFrom);
+        if (filterOptions.TimeEndedTo.HasValue) query = query.Where(x => x.TimeEnded <= filterOptions.TimeEndedTo);
+        if (filterOptions.TimeStartedFrom.HasValue) query = query.Where(x => x.TimeStarted >= filterOptions.TimeStartedFrom);
+        if (filterOptions.TimeStartedTo.HasValue) query = query.Where(x => x.TimeStarted <= filterOptions.TimeStartedTo);
+        if (!string.IsNullOrWhiteSpace(filterOptions.ToNumber)) query = query.Where(x => x.ToNumber != null && x.ToNumber.Contains(filterOptions.ToNumber));
+        if (filterOptions.ReceivedDateFrom.HasValue) query = query.Where(x => x.ReceivedDate >= filterOptions.ReceivedDateFrom);
+        if (filterOptions.ReceivedDateTo.HasValue) query = query.Where(x => x.ReceivedDate <= filterOptions.ReceivedDateTo);
+
+        return query;
     }
 }
