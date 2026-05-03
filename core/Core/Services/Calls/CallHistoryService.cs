@@ -1,12 +1,13 @@
-﻿using System.Globalization;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using System.Globalization;
 using Waffle.Core.Interfaces.IRepository.Calls;
 using Waffle.Core.Interfaces.IService;
 using Waffle.Core.Interfaces.IService.Calls;
 using Waffle.Core.Services.Calls.Args;
 using Waffle.Core.Services.Calls.Filters;
 using Waffle.Core.Services.Calls.Models;
+using Waffle.Core.Services.Calls.Results;
 using Waffle.Data;
 using Waffle.Entities;
 using Waffle.Entities.Contacts;
@@ -14,16 +15,16 @@ using Waffle.Models;
 
 namespace Waffle.Core.Services.Calls;
 
-public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, ILeadService _leadService, ApplicationDbContext _context, IContactService _contactService, IHCAService _hcaService) : ICallHistoryService
+public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, ILeadService _leadService, ApplicationDbContext _context, IContactService _contactService, IHCAService _hcaService) : ICallService
 {
     public Task<ListResult<object>> HistoriesAsync(CallHistoryFilterOptions filterOptions) => _callHistoryRepository.HistoriesAsync(filterOptions);
 
-    public async Task<ListResult<CallWebhookLog>> WebhookLogsAsync(CallWebhookLogFilterOptions filterOptions)
+    public async Task<ListResult<CallWebhookLogListItem>> WebhookLogsAsync(CallWebhookLogFilterOptions filterOptions)
     {
         var query = BuildWebhookLogQuery(filterOptions)
             .OrderByDescending(x => x.ReceivedDate)
             .ThenByDescending(x => x.TimeStarted);
-        return await ListResult<CallWebhookLog>.Success(query, filterOptions);
+        return await ListResult<CallWebhookLogListItem>.Success(query, filterOptions);
     }
 
     public async Task<TResult> CompleteAsync(CallCompleteArgs args)
@@ -105,6 +106,12 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
     {
         try
         {
+            Guid? staffId = null;
+            if (!string.IsNullOrEmpty(args.FromNumber))
+            {
+                var staff = await _context.Users.FirstOrDefaultAsync(x => x.LineCode == args.FromNumber);
+                staffId = staff?.Id;
+            }
             await _context.CallWebhookLogs.AddAsync(new()
             {
                 Application = args.Application,
@@ -130,7 +137,8 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
                 TimeEnded = ParseDateTime(args.TimeEnded),
                 TimeStarted = ParseDateTime(args.TimeStarted),
                 ToNumber = args.ToNumber,
-                ReceivedDate = DateTime.Now
+                ReceivedDate = DateTime.Now,
+                StaffId = staffId
             });
             await _context.SaveChangesAsync();
             return TResult.Success;
@@ -230,18 +238,43 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
         return null;
     }
 
-    private IQueryable<CallWebhookLog> BuildWebhookLogQuery(CallWebhookLogFilterOptions filterOptions)
+    private IQueryable<CallWebhookLogListItem> BuildWebhookLogQuery(CallWebhookLogFilterOptions filterOptions)
     {
-        var query = _context.CallWebhookLogs.AsNoTracking().AsQueryable();
+        var query = from cwl in _context.CallWebhookLogs
+                    join u in _context.Users on cwl.StaffId equals u.Id into cwlu
+                    from u in cwlu.DefaultIfEmpty()
+                    select new CallWebhookLogListItem
+                    {
+                        Id = cwl.Id,
+                        Billsec = cwl.Billsec,
+                        CampaignUuid = cwl.CampaignUuid,
+                        Direction = cwl.Direction,
+                        Duration = cwl.Duration,
+                        FromNumber = cwl.FromNumber,
+                        Hotline = cwl.Hotline,
+                        PressKey = cwl.PressKey,
+                        ReceiveDest = cwl.ReceiveDest,
+                        RecordingUrl = cwl.RecordingUrl,
+                        RefId = cwl.RefId,
+                        SipCallId = cwl.SipCallId,
+                        SipHangupDisposition = cwl.SipHangupDisposition,
+                        State = cwl.State,
+                        Status = cwl.Status,
+                        TimeAnswered = cwl.TimeAnswered,
+                        TimeEnded = cwl.TimeEnded,
+                        TimeStarted = cwl.TimeStarted,
+                        ToNumber = cwl.ToNumber,
+                        ReceivedDate = cwl.ReceivedDate,
+                        UserName = u.UserName,
+                        StaffName = u.Name,
+                        StaffId = u.Id,
+                        StaffAvatar = u.Avatar,
+                        BranchId = u.BranchId
+                    };
 
-        if (!string.IsNullOrWhiteSpace(filterOptions.Application)) query = query.Where(x => x.Application != null && x.Application.Contains(filterOptions.Application));
         if (filterOptions.BillsecFrom.HasValue) query = query.Where(x => x.Billsec >= filterOptions.BillsecFrom);
         if (filterOptions.BillsecTo.HasValue) query = query.Where(x => x.Billsec <= filterOptions.BillsecTo);
-        if (!string.IsNullOrWhiteSpace(filterOptions.CallId)) query = query.Where(x => x.CallId != null && x.CallId.Contains(filterOptions.CallId));
-        if (!string.IsNullOrWhiteSpace(filterOptions.CampaignUuid)) query = query.Where(x => x.CampaignUuid != null && x.CampaignUuid.Contains(filterOptions.CampaignUuid));
         if (!string.IsNullOrWhiteSpace(filterOptions.Direction)) query = query.Where(x => x.Direction != null && x.Direction.Contains(filterOptions.Direction));
-        if (!string.IsNullOrWhiteSpace(filterOptions.Domain)) query = query.Where(x => x.Domain != null && x.Domain.Contains(filterOptions.Domain));
-        if (!string.IsNullOrWhiteSpace(filterOptions.DomainUuid)) query = query.Where(x => x.DomainUuid != null && x.DomainUuid.Contains(filterOptions.DomainUuid));
         if (filterOptions.DurationFrom.HasValue) query = query.Where(x => x.Duration >= filterOptions.DurationFrom);
         if (filterOptions.DurationTo.HasValue) query = query.Where(x => x.Duration <= filterOptions.DurationTo);
         if (!string.IsNullOrWhiteSpace(filterOptions.FromNumber)) query = query.Where(x => x.FromNumber != null && x.FromNumber.Contains(filterOptions.FromNumber));
@@ -250,10 +283,7 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
         if (!string.IsNullOrWhiteSpace(filterOptions.PressKey)) query = query.Where(x => x.PressKey != null && x.PressKey.Contains(filterOptions.PressKey));
         if (!string.IsNullOrWhiteSpace(filterOptions.ReceiveDest)) query = query.Where(x => x.ReceiveDest != null && x.ReceiveDest.Contains(filterOptions.ReceiveDest));
         if (!string.IsNullOrWhiteSpace(filterOptions.RecordingUrl)) query = query.Where(x => x.RecordingUrl != null && x.RecordingUrl.Contains(filterOptions.RecordingUrl));
-        if (!string.IsNullOrWhiteSpace(filterOptions.RefId)) query = query.Where(x => x.RefId != null && x.RefId.Contains(filterOptions.RefId));
-        if (!string.IsNullOrWhiteSpace(filterOptions.SipCallId)) query = query.Where(x => x.SipCallId != null && x.SipCallId.Contains(filterOptions.SipCallId));
         if (!string.IsNullOrWhiteSpace(filterOptions.SipHangupDisposition)) query = query.Where(x => x.SipHangupDisposition != null && x.SipHangupDisposition.Contains(filterOptions.SipHangupDisposition));
-        if (!string.IsNullOrWhiteSpace(filterOptions.State)) query = query.Where(x => x.State != null && x.State.Contains(filterOptions.State));
         if (!string.IsNullOrWhiteSpace(filterOptions.Status)) query = query.Where(x => x.Status != null && x.Status.Contains(filterOptions.Status));
         if (filterOptions.TimeAnsweredFrom.HasValue) query = query.Where(x => x.TimeAnswered >= filterOptions.TimeAnsweredFrom);
         if (filterOptions.TimeAnsweredTo.HasValue) query = query.Where(x => x.TimeAnswered <= filterOptions.TimeAnsweredTo);

@@ -4,14 +4,9 @@ namespace Waffle.Core.Services.Calls.Models;
 
 public class CallWebhookLogFilterOptions : FilterOptions
 {
-    public string? Application { get; set; }
     public int? BillsecFrom { get; set; }
     public int? BillsecTo { get; set; }
-    public string? CallId { get; set; }
-    public string? CampaignUuid { get; set; }
     public string? Direction { get; set; }
-    public string? Domain { get; set; }
-    public string? DomainUuid { get; set; }
     public int? DurationFrom { get; set; }
     public int? DurationTo { get; set; }
     public string? FromNumber { get; set; }
@@ -20,10 +15,7 @@ public class CallWebhookLogFilterOptions : FilterOptions
     public string? PressKey { get; set; }
     public string? ReceiveDest { get; set; }
     public string? RecordingUrl { get; set; }
-    public string? RefId { get; set; }
-    public string? SipCallId { get; set; }
     public string? SipHangupDisposition { get; set; }
-    public string? State { get; set; }
     public string? Status { get; set; }
     public DateTime? TimeAnsweredFrom { get; set; }
     public DateTime? TimeAnsweredTo { get; set; }

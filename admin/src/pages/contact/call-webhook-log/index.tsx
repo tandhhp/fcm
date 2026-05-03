@@ -1,5 +1,5 @@
 import { apiCallWebhookLogs, apiCallWebhookLogsExport } from "@/services/call";
-import { ExportOutlined } from "@ant-design/icons";
+import { ExportOutlined, PlayCircleOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProColumns, ProTable } from "@ant-design/pro-components";
 import { Button } from "antd";
 import dayjs from "dayjs";
@@ -51,59 +51,33 @@ const Index: React.FC = () => {
         {
             title: '#',
             valueType: 'indexBorder',
-            width: 50,
+            width: 30,
             align: 'center'
-        },
-        {
-            title: 'Application',
-            dataIndex: 'application',
-            width: 120,
-        },
-        {
-            title: 'CallId',
-            dataIndex: 'callId',
-            width: 180,
-        },
-        {
-            title: 'CampaignUuid',
-            dataIndex: 'campaignUuid',
-            width: 180,
-            hideInTable: true,
         },
         {
             title: 'Direction',
             dataIndex: 'direction',
-            width: 100,
+            width: 80,
         },
         {
-            title: 'Domain',
-            dataIndex: 'domain',
-            width: 180,
-        },
-        {
-            title: 'DomainUuid',
-            dataIndex: 'domainUuid',
-            hideInTable: true,
-        },
-        {
-            title: 'FromNumber',
+            title: 'Code',
             dataIndex: 'fromNumber',
-            width: 130,
+            width: 50,
+        },
+        {
+            title: 'Nhân viên',
+            dataIndex: 'staffName',
+            minWidth: 150,
         },
         {
             title: 'ToNumber',
             dataIndex: 'toNumber',
-            width: 130,
+            width: 100,
         },
         {
             title: 'Hotline',
             dataIndex: 'hotline',
             width: 120,
-            hideInTable: true,
-        },
-        {
-            title: 'LeadUuid',
-            dataIndex: 'leadUuid',
             hideInTable: true,
         },
         {
@@ -117,31 +91,10 @@ const Index: React.FC = () => {
             hideInTable: true,
         },
         {
-            title: 'RecordingUrl',
-            dataIndex: 'recordingUrl',
-            hideInTable: true,
-        },
-        {
-            title: 'RefId',
-            dataIndex: 'refId',
-            hideInTable: true,
-        },
-        {
-            title: 'SipCallId',
-            dataIndex: 'sipCallId',
-            width: 220,
-            hideInTable: true,
-        },
-        {
             title: 'SipHangupDisposition',
             dataIndex: 'sipHangupDisposition',
             width: 180,
             hideInTable: true,
-        },
-        {
-            title: 'State',
-            dataIndex: 'state',
-            width: 120,
         },
         {
             title: 'Status',
@@ -224,6 +177,15 @@ const Index: React.FC = () => {
             valueType: 'dateTimeRange',
             hideInTable: true,
         },
+        {
+            title: 'Bản thu âm',
+            dataIndex: 'recordingUrl',
+            render: (_, record) => record.recordingUrl ? <Button size="small" block type="primary" href={record.recordingUrl} target="_blank" rel="noopener noreferrer" icon={<PlayCircleOutlined />}> Nghe</Button> : (
+                <Button size="small" disabled>Không có</Button>
+            ),
+            search: false,
+            width: 80
+        }
     ];
 
     return (
@@ -240,7 +202,6 @@ const Index: React.FC = () => {
                 columns={columns}
                 search={{
                     layout: 'vertical',
-                    defaultCollapsed: false,
                 }}
                 scroll={{
                     x: true,

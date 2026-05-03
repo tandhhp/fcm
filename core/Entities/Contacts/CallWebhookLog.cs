@@ -46,4 +46,5 @@ public class CallWebhookLog : BaseEntity
     [StringLength(64)]
     public string? ToNumber { get; set; }
     public DateTime ReceivedDate { get; set; }
+    public Guid? StaffId { get; set; }
 }

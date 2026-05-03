@@ -517,6 +517,13 @@ export default [
     ]
   },
   {
+    name: 'Chiến dịch',
+    icon: 'RocketOutlined',
+    path: '/campaign',
+    access: 'can_read_page_campaign',
+    component: './event/campaign'
+  },
+  {
     icon: 'CalendarOutlined',
     name: 'Sự kiện',
     path: '/event',
