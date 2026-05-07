@@ -1230,13 +1230,11 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                     {
                         label = $"{a.Name} - {a.UserName}",
                         value = a.Id,
-                        a.SmId,
-                        a.DosId,
-                        a.BranchId
+                        a.ManagerId
                     };
         if (selectOptions.SalesManagerId.HasValue)
         {
-            query = query.Where(x => x.SmId == selectOptions.SalesManagerId);
+            query = query.Where(x => x.ManagerId == selectOptions.SalesManagerId);
         }
 
         return Ok(await query.ToListAsync());
