@@ -308,7 +308,7 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
                                                                       join dos in _context.Users on sm.ManagerId equals dos.Id
                                                                       where sales.ManagerId == sm.Id
                                                                       select dos.Name).FirstOrDefault() : string.Empty,
-                        SmName = sales != null && sales.SmId != null ? _context.Users.First(x => x.Id == sales.ManagerId).Name : string.Empty,
+                        SmName = sales != null && sales.ManagerId != null ? _context.Users.First(x => x.Id == sales.ManagerId).Name : string.Empty,
                         l.BranchId
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.ContractCode))
