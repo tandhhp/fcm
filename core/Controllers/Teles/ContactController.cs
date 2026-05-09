@@ -571,6 +571,10 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
             {
                 query = query.Where(x => x.ManagerId == user.Id || x.CreatedBy == user.Id);
             }
+            if (User.IsInRole(RoleName.Event))
+            {
+                query = query.Where(x => x.BranchId == user.BranchId);
+            }
             if (filterOptions.BranchId.HasValue)
             {
                 query = query.Where(x => x.BranchId == filterOptions.BranchId);

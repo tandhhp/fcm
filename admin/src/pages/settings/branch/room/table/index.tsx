@@ -45,6 +45,18 @@ const Index: React.FC = () => {
                         dataIndex: 'name',
                     },
                     {
+                        title: 'Thứ tự',
+                        dataIndex: 'sortOrder',
+                        valueType: 'digit',
+                        search: false
+                    },
+                    {
+                        title: 'Ngày tạo',
+                        dataIndex: 'createdDate',
+                        valueType: 'dateTime',
+                        search: false
+                    },
+                    {
                         title: <SettingOutlined />,
                         valueType: 'option',
                         render: (text, record) => [

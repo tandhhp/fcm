@@ -191,13 +191,18 @@ public class EventRepository(ApplicationDbContext context, IHCAService _hcaServi
 
     public async Task<object?> TableOptionsAsync(AllTableFilterOptions filterOptions)
     {
-        var rooms = await _context.Rooms.AsNoTracking().ToListAsync();
-        var tables = await _context.Tables.OrderBy(x => x.SortOrder).AsNoTracking().ToListAsync();
+        var rooms = await _context.Rooms.Where(x => x.BranchId == filterOptions.BranchId).AsNoTracking().ToListAsync();
+        var tables = await (from t in _context.Tables
+                            join r in _context.Rooms on t.RoomId equals r.Id
+                            where filterOptions.BranchId == null || r.BranchId == filterOptions.BranchId
+                            select t).ToListAsync();
+
         var eventTables = await (from l in _context.Leads
                                  join f in _context.LeadFeedbacks on l.Id equals f.LeadId
                                  where l.EventId == filterOptions.EventId && l.EventDate.Date == filterOptions.EventDate.Date
                                  select f.TableId
                                  ).ToListAsync();
+
         var result = new List<OptionGroup>();
         foreach (var room in rooms)
         {

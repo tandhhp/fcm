@@ -1,5 +1,6 @@
 import { apiEventTableOptions } from "@/services/event";
 import { apiAttendanceOptions } from "@/services/event/attendance";
+import { apiBranchOptions } from "@/services/settings/branch";
 import { apiLeadCheckin, apiLeadDetail } from "@/services/users/lead";
 import { GENDER_OPTIONS } from "@/utils/constants";
 import { ModalForm, ModalFormProps, ProFormDatePicker, ProFormInstance, ProFormList, ProFormSelect, ProFormText, ProFormTextArea } from "@ant-design/pro-components";
@@ -80,6 +81,10 @@ const LeadCheckin: React.FC<Props> = (props) => {
                     {
                         name: 'subLeads',
                         value: data.subLeads
+                    },
+                    {
+                        name: 'branchId',
+                        value: data.branchId
                     }
                 ]);
                 setLoading(false);
@@ -123,17 +128,20 @@ const LeadCheckin: React.FC<Props> = (props) => {
                 <Col md={8} xs={12}>
                     <ProFormText name="identityNumber" label="Số CCCD" />
                 </Col>
-                <Col md={6} xs={12}>
+                <Col md={4} xs={12}>
                     <ProFormDatePicker.Year label="Năm sinh" name="dateOfBirth" width="xl" />
                 </Col>
                 <Col md={4} xs={12}>
                     <ProFormSelect label="Giới tính" name="gender" options={GENDER_OPTIONS} />
                 </Col>
-                <Col md={6} xs={12}>
+                <Col md={4} xs={12}>
+                    <ProFormSelect name="branchId" label="Chi nhánh" request={apiBranchOptions} allowClear={false} rules={[{ required: true }]} />
+                </Col>
+                <Col md={4} xs={12}>
                     <ProFormSelect name="tableId" label="Bàn" request={apiEventTableOptions} params={{
                         eventId: id,
                         eventDate: props.data?.eventDate ? dayjs(props.data.eventDate).format('YYYY-MM-DD') : undefined
-                    }} rules={[{ required: true }]} showSearch />
+                    }} rules={[{ required: true }]} showSearch dependencies={["branchId"]} />
                 </Col>
                 <Col md={8} xs={12}>
                     <ProFormSelect name="attendanceId" label="Trạng thái tham dự" request={apiAttendanceOptions} showSearch rules={[

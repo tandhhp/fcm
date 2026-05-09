@@ -268,6 +268,9 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
     public async Task<ListResult<object>> GetWaitingListAsync(LeadWaittingListFilterOptions filterOptions)
     {
         var userId = _hcaService.GetUserId();
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return ListResult<object>.Failed("User not found");
+
         var query = from l in _context.Leads
                     join e in _context.Events on l.EventId equals e.Id
                     join s in _context.Sources on l.SourceId equals s.Id into sourceJoin
@@ -341,6 +344,10 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
         if (_hcaService.IsUserInRole(RoleName.DOS))
         {
             query = query.Where(x => x.DosId == userId);
+        }
+        if (_hcaService.IsUserInRole(RoleName.Event))
+        {
+            query = query.Where(x => x.BranchId == user.BranchId);
         }
         if (filterOptions.BranchId.HasValue)
         {
