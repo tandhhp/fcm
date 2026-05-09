@@ -235,7 +235,7 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
     public async Task<object?> GetLeadOptionsAsync(ContactLeadSelectOptions selectOptions)
     {
         var query = from l in _context.Leads
-                    where !string.IsNullOrEmpty(l.IdentityNumber) && !string.IsNullOrEmpty(l.PhoneNumber) && (l.Status == LeadStatus.Checkin || l.Status == LeadStatus.CloseDeal)
+                    where !string.IsNullOrEmpty(l.IdentityNumber) || !string.IsNullOrEmpty(l.PhoneNumber) && (l.Status == LeadStatus.Checkin || l.Status == LeadStatus.CloseDeal)
                     select new
                     {
                         l.Id,
@@ -249,7 +249,7 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
         }
         return await query.Select(x => new
         {
-            Label = $"{x.IdentityNumber} - {x.PhoneNumber} - {x.Name}",
+            Label = $"{x.IdentityNumber ?? "Chưa có"} - {x.PhoneNumber ?? "Chưa có"} - {x.Name}",
             Value = x.Id,
         }).ToListAsync();
     }
@@ -343,7 +343,7 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
         {
             query = query.Where(c => c.SalesManagerId == userId);
         }
-        if (_hcaService.IsUserInRole(RoleName.Cx))
+        if (_hcaService.IsUserInAnyRole(RoleName.Cx, RoleName.Event))
         {
             query = query.Where(x => x.BranchId == user.BranchId);
         }

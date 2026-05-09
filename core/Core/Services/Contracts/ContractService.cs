@@ -102,7 +102,7 @@ public class ContractService(IContractRepository _contractRepository, IWebHostEn
             lead.IdentityNumber,
             contract.CreatedDate,
             lead.Gender,
-            SalesManagerId = sales.SmId,
+            SalesManagerId = sales.ManagerId,
             contract.SourceId,
             contract.LeadId,
             contract.KeyInId,
@@ -205,23 +205,31 @@ public class ContractService(IContractRepository _contractRepository, IWebHostEn
 
     public async Task<TResult> UpdateAsync(ContractUpdateArgs args)
     {
-        var contract = await _contractRepository.FindAsync(args.Id);
-        if (contract is null) return TResult.Failed("Không tìm thấy hợp đồng!");
-        if (args.Amount <= 0) return TResult.Failed("Số tiền hợp đồng không hợp lệ!");
-        if (contract.Code != args.Code && await AnyAsync(args.Code)) return TResult.Failed("Mã hợp đồng đã tồn tại!");
-        contract.Amount = args.Amount;
-        contract.Code = args.Code;
-        contract.CardId = args.CardId;
-        contract.SalesId = args.SalesId;
-        contract.SourceId = args.SourceId;
-        contract.ToById = args.ToById;
-        contract.KeyInId = args.KeyInId;
-        contract.TeamKeyInId = args.TeamKeyInId;
-        contract.LeadId = args.LeadId;
-        contract.CreatedDate = args.CreatedDate ?? contract.CreatedDate;
-        await _contractRepository.UpdateAsync(contract);
-        await _logService.AddAsync($"Hợp đồng {args.Code} đã được cập nhật");
-        return TResult.Success;
+        try
+        {
+            var contract = await _contractRepository.FindAsync(args.Id);
+            if (contract is null) return TResult.Failed("Không tìm thấy hợp đồng!");
+            if (args.Amount <= 0) return TResult.Failed("Số tiền hợp đồng không hợp lệ!");
+            if (contract.Code != args.Code && await AnyAsync(args.Code)) return TResult.Failed("Mã hợp đồng đã tồn tại!");
+            contract.Amount = args.Amount;
+            contract.Code = args.Code;
+            contract.CardId = args.CardId;
+            contract.SalesId = args.SalesId;
+            contract.SourceId = args.SourceId;
+            contract.ToById = args.ToById;
+            contract.KeyInId = args.KeyInId;
+            contract.TeamKeyInId = args.TeamKeyInId;
+            contract.LeadId = args.LeadId;
+            contract.CreatedDate = args.CreatedDate ?? contract.CreatedDate;
+            await _contractRepository.UpdateAsync(contract);
+            await _logService.AddAsync($"Hợp đồng {args.Code} đã được cập nhật");
+            return TResult.Success;
+        }
+        catch (Exception ex)
+        {
+            await _logService.ExceptionAsync(ex);
+            return TResult.Failed(ex.ToString());
+        }
     }
 
     public async Task<TResult> UploadEvidencesAsync(UploadEvidencesArgs args, string host)

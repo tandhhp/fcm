@@ -269,37 +269,19 @@ public class RoleController(RoleManager<ApplicationRole> _roleManager, Applicati
     [HttpGet("key-in-options")]
     public async Task<IActionResult> GetKeyInOptionsAsync([FromQuery] KeyInSelectOptions selectOptions)
     {
-        var roleName = RoleName.Sales;
-        if (selectOptions.TeamKeyInId.HasValue)
-        {
-            var teamKeyIn = await _context.Users.FindAsync(selectOptions.TeamKeyInId.Value);
-            if (teamKeyIn is null) return BadRequest("Không tìm thấy trưởng nhóm!");
-            if (await _userManager.IsInRoleAsync(teamKeyIn, RoleName.TelesaleManager))
-            {
-                roleName = RoleName.Telesales;
-            }
-        }
         var query = from a in _context.Users
                     join b in _context.UserRoles on a.Id equals b.UserId
                     join c in _context.Roles on b.RoleId equals c.Id
-                    where c.Name == roleName //&& a.Status == UserStatus.Working
+                    where (c.Name == RoleName.Sales || c.Name == RoleName.Telesales) && a.Status == UserStatus.Working
                     select new
                     {
                         a.Name,
                         a.Id,
-                        a.SmId,
-                        a.TmId
+                        a.ManagerId
                     };
         if (selectOptions.TeamKeyInId.HasValue)
         {
-            if (roleName == RoleName.Sales)
-            {
-                query = query.Where(x => x.SmId == selectOptions.TeamKeyInId);
-            }
-            if (roleName == RoleName.Telesales)
-            {
-                query = query.Where(x => x.TmId == selectOptions.TeamKeyInId);
-            }
+            query = query.Where(x => x.ManagerId == selectOptions.TeamKeyInId);
         }
         if (!string.IsNullOrEmpty(selectOptions.KeyWords))
         {
