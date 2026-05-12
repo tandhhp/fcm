@@ -184,6 +184,20 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
         }
     }
 
+    public async Task<IEnumerable<Lead>> GetDupsAsync(string? identityNumber, string? phoneNumber)
+    {
+        var leads = new List<Lead>();
+        if (!string.IsNullOrWhiteSpace(phoneNumber))
+        {
+            leads.AddRange(await _context.Leads.Where(x => x.PhoneNumber == phoneNumber).ToListAsync());
+        }
+        if (!string.IsNullOrWhiteSpace(identityNumber))
+        {
+            leads.AddRange(await _context.Leads.Where(x => x.IdentityNumber == identityNumber).ToListAsync());
+        }
+        return leads.Distinct();
+    }
+
     public async Task<List<LeadExportCheckinResult>> GetExportCheckinDataAsync(LeadCheckinListFilterOptions filterOptions)
     {
         var query = from a in _context.Leads
@@ -412,7 +426,20 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
         {
             query = query.Where(x => x.Name.ToLower().Contains(filterOptions.Name.ToLower()));
         }
-        var groups = await query.Skip((filterOptions.Current - 1) * filterOptions.PageSize).Take(filterOptions.PageSize).ToListAsync();
+        var groups = await query
+            .GroupBy(x => new { x.PhoneNumber, x.IdentityNumber })
+            .Select(g => new
+            {
+                Id = g.First().Id,
+                Name = g.First().Name,
+                PhoneNumber = g.First().PhoneNumber,
+                IdentityNumber = g.First().IdentityNumber,
+                DateOfBirth = g.First().DateOfBirth,
+                Note = g.First().Note,
+                Duplicated = g.First().Duplicated,
+                Count = g.First().Count
+            })
+            .Skip((filterOptions.Current - 1) * filterOptions.PageSize).Take(filterOptions.PageSize).ToListAsync();
         var leadIds = groups.Select(x => x.Id).ToList();
         var subLeads = await _context.SubLeads.Where(x => leadIds.Contains(x.LeadId)).ToListAsync();
         var data = new List<LeadCustomer>();

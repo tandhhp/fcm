@@ -78,12 +78,15 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
         return TResult.Success;
     }
 
-    public async Task<TResult> AllowedDuplicateAsync(string citizenId)
+    public async Task<TResult> AllowedDuplicateAsync(Guid id)
     {
-        var leads = await _leadRepository.ListByCitizenIdAsync(citizenId);
-        if (leads.Count == 0) return TResult.Failed("Không tìm thấy khách hàng!");
-        foreach (var lead in leads)
+        var data = await _leadRepository.FindAsync(id);
+        if (data is null) return TResult.Failed("Không tìm thấy khách hàng!");
+        var leads = await _leadRepository.GetDupsAsync(data.IdentityNumber, data.PhoneNumber);
+        foreach (var item in leads)
         {
+            var lead = await _leadRepository.FindAsync(item.Id);
+            if (lead == null) continue;
             lead.Duplicated = !lead.Duplicated;
             await _leadRepository.UpdateAsync(lead);
         }

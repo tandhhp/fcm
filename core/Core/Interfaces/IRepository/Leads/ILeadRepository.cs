@@ -14,6 +14,7 @@ public interface ILeadRepository : IAsyncRepository<Lead>
     Task<ExistingLeadResult?> FindByIdentityNumberAsync(string identityNumber);
     Task<Lead?> FindByPhoneNumberAsync(string? phoneNumber);
     Task<ListResult<object>> GetCheckinListAsync(LeadCheckinListFilterOptions filterOptions);
+    Task<IEnumerable<Lead>> GetDupsAsync(string? identityNumber, string? phoneNumber);
     Task<List<LeadExportCheckinResult>> GetExportCheckinDataAsync(LeadCheckinListFilterOptions filterOptions);
     Task<LeadFeedback?> GetFeedbackAsync(Guid id);
     Task<object> GetSubLeadsAsync(Guid id);

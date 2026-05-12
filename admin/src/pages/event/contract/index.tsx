@@ -1,5 +1,5 @@
 import { apiContractExport, apiContractList } from "@/services/finances/contract";
-import { EditOutlined, ExportOutlined, ManOutlined, MoneyCollectOutlined, MoreOutlined, PictureOutlined, PlusOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
+import { EditOutlined, EnvironmentOutlined, ExportOutlined, ManOutlined, MoneyCollectOutlined, MoreOutlined, PictureOutlined, PlusOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { useRef, useState } from "react";
 import { Button, Dropdown, Tag } from "antd";
@@ -89,10 +89,14 @@ const Index: React.FC = () => {
                         title: 'Họ và tên',
                         dataIndex: 'customerName',
                         render: (_, record) => {
-                            if (record.gender) {
-                                return <><WomanOutlined className="text-pink-500" /> {record.customerName}</>
-                            }
-                            return <><ManOutlined className="text-blue-500" /> {record.customerName}</>
+                            const gender = record.gender === true ? <WomanOutlined className="text-pink-500" /> : <ManOutlined className="text-blue-500" />;
+
+                            return (
+                                <>
+                                    <div>{gender} {record.customerName}</div>
+                                    <div><EnvironmentOutlined className="text-green-500" /> {record.branchName}</div>
+                                </>
+                            )
                         },
                         minWidth: 200
                     },

@@ -9,7 +9,7 @@ namespace Waffle.Core.Interfaces.IService;
 public interface ILeadService
 {
     Task<TResult> AddAsync(LeadCreateArgs leadCreateArgs);
-    Task<TResult> AllowedDuplicateAsync(string id);
+    Task<TResult> AllowedDuplicateAsync(Guid id);
     Task<IEnumerable<string?>> AllPhoneNumbersAsync();
     Task<TResult> CheckinAsync(LeadCheckinArgs args);
     Task<TResult<object>> DetailAsync(Guid id);

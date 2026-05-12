@@ -278,6 +278,8 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
         if (user is null) return ListResult<object>.Failed("User not found");
         var query = from c in _context.Contracts
                     join l in _context.Leads on c.LeadId equals l.Id
+                    join b in _context.Branches on l.BranchId equals b.Id into branchJoin
+                    from b in branchJoin.DefaultIfEmpty()
                     join sales in _context.Users on c.SalesId equals sales.Id into salesJoin
                     from sales in salesJoin.DefaultIfEmpty()
                     join s in _context.Sources on c.SourceId equals s.Id into sourceJoin
@@ -309,7 +311,8 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
                                                                       where sales.ManagerId == sm.Id
                                                                       select dos.Name).FirstOrDefault() : string.Empty,
                         SmName = sales != null && sales.ManagerId != null ? _context.Users.First(x => x.Id == sales.ManagerId).Name : string.Empty,
-                        l.BranchId
+                        l.BranchId,
+                        BranchName = b != null ? b.Name : string.Empty
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.ContractCode))
         {
@@ -343,7 +346,7 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
         {
             query = query.Where(c => c.SalesManagerId == userId);
         }
-        if (_hcaService.IsUserInAnyRole(RoleName.Cx, RoleName.Event))
+        if (_hcaService.IsUserInAnyRole(RoleName.Cx))
         {
             query = query.Where(x => x.BranchId == user.BranchId);
         }
