@@ -216,6 +216,9 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
     public async Task<ListResult<object>> GetInvoicesAsync(ContractInvoiceFilterOptions filterOptions)
     {
         var query = from i in _context.Invoices
+                    join s in _context.Users on i.CreatedBy equals s.Id
+                    join sales in _context.Users on i.SalesId equals sales.Id into salesJoin
+                    from sales in salesJoin.DefaultIfEmpty()
                     where i.ContractId == filterOptions.ContractId
                     select new
                     {
@@ -226,7 +229,13 @@ public class ContractRepository(ApplicationDbContext context, IHCAService _hcaSe
                         i.Note,
                         i.CreatedAt,
                         i.EvidenceUrl,
-                        i.PaymentMethod
+                        i.PaymentMethod,
+                        CreatorName = s.Name,
+                        CreatorAvatar = s.Avatar,
+                        CreatorUserName = s.UserName,
+                        SalesName = sales != null ? sales.Name : string.Empty,
+                        SalesAvatar = sales != null ? sales.Avatar : string.Empty,
+                        SalesUserName = sales != null ? sales.UserName : string.Empty,
                     };
         query = query.OrderByDescending(i => i.CreatedAt);
         return await ListResult<object>.Success(query, filterOptions);

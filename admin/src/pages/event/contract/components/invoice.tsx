@@ -1,5 +1,6 @@
 import { apiContractInvoiceList } from "@/services/finances/contract";
 import { DrawerForm, DrawerFormProps, ProTable } from "@ant-design/pro-components";
+import { Avatar } from "antd";
 
 type Props = DrawerFormProps & {
     data?: any;
@@ -7,7 +8,7 @@ type Props = DrawerFormProps & {
 
 const ContractInvoice: React.FC<Props> = (props) => {
     return (
-        <DrawerForm {...props} title="Hóa đơn hợp đồng" submitter={false} width={1000}>
+        <DrawerForm {...props} title="Hóa đơn hợp đồng" submitter={false} width={1200}>
             <ProTable
                 request={apiContractInvoiceList}
                 params={{
@@ -60,6 +61,32 @@ const ContractInvoice: React.FC<Props> = (props) => {
                             3: { text: 'Hủy', status: 'Default' },
                         },
                         search: false
+                    },
+                    {
+                        title: 'Người tạo',
+                        dataIndex: 'creatorName',
+                        search: false,
+                        render: (text, record) => {
+                            return (
+                                <div>
+                                    <Avatar src={record.creatorAvatar} size="small" className="mr-1" />
+                                    {text}
+                                </div>
+                            )
+                        }
+                    },
+                    {
+                        title: 'Sales',
+                        dataIndex: 'salesName',
+                        search: false,
+                        render: (text, record) => {
+                            return (
+                                <div>
+                                    <Avatar src={record.salesAvatar} size="small" className="mr-1" />
+                                    {text}
+                                </div>
+                            )
+                        }
                     },
                     {
                         title: 'Ghi chú',
