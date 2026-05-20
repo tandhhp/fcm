@@ -24,14 +24,16 @@ const RoleCenter: React.FC = () => {
     const [openClaim, setOpenClaim] = useState<boolean>(false);
     const [openAddToRole, setOpenAddToRole] = useState<boolean>(false);
     const { data } = useRequest(() => apiRoleDetail(id!));
+    const [dosId, setDosId] = useState<string>();
+
+    useEffect(() => {
+        apiSmOptions(dosId).then(response => {
+            setSm(response);
+        });
+    }, [dosId]);
 
     useEffect(() => {
         if (user && open) {
-            if (user.dosId) {
-                apiSmOptions(user.dosId).then(response => {
-                    setSm(response);
-                })
-            }
             formRef.current?.setFields([
                 {
                     name: 'id',
@@ -122,7 +124,7 @@ const RoleCenter: React.FC = () => {
                     value: user.lineCode
                 }
             ]);
-
+            setDosId(user.dosId);
         }
     }, [user, open]);
 
@@ -442,9 +444,7 @@ const RoleCenter: React.FC = () => {
                         <ProFormSelect request={apiDosOptions}
                             fieldProps={{
                                 onChange: (value: string) => {
-                                    apiSmOptions(value).then(response => {
-                                        setSm(response);
-                                    });
+                                    setDosId(value);
                                 }
                             }}
                             name="dosId" label="DOS" />
