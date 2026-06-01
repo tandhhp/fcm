@@ -224,6 +224,7 @@ public class ContactService(IContactRepository _contactRepository, ILeadReposito
                 lead.Note = args.Note;
                 lead.EventId = args.EventId;
                 lead.TelesaleId = telesales.Id;
+                lead.CreatedDate = DateTime.Now;
                 _context.Leads.Update(lead);
                 await _context.SaveChangesAsync();
                 return TResult.Success;

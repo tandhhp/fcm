@@ -321,7 +321,8 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
                         SubLeads = _context.SubLeads.Where(x => x.LeadId == l.Id).Select(sub => $"{sub.Name} - {sub.PhoneNumber}").ToList(),
                         l.BranchId,
                         c.Avatar,
-                        l.Confirm2
+                        l.Confirm2,
+                        InviteCount = _context.LeadHistories.Count(h => h.LeadId == l.Id)
                     };
         if (filterOptions.EventId.HasValue)
         {
@@ -366,6 +367,10 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
         if (filterOptions.BranchId.HasValue)
         {
             query = query.Where(x => x.BranchId == filterOptions.BranchId);
+        }
+        if (filterOptions.SourceId.HasValue)
+        {
+            query = query.Where(x => x.SourceId == filterOptions.SourceId);
         }
         query = query.OrderByDescending(x => x.EventDate);
         return await ListResult<object>.Success(query, filterOptions);

@@ -432,6 +432,10 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         {
             query = query.Where(x => x.TmId == _hcaService.GetUserId());
         }
+        if (_hcaService.IsUserInRole(RoleName.Telesales))
+        {
+            query = query.Where(x => x.StaffId == _hcaService.GetUserId());
+        }
         query = query.OrderByDescending(x => x.CreatedDate);
         return await ListResult<object>.Success(query, filterOptions);
     }

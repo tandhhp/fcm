@@ -1,6 +1,6 @@
 import { apiEventOptions } from "@/services/event";
 import { apiLeadWaitingList } from "@/services/users/lead";
-import { CheckOutlined, DeleteOutlined, EditOutlined, KeyOutlined, ManOutlined, MoreOutlined, PlusOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
+import { CheckOutlined, DeleteOutlined, EditOutlined, HistoryOutlined, KeyOutlined, ManOutlined, MoreOutlined, PlusOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, ProTable } from "@ant-design/pro-components";
 import { useRef, useState } from "react";
 import { Avatar, Button, Dropdown, message, Popconfirm, Tag } from "antd";
@@ -10,11 +10,13 @@ import { CONFIRM2_OPTIONS, LeadStatus } from "@/utils/constants";
 import LeadForm from "@/components/form/lead-form";
 import LeadStatusRender from "@/components/lead/status-render";
 import { apiBranchOptions } from "@/services/settings/branch";
+import ReinviteHistories from "./reinvite";
 
 const WaitingList: React.FC = () => {
 
     const access = useAccess();
     const [keyInOpen, setKeyInOpen] = useState<boolean>(false);
+    const [historyOpen, setHistoryOpen] = useState<boolean>(false);
     const [selectedRecord, setSelectedRecord] = useState<any>(null);
     const actionRef = useRef<ActionType>();
 
@@ -144,7 +146,17 @@ const WaitingList: React.FC = () => {
                         valueType: 'select',
                         request: apiEventOptions,
                         hideInTable: true,
-                        title: 'Sự kiện'
+                        title: 'Khung giờ'
+                    },
+                    {
+                        title: 'Nguồn',
+                        dataIndex: 'sourceId',
+                        valueType: 'select',
+                        hideInTable: true,
+                        valueEnum: {
+                            1: 'PRIVATE',
+                            2: 'TELE_OPC'
+                        }
                     },
                     {
                         title: 'Trạng thái',
@@ -186,6 +198,20 @@ const WaitingList: React.FC = () => {
                         }
                     },
                     {
+                        title: 'Lượt',
+                        dataIndex: 'inviteCount',
+                        search: false,
+                        width: 40,
+                        minWidth: 40,
+                        valueType: 'digit',
+                        render: (dom, entity) => (
+                            <Button type="dashed" size="small" onClick={() => {
+                                setSelectedRecord(entity);
+                                setHistoryOpen(true);
+                            }}>{dom}</Button>
+                        )
+                    },
+                    {
                         title: <SettingOutlined />,
                         valueType: 'option',
                         width: 60,
@@ -205,6 +231,15 @@ const WaitingList: React.FC = () => {
                                             setKeyInOpen(true);
                                         },
                                         disabled: !canEdit(entity)
+                                    },
+                                    {
+                                        key: 'history',
+                                        label: 'Lịch sử mời lại',
+                                        icon: <HistoryOutlined />,
+                                        onClick: () => {
+                                            setSelectedRecord(entity);
+                                            setHistoryOpen(true);
+                                        }
                                     }
                                 ]
                             }}>
@@ -222,6 +257,7 @@ const WaitingList: React.FC = () => {
                 ]}
             />
             <LeadForm open={keyInOpen} onOpenChange={setKeyInOpen} reload={() => actionRef.current?.reload()} data={selectedRecord} />
+            <ReinviteHistories open={historyOpen} onClose={() => setHistoryOpen(false)} leadId={selectedRecord?.id} />
         </>
     )
 }

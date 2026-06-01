@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using System.Globalization;
+using Waffle.Core.Constants;
 using Waffle.Core.Interfaces.IRepository.Calls;
 using Waffle.Core.Interfaces.IService;
 using Waffle.Core.Interfaces.IService.Calls;
@@ -49,27 +50,62 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
                 contact.Confirm1 = true;
                 if (args.EventDate != null && args.EventId != null)
                 {
-                    var lead = await _leadService.FindByPhoneNumberAsync(contact.PhoneNumber);
-                    if (lead != null && !lead.Duplicated) return TResult.Failed($"Liên hệ đã có lịch hẹn vào ngày {lead.EventDate:dd-MM-yyyy}!");
                     if (contact.UserId == null) return TResult.Failed("Liên hệ chưa có người phụ trách!");
                     var telesales = await _context.Users.FindAsync(contact.UserId);
                     if (telesales is null) return TResult.Failed("Người phụ trách không tồn tại!");
-                    await _context.Leads.AddAsync(new Lead
+
+                    var lead = await _leadService.FindByPhoneNumberAsync(contact.PhoneNumber);
+                    if (lead != null && !lead.Duplicated)
                     {
-                        Name = contact.Name,
-                        PhoneNumber = contact.PhoneNumber!,
-                        Email = contact.Email,
-                        EventDate = args.EventDate.GetValueOrDefault(),
-                        EventId = args.EventId.GetValueOrDefault(),
-                        Gender = contact.Gender,
-                        Note = args.Note,
-                        TelesaleId = contact.UserId,
-                        BranchId = telesales.BranchId,
-                        CreatedBy = contact.UserId.GetValueOrDefault(),
-                        Status = LeadStatus.Pending,
-                        Confirm2 = Confirm2.UNCONFIRM,
-                        SourceId = contact.SourceId
-                    });
+                        if (lead.Status == LeadStatus.Checkin) return TResult.Failed($"Khách đã check-in vào ngày ${lead.EventDate:dd-MM-yyyy}");
+                        if (lead.Status == LeadStatus.CloseDeal) return TResult.Failed($"Khách đã chốt deal vào ngày ${lead.EventDate:dd-MM-yyyy}");
+                        var leadDetail = await _context.LeadHistories.FirstOrDefaultAsync(x => x.LeadId == lead.Id);
+                        await _context.LeadHistories.AddAsync(new LeadHistory
+                        {
+                            LeadId = lead.Id,
+                            EventDate = lead.EventDate,
+                            Note = lead.Note,
+                            CreatedBy = _hcaService.GetUserId(),
+                            AttendanceId = lead.AttendanceId,
+                            CheckinTime = leadDetail?.CheckinTime,
+                            CheckoutTime = leadDetail?.CheckoutTime,
+                            EventId = lead.EventId,
+                            SalesId = lead.SalesId,
+                            TableId = leadDetail?.TableId,
+                            TelesaleId = lead.TelesaleId,
+                            ToById = lead.ToById,
+                            TransportId = leadDetail?.TransportId,
+                        });
+                        lead.Status = LeadStatus.Pending;
+                        lead.EventDate = args.EventDate.GetValueOrDefault();
+                        lead.Note = args.Note;
+                        lead.EventId = args.EventId.GetValueOrDefault();
+                        lead.TelesaleId = contact.UserId;
+                        lead.CreatedBy = contact.UserId.GetValueOrDefault();
+                        lead.SourceId = SourceConstant.TELE_OPC;
+                        lead.CreatedDate = DateTime.Now;
+                        _context.Leads.Update(lead);
+                    }
+                    else
+                    {
+                        await _context.Leads.AddAsync(new Lead
+                        {
+                            Name = contact.Name,
+                            PhoneNumber = contact.PhoneNumber!,
+                            Email = contact.Email,
+                            EventDate = args.EventDate.GetValueOrDefault(),
+                            EventId = args.EventId.GetValueOrDefault(),
+                            Gender = contact.Gender,
+                            Note = args.Note,
+                            TelesaleId = contact.UserId,
+                            BranchId = telesales.BranchId,
+                            CreatedBy = contact.UserId.GetValueOrDefault(),
+                            Status = LeadStatus.Pending,
+                            Confirm2 = Confirm2.UNCONFIRM,
+                            SourceId = SourceConstant.TELE_OPC,
+                            CreatedDate = DateTime.Now
+                        });
+                    }
                 }
             }
             contact.FollowUpdate = followUpDate;

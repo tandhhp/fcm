@@ -8,4 +8,5 @@ public class LeadWaittingListFilterOptions : FilterOptions
     public string? Name { get; set; }
     public DateTime? EventDate { get; set; }
     public Guid? EventId { get; set; }
+    public int? SourceId { get; set; }
 }
