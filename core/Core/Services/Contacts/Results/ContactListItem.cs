@@ -11,7 +11,7 @@ public class ContactListItem : BaseEntity
     public string? Note { get; set; }
     public Guid? TelesalesId { get; set; }
     public string? TelesalesName { get; set; }
-    public bool ShowUp { get; set; }
+    public bool HasAppointment { get; set; }
     public int? SourceId { get; set; }
     public Guid? TmId { get; set; }
     public Guid? DotId { get; set; }
@@ -24,4 +24,5 @@ public class ContactListItem : BaseEntity
     public bool Called { get; set; }
     public string? Name2 { get; set; }
     public string? PhoneNumber2 { get; set; }
+    public Guid? ManagerId { get; set; }
 }

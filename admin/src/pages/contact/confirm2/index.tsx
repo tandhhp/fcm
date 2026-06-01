@@ -120,20 +120,20 @@ const Index: React.FC = () => {
             minWidth: 100,
         },
         {
-            title: 'Giờ',
-            dataIndex: 'eventId',
-            width: 60,
-            valueType: 'select',
-            request: apiEventOptions,
-            minWidth: 60
-        },
-        {
             title: 'Ngày sự kiện',
             dataIndex: 'dateRange',
             valueType: 'dateRange',
             hideInTable: true,
             minWidth: 100,
             width: 100
+        },
+        {
+            title: 'Giờ',
+            dataIndex: 'eventId',
+            width: 60,
+            valueType: 'select',
+            request: apiEventOptions,
+            minWidth: 60
         },
         {
             title: 'Xác nhận 2',

@@ -9,6 +9,7 @@ import ContactForm from "./components/form";
 import CallForm from "./components/call";
 import BookingForm from "./components/booking";
 import { apiSourceOptions } from "@/services/settings/source";
+import AppointmentDrawer from "./components/appointment-drawer";
 
 const ContactPage: React.FC = () => {
 
@@ -19,6 +20,8 @@ const ContactPage: React.FC = () => {
     const [openForm, setOpenForm] = useState<boolean>(false);
     const [openCall, setOpenCall] = useState<boolean>(false);
     const [openBooking, setOpenBooking] = useState<boolean>(false);
+    const [openAppointmentDrawer, setOpenAppointmentDrawer] = useState<boolean>(false);
+    const [appointmentPhone, setAppointmentPhone] = useState<string>();
 
     const columns: ProColumnType<any>[] = [
         {
@@ -105,8 +108,8 @@ const ContactPage: React.FC = () => {
             minWidth: 140
         },
         {
-            title: 'Show-up',
-            dataIndex: 'showUp',
+            title: 'Sự kiện',
+            dataIndex: 'hasAppointment',
             valueType: 'select',
             valueEnum: {
                 true: { text: 'Có' },
@@ -114,7 +117,18 @@ const ContactPage: React.FC = () => {
             },
             width: 80,
             search: false,
-            minWidth: 80
+            minWidth: 80,
+            render: (_, record) => {
+                if (!record.hasAppointment) return <Button type="dashed" block size="small" disabled>Không</Button>;
+                return (
+                    <Button type="dashed" block size="small" onClick={() => {
+                        setAppointmentPhone(record.phoneNumber);
+                        setOpenAppointmentDrawer(true);
+                    }}>
+                        Có
+                    </Button>
+                )
+            }
         },
         {
             title: 'Ghi chú',
@@ -155,16 +169,6 @@ const ContactPage: React.FC = () => {
                             icon: <PhoneOutlined />
                         },
                         {
-                            key: 'booking',
-                            label: 'Đặt lịch hẹn',
-                            onClick: () => {
-                                setContact(entity);
-                                setOpenBooking(true);
-                            },
-                            icon: <CalendarOutlined />,
-                            disabled: entity.isBooked
-                        },
-                        {
                             key: 'block',
                             label: 'Chặn liên hệ',
                             onClick: () => {
@@ -183,7 +187,7 @@ const ContactPage: React.FC = () => {
                     message.success('Xóa thành công!');
                     actionRef.current?.reload();
                 }}>
-                    <Button type="primary" danger icon={<DeleteOutlined />} size="small" disabled={!access.telesale && !access.telesaleManager && !access.dot}></Button>
+                    <Button type="primary" danger icon={<DeleteOutlined />} size="small" disabled={!access.telesale && !access.telesaleManager && !access.dot && !access.canAdmin}></Button>
                 </Popconfirm>
             ],
             width: 80
@@ -211,6 +215,7 @@ const ContactPage: React.FC = () => {
             <ContactForm open={openForm} onOpenChange={setOpenForm} data={contact} reload={() => actionRef.current?.reload()} />
             <CallForm open={openCall} data={contact} onOpenChange={setOpenCall} reload={() => actionRef.current?.reload()} />
             <BookingForm open={openBooking} data={contact} onOpenChange={setOpenBooking} reload={() => actionRef.current?.reload()} />
+            <AppointmentDrawer open={openAppointmentDrawer} phoneNumber={appointmentPhone} onOpenChange={setOpenAppointmentDrawer} />
         </PageContainer>
     )
 }

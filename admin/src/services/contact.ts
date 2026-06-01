@@ -81,6 +81,20 @@ export async function listLead(params: any) {
   return request(`contact/lead/list`, { params });
 }
 
+export async function apiLeadByPhone(phoneNumber?: string) {
+  return request(`contact/lead/list`, {
+    params: {
+      current: 1,
+      pageSize: 20,
+      phoneNumber
+    }
+  });
+}
+
+export async function apiLeadDetailById(id: string) {
+  return request(`contact/lead/${id}`);
+}
+
 export const apiUpdateLeadStatus = (data: any) => request(`contact/lead/status`, {
   method: 'POST',
   data
@@ -363,4 +377,39 @@ export async function apiReportMultipleAssignExport(params: {
     params,
     responseType: 'blob'
   });
+}
+
+export async function apiContactDetailsByPhone(phoneNumber: string) {
+  return request<API.TResult<{
+    id: string;
+    name?: string;
+    phoneNumber?: string;
+    email?: string;
+    address?: string;
+    confirm1?: boolean;
+    note?: string;
+    createdDate?: string;
+    callHistories?: {
+      id: string;
+      note?: string;
+      callStatusId?: number;
+      contactId?: string;
+      age?: number;
+      extraStatus?: string;
+      createdDate?: string;
+      caller?: string;
+      status?: string;
+    }[];
+    CallHistories?: {
+      id: string;
+      note?: string;
+      callStatusId?: number;
+      contactId?: string;
+      age?: number;
+      extraStatus?: string;
+      createdDate?: string;
+      caller?: string;
+      status?: string;
+    }[];
+  }>>(`contact/detail-by-phone/${encodeURIComponent(phoneNumber)}`);
 }

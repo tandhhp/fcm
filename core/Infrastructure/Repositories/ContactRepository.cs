@@ -325,18 +325,16 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         Note = a.Note,
                         TelesalesId = a.UserId,
                         TelesalesName = b.Name,
-                        ShowUp = _context.Leads.Any(x => x.PhoneNumber == a.PhoneNumber && !x.Duplicated && (x.Status == LeadStatus.Checkin || x.Status == LeadStatus.CloseDeal)),
+                        HasAppointment = _context.Leads.Any(x => x.PhoneNumber == a.PhoneNumber),
                         SourceId = a.SourceId,
-                        TmId = b.TmId,
-                        DotId = b.DotId,
-                        DosId = b.DosId,
                         Confirm1 = a.Confirm1,
                         SourceName = s.Name,
                         TypeOfDataId = s.TypeOfDataId,
                         TypeOfDataName = tod.Name,
                         SourceType = tod.Source,
                         Name2 = a.Name2,
-                        PhoneNumber2 = a.PhoneNumber2
+                        PhoneNumber2 = a.PhoneNumber2,
+                        ManagerId = b.ManagerId
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
         {
@@ -352,7 +350,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         }
         if (filterOptions.IsBooked.HasValue)
         {
-            query = query.Where(x => x.ShowUp == filterOptions.IsBooked);
+            query = query.Where(x => x.HasAppointment == filterOptions.IsBooked);
         }
         if (filterOptions.Confirm1.HasValue)
         {
@@ -376,7 +374,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         }
         if (_hcaService.IsUserInRole(RoleName.TelesaleManager))
         {
-            query = query.Where(x => x.TmId == userId);
+            query = query.Where(x => x.ManagerId == userId);
         }
         query = query.OrderByDescending(x => x.CreatedDate);
         return await ListResult<dynamic>.Success(query, filterOptions);
@@ -404,7 +402,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         c.Confirm2,
                         c.EventDate,
                         EventName = d.Name,
-                        b.TmId,
+                        ManagerId = b.ManagerId,
                         c.EventId,
                         ContactNote = _context.Contacts.Where(x => x.PhoneNumber == c.PhoneNumber).Select(x => x.Note).FirstOrDefault()
                     };
@@ -430,7 +428,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         }
         if (_hcaService.IsUserInRole(RoleName.TelesaleManager))
         {
-            query = query.Where(x => x.TmId == _hcaService.GetUserId());
+            query = query.Where(x => x.ManagerId == _hcaService.GetUserId());
         }
         if (_hcaService.IsUserInRole(RoleName.Telesales))
         {

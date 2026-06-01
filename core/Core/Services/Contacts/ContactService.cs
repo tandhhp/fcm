@@ -818,6 +818,39 @@ public class ContactService(IContactRepository _contactRepository, ILeadReposito
         });
     }
 
+    public async Task<TResult> GetDetailByPhoneAsync(string phone)
+    {
+        var contact = await _context.Contacts.FirstOrDefaultAsync(x => x.PhoneNumber == phone);
+        if (contact is null) return TResult.Failed("Contact not found");
+        var callHistories = await _context.CallHistories.Where(x => x.ContactId == contact.Id)
+            .OrderByDescending(x => x.CreatedDate)
+            .Select(x => new
+            {
+                x.Id,
+                x.Note,
+                x.CallStatusId,
+                x.ContactId,
+                x.Age,
+                x.ExtraStatus,
+                x.CreatedDate,
+                Caller = _context.Users.Where(u => u.Id == x.CreatedBy).Select(u => u.Name).FirstOrDefault(),
+                Status = _context.CallStatuses.Where(cs => cs.Id == x.CallStatusId).Select(cs => cs.Name).FirstOrDefault()
+            })
+            .ToListAsync();
+        return TResult.Ok(new
+        {
+            contact.Id,
+            contact.Name,
+            contact.PhoneNumber,
+            contact.Email,
+            contact.Address,
+            contact.Confirm1,
+            contact.Note,
+            contact.CreatedDate,
+            CallHistories = callHistories
+        });
+    }
+
     private class ContactTransferListItem
     {
         public Guid Id { get; set; }

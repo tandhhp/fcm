@@ -1,6 +1,6 @@
 import { apiEventOptions } from "@/services/event";
 import { apiLeadWaitingList } from "@/services/users/lead";
-import { CheckOutlined, DeleteOutlined, EditOutlined, HistoryOutlined, KeyOutlined, ManOutlined, MoreOutlined, PlusOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
+import { CheckOutlined, DeleteOutlined, EditOutlined, FileSearchOutlined, HistoryOutlined, KeyOutlined, ManOutlined, MoreOutlined, PlusOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, ProTable } from "@ant-design/pro-components";
 import { useRef, useState } from "react";
 import { Avatar, Button, Dropdown, message, Popconfirm, Tag } from "antd";
@@ -11,6 +11,7 @@ import LeadForm from "@/components/form/lead-form";
 import LeadStatusRender from "@/components/lead/status-render";
 import { apiBranchOptions } from "@/services/settings/branch";
 import ReinviteHistories from "./reinvite";
+import LeadDetails from "./lead-details";
 
 const WaitingList: React.FC = () => {
 
@@ -18,6 +19,7 @@ const WaitingList: React.FC = () => {
     const [keyInOpen, setKeyInOpen] = useState<boolean>(false);
     const [historyOpen, setHistoryOpen] = useState<boolean>(false);
     const [selectedRecord, setSelectedRecord] = useState<any>(null);
+    const [detailOpen, setDetailOpen] = useState<boolean>(false);
     const actionRef = useRef<ActionType>();
 
     const onApprove = async (id: string) => {
@@ -240,6 +242,15 @@ const WaitingList: React.FC = () => {
                                             setSelectedRecord(entity);
                                             setHistoryOpen(true);
                                         }
+                                    },
+                                    {
+                                        key: 'detail',
+                                        label: 'Thông tin chi tiết',
+                                        icon: <FileSearchOutlined />,
+                                        onClick: () => {
+                                            setSelectedRecord(entity);
+                                            setDetailOpen(true);
+                                        }
                                     }
                                 ]
                             }}>
@@ -256,6 +267,7 @@ const WaitingList: React.FC = () => {
                     }
                 ]}
             />
+            <LeadDetails open={detailOpen} onOpenChange={setDetailOpen} lead={selectedRecord} />
             <LeadForm open={keyInOpen} onOpenChange={setKeyInOpen} reload={() => actionRef.current?.reload()} data={selectedRecord} />
             <ReinviteHistories open={historyOpen} onClose={() => setHistoryOpen(false)} leadId={selectedRecord?.id} />
         </>

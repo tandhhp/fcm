@@ -39,4 +39,5 @@ public interface IContactService
     Task<TResult<byte[]?>> ExportTmrDataReportAsync(TmrDataReportFilterOptions filterOptions);
     Task<TResult<byte[]?>> ExportMultipleAssignReportAsync(MultipleAssignReportFilterOptions filterOptions);
     Task<TResult> GetMultipleAssignReportAsync(MultipleAssignReportFilterOptions filterOptions);
+    Task<TResult> GetDetailByPhoneAsync(string phone);
 }
