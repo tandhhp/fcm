@@ -171,7 +171,7 @@ const ContactPage: React.FC = () => {
                     message.success('Xóa thành công!');
                     actionRef.current?.reload();
                 }}>
-                    <Button type="primary" danger icon={<DeleteOutlined />} size="small" disabled={access.telesale}></Button>
+                    <Button type="primary" danger icon={<DeleteOutlined />} size="small" disabled={!access.telesale && !access.telesaleManager && !access.dot}></Button>
                 </Popconfirm>
             ],
             width: 60
@@ -182,7 +182,7 @@ const ContactPage: React.FC = () => {
         <PageContainer extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => {
             setContact(undefined);
             setOpenForm(true);
-        }} disabled={access.telesale}>
+        }} disabled={!access.telesale && !access.telesaleManager && !access.dot}>
             Tạo mới
         </Button>}>
             <ProTable

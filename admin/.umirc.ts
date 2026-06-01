@@ -40,5 +40,6 @@ export default defineConfig({
       COMPANY_NAME: process.env.COMPANY_NAME,
       PRIMARY_COLOR: process.env.PRIMARY_COLOR
     }
-  }
+  },
+  devtool: false
 });
