@@ -61,7 +61,7 @@ const Index: React.FC = () => {
         <PageContainer extra={<Button type="primary" onClick={() => {
             setDepartment(undefined);
             setOpen(true);
-        }} icon={<PlusOutlined />} disabled={!access.canHR}>Tạo phòng ban</Button>}>
+        }} icon={<PlusOutlined />} disabled={!access.dot && !access.canHR}>Tạo phòng ban</Button>}>
             <ProTable
                 request={apiDepartmentList}
                 search={{
