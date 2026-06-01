@@ -22,30 +22,30 @@ const ContactPage: React.FC = () => {
 
     const columns: ProColumnType<any>[] = [
         {
-            title: 'STT',
+            title: '#',
             valueType: 'indexBorder',
-            width: 50
+            width: 30
         },
         {
             title: 'Họ và tên',
             dataIndex: 'name',
-            render: (text, record) => {
-                if (record.gender === true) {
-                    return <><WomanOutlined className="text-pink-500" /> {text}</>
-                }
-                if (record.gender === false) {
-                    return <><ManOutlined className="text-blue-500" /> {text}</>
-                }
-                return text;
-            }
+            render: (text, record) => (
+                <>
+                    <div className="font-semibold">{text}</div>
+                    <div className="text-xs text-gray-500">HT2: {record.name2 || 'N/A'}</div>
+                    <div className="text-xs text-gray-500">SDT2: {record.phoneNumber2 || 'N/A'}</div>
+                </>
+            ),
+            minWidth: 150,
+            width: 150
         },
         {
             title: 'Số điện thoại',
             dataIndex: 'phoneNumber',
-            width: 110,
+            width: 130,
             render: (text, record) => {
                 return (
-                    <Button type="link" size="small" icon={<PhoneOutlined />} onClick={() => {
+                    <Button type="primary" size="small" icon={<PhoneOutlined />} onClick={() => {
                         setContact(record);
                         setOpenCall(true);
                     }}>{text}</Button>
@@ -67,12 +67,15 @@ const ContactPage: React.FC = () => {
             dataIndex: 'createdDate',
             valueType: 'date',
             search: false,
-            width: 100
+            width: 90,
+            minWidth: 90
         },
         {
             title: 'Nhân viên',
             dataIndex: 'telesalesName',
-            search: false
+            search: false,
+            minWidth: 160,
+            width: 160
         },
         {
             title: 'Source',
@@ -83,32 +86,41 @@ const ContactPage: React.FC = () => {
                 2: 'Company',
                 3: 'Private',
                 4: 'Reference'
-            }
+            },
+            minWidth: 100,
+            width: 100,
         },
         {
             title: 'Source Name',
             dataIndex: 'sourceName',
-            search: false
+            search: false,
+            width: 120,
+            minWidth: 120
         },
         {
             title: 'Type of Data',
             dataIndex: 'typeOfDataName',
-            search: false
+            search: false,
+            width: 140,
+            minWidth: 140
         },
         {
-            title: 'Họ & Tên 2',
-            dataIndex: 'name2',
-            search: false
-        },
-        {
-            title: 'SDT 2',
-            dataIndex: 'phoneNumber2',
-            search: false
+            title: 'Show-up',
+            dataIndex: 'showUp',
+            valueType: 'select',
+            valueEnum: {
+                true: { text: 'Có' },
+                false: { text: 'Không' }
+            },
+            width: 80,
+            search: false,
+            minWidth: 80
         },
         {
             title: 'Ghi chú',
             dataIndex: 'note',
-            search: false
+            search: false,
+            minWidth: 200
         },
         {
             title: 'Tác vụ',
@@ -174,7 +186,7 @@ const ContactPage: React.FC = () => {
                     <Button type="primary" danger icon={<DeleteOutlined />} size="small" disabled={!access.telesale && !access.telesaleManager && !access.dot}></Button>
                 </Popconfirm>
             ],
-            width: 60
+            width: 80
         }
     ]
 
@@ -186,9 +198,7 @@ const ContactPage: React.FC = () => {
             Tạo mới
         </Button>}>
             <ProTable
-                scroll={{
-                    x: true
-                }}
+                scroll={{ x: true }}
                 actionRef={actionRef}
                 search={{
                     layout: 'vertical'

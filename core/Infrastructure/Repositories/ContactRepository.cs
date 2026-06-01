@@ -19,7 +19,7 @@ using Waffle.Models.Filters;
 
 namespace Waffle.Infrastructure.Repositories;
 
-public class ContactRepository(ApplicationDbContext context, IHCAService _hcaService, UserManager<ApplicationUser> _userManager) : EfRepository<Contact>(context), IContactRepository
+public class ContactRepository(ApplicationDbContext context, IHCAService _hcaService) : EfRepository<Contact>(context), IContactRepository
 {
     public async Task<ListResult<object>> DialedCallsAsync(ContactFilterOptions filterOptions)
     {
@@ -325,7 +325,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         Note = a.Note,
                         TelesalesId = a.UserId,
                         TelesalesName = b.Name,
-                        ShowUp = _context.Leads.Any(x => x.PhoneNumber == a.PhoneNumber && !x.Duplicated),
+                        ShowUp = _context.Leads.Any(x => x.PhoneNumber == a.PhoneNumber && !x.Duplicated && (x.Status == LeadStatus.Checkin || x.Status == LeadStatus.CloseDeal)),
                         SourceId = a.SourceId,
                         TmId = b.TmId,
                         DotId = b.DotId,
@@ -387,7 +387,9 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         var query = from b in _context.Users
                     join c in _context.Leads on b.Id equals c.CreatedBy
                     join d in _context.Events on c.EventId equals d.Id
-                    where c.Confirm2 != null
+                    join ur in _context.UserRoles on b.Id equals ur.UserId
+                    join r in _context.Roles on ur.RoleId equals r.Id
+                    where r.Name == RoleName.Telesales || r.Name == RoleName.TelesaleManager || r.Name == RoleName.Dot
                     select new
                     {
                         c.Id,
@@ -402,7 +404,9 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         c.Confirm2,
                         c.EventDate,
                         EventName = d.Name,
-                        b.TmId
+                        b.TmId,
+                        c.EventId,
+                        ContactNote = _context.Contacts.Where(x => x.PhoneNumber == c.PhoneNumber).Select(x => x.Note).FirstOrDefault()
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
         {
@@ -410,7 +414,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         }
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {
-            query = query.Where(x => !string.IsNullOrEmpty(x.Name) && x.Email.Contains(filterOptions.Name));
+            query = query.Where(x => !string.IsNullOrEmpty(x.Name) && x.Name.Contains(filterOptions.Name));
         }
         if (filterOptions.Confirm2.HasValue)
         {
@@ -419,6 +423,10 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         if (filterOptions.FromDate.HasValue && filterOptions.ToDate.HasValue)
         {
             query = query.Where(x => x.EventDate.Date >= filterOptions.FromDate.Value.Date && x.EventDate.Date <= filterOptions.ToDate.Value.Date);
+        }
+        if (filterOptions.EventId.HasValue)
+        {
+            query = query.Where(x => x.EventId == filterOptions.EventId);
         }
         if (_hcaService.IsUserInRole(RoleName.TelesaleManager))
         {

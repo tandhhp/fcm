@@ -23,88 +23,9 @@ const Index: React.FC = () => {
 
     const columns: ProColumnType<any>[] = [
         {
-            title: 'STT',
+            title: '#',
             valueType: 'indexBorder',
-            width: 50
-        },
-        {
-            title: 'Họ tên khách hàng',
-            dataIndex: 'name',
-            render: (text, record) => {
-                if (record.gender === true) {
-                    return <><WomanOutlined className="text-pink-500" /> {text}</>
-                }
-                if (record.gender === false) {
-                    return <><ManOutlined className="text-blue-500" /> {text}</>
-                }
-                return text;
-            },
-            width: 200
-        },
-        {
-            title: 'Số điện thoại',
-            dataIndex: 'phoneNumber',
-            width: 120,
-            copyable: true
-        },
-        {
-            title: 'Ngày tạo',
-            dataIndex: 'createdDate',
-            valueType: 'date',
-            search: false,
-            width: 100
-        },
-        {
-            title: 'Nhân viên',
-            dataIndex: 'staffName',
-            search: false,
-            width: 200,
-            render: (text, record) => (
-                <div className="flex items-center gap-1">
-                    <Avatar size="small" src={record.staffAvatar} />{text}
-                </div>
-            )
-        },
-        {
-            title: 'Sự kiện',
-            dataIndex: 'eventDate',
-            valueType: 'date',
-            search: false,
-            width: 100
-        },
-        {
-            title: 'Giờ',
-            dataIndex: 'eventName',
-            search: false,
-            width: 100
-        },
-        {
-            title: 'Ngày sự kiện',
-            dataIndex: 'dateRange',
-            valueType: 'dateRange',
-            hideInTable: true
-        },
-        {
-            title: 'Xác nhận 2',
-            dataIndex: 'confirm2',
-            render: (text, record) => {
-                return (
-                    <div>
-                        {getConfirm2StatusTag(record.confirm2)}
-
-                    </div>
-                )
-            },
-            valueType: 'select',
-            fieldProps: {
-                options: CONFIRM2_OPTIONS
-            },
-            width: 120
-        },
-        {
-            title: 'Ghi chú',
-            dataIndex: 'note',
-            search: false
+            width: 30
         },
         {
             title: <SettingOutlined />,
@@ -147,6 +68,101 @@ const Index: React.FC = () => {
             ],
             width: 40,
             align: 'center'
+        },
+        {
+            title: 'Họ tên khách hàng',
+            dataIndex: 'name',
+            render: (text, record) => {
+                if (record.gender === true) {
+                    return <><WomanOutlined className="text-pink-500" /> {text}</>
+                }
+                if (record.gender === false) {
+                    return <><ManOutlined className="text-blue-500" /> {text}</>
+                }
+                return text;
+            },
+            width: 200,
+            minWidth: 200
+        },
+        {
+            title: 'Số điện thoại',
+            dataIndex: 'phoneNumber',
+            width: 120,
+            copyable: true,
+            minWidth: 120
+        },
+        {
+            title: 'Ngày tạo',
+            dataIndex: 'createdDate',
+            valueType: 'date',
+            search: false,
+            width: 100,
+            minWidth: 100
+        },
+        {
+            title: 'Nhân viên',
+            dataIndex: 'staffName',
+            search: false,
+            width: 200,
+            minWidth: 200,
+            render: (text, record) => (
+                <div className="flex items-center gap-1">
+                    <Avatar size="small" src={record.staffAvatar} />{text}
+                </div>
+            )
+        },
+        {
+            title: 'Sự kiện',
+            dataIndex: 'eventDate',
+            valueType: 'date',
+            search: false,
+            width: 100,
+            minWidth: 100,
+        },
+        {
+            title: 'Giờ',
+            dataIndex: 'eventId',
+            width: 60,
+            valueType: 'select',
+            request: apiEventOptions,
+            minWidth: 60
+        },
+        {
+            title: 'Ngày sự kiện',
+            dataIndex: 'dateRange',
+            valueType: 'dateRange',
+            hideInTable: true,
+            minWidth: 100,
+            width: 100
+        },
+        {
+            title: 'Xác nhận 2',
+            dataIndex: 'confirm2',
+            render: (text, record) => {
+                return (
+                    <div>
+                        {getConfirm2StatusTag(record.confirm2)}
+
+                    </div>
+                )
+            },
+            valueType: 'select',
+            fieldProps: {
+                options: CONFIRM2_OPTIONS
+            },
+            width: 120
+        },
+        {
+            title: 'Ghi chú',
+            dataIndex: 'contactNote',
+            search: false,
+            minWidth: 200,
+        },
+        {
+            title: 'Ghi chú xác nhận 2',
+            dataIndex: 'note',
+            search: false,
+            minWidth: 200,
         }
     ]
 

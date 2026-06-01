@@ -21,4 +21,5 @@ public class ContactFilterOptions : FilterOptions
     public int? TypeOfDataId { get; set; }
     public SourceType? SourceType { get; set; }
     public Guid? TelesalesId { get; set; }
+    public Guid? EventId { get; set; }
 }
