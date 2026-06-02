@@ -22,4 +22,5 @@ public class ContactFilterOptions : FilterOptions
     public SourceType? SourceType { get; set; }
     public Guid? TelesalesId { get; set; }
     public Guid? EventId { get; set; }
+    public LeadStatus? LeadStatus { get; set; }
 }

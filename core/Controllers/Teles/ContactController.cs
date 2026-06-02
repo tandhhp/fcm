@@ -340,7 +340,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
             var teleIds = await (from a in _context.Users
                                  join b in _context.UserRoles on a.Id equals b.UserId
                                  join c in _context.Roles on b.RoleId equals c.Id
-                                 where c.Name == RoleName.Telesales && a.TmId == user.Id
+                                 where c.Name == RoleName.Telesales && a.ManagerId == user.Id
                                  select a.Id).ToListAsync();
             query = query.Where(x => x.TelesaleId != null && teleIds.Contains(x.TelesaleId.Value));
         }
@@ -355,7 +355,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
             var teleIds = await (from a in _context.Users
                                  join b in _context.UserRoles on a.Id equals b.UserId
                                  join c in _context.Roles on b.RoleId equals c.Id
-                                 where c.Name == RoleName.Telesales && a.TmId != null && tmIds.Contains(a.TmId.Value)
+                                 where c.Name == RoleName.Telesales && a.ManagerId != null && tmIds.Contains(a.ManagerId.Value)
                                  select a.Id).ToListAsync();
 
             var telesales = await _userManager.GetUsersInRoleAsync(RoleName.Telesales);
@@ -380,7 +380,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
         }
         if (filterOptions.FromDate != null && filterOptions.ToDate != null)
         {
-            query = query.Where(x => x.EventDate.Date >= filterOptions.FromDate.Value.Date && x.EventDate <= filterOptions.ToDate.Value.Date);
+            query = query.Where(x => x.EventDate.Date >= filterOptions.FromDate.Value.Date && x.EventDate.Date <= filterOptions.ToDate.Value.Date);
         }
         if (!User.IsInRole(RoleName.Telesales) && !User.IsInRole(RoleName.TelesaleManager) && !User.IsInRole(RoleName.Dot) && !User.IsInRole(RoleName.Admin) && !User.IsInRole(RoleName.CxTP))
         {
@@ -396,7 +396,7 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
         }
         if (filterOptions.SmId != null)
         {
-            query = query.Where(x => x.SmId == filterOptions.SmId);
+            query = query.Where(x => x.ManagerId == filterOptions.SmId);
         }
 
         return Ok(new

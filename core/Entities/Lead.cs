@@ -22,7 +22,7 @@ public class Lead : BaseEntity
     public LeadStatus Status { get; set; }
     public DateTime CreatedDate { get; set; } = DateTime.Now;
     public DateTime EventDate { get; set; }
-    [Comment("DDCN")]
+    [Comment("Số CCCD")]
     [StringLength(12)]
     public string? IdentityNumber { get; set; }
     [ForeignKey(nameof(Branch))]
@@ -44,6 +44,8 @@ public class Lead : BaseEntity
     [ForeignKey(nameof(Voucher2))]
     public Guid? Voucher2Id { get; set; }
     public Confirm2? Confirm2 { get; set; }
+    [Comment("Ngày tạo lịch hẹn")]
+    public DateTime? AppointmentDate { get; set; }
 
     public virtual Event? Event { get; set; }
     public virtual Branch? Branch { get; set; }

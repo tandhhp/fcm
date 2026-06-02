@@ -62,7 +62,8 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         IsBooked = _context.Leads.Any(x => x.PhoneNumber == c.PhoneNumber),
                         c.SourceId,
                         TeamId = (int?)t.Id,
-                        TeamName = t.Name
+                        TeamName = t.Name,
+                        LeadStatus = (LeadStatus?)_context.Leads.Where(x => x.PhoneNumber == c.PhoneNumber).Select(x => x.Status).FirstOrDefault()
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {
@@ -100,9 +101,9 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         {
             query = query.Where(x => x.Note != null && x.Note.ToLower().Contains(filterOptions.Note.ToLower()));
         }
-        if (filterOptions.IsBooked.HasValue)
+        if (filterOptions.LeadStatus.HasValue)
         {
-            query = query.Where(c => c.IsBooked == filterOptions.IsBooked);
+            query = query.Where(c => c.LeadStatus == filterOptions.LeadStatus);
         }
         if (_hcaService.IsUserInRole(RoleName.Telesales))
         {
@@ -325,7 +326,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         Note = a.Note,
                         TelesalesId = a.UserId,
                         TelesalesName = b.Name,
-                        HasAppointment = _context.Leads.Any(x => x.PhoneNumber == a.PhoneNumber),
+                        LeadStatus = _context.Leads.Where(x => x.PhoneNumber == a.PhoneNumber).Select(x => x.Status).FirstOrDefault(),
                         SourceId = a.SourceId,
                         Confirm1 = a.Confirm1,
                         SourceName = s.Name,
@@ -348,9 +349,9 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         {
             query = query.Where(x => x.SourceId == filterOptions.SourceId);
         }
-        if (filterOptions.IsBooked.HasValue)
+        if (filterOptions.LeadStatus.HasValue)
         {
-            query = query.Where(x => x.HasAppointment == filterOptions.IsBooked);
+            query = query.Where(x => x.LeadStatus == filterOptions.LeadStatus);
         }
         if (filterOptions.Confirm1.HasValue)
         {
