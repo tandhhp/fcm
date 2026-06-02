@@ -16,7 +16,6 @@ public interface IContactService
     public Task<ListResult<object>> GetBlacklistAsync(BlacklistFilterOptions filterOptions);
     Task<TResult> UpdateAsync(ContactUpdateArgs args);
     Task<TResult> CreateAsync(ContactCreateArgs args);
-    Task<TResult> BookAsync(ContactBookArgs args);
     Task<ListResult<dynamic>> ListContactAsync(ContactFilterOptions filterOptions);
     Task<TResult> ImportAsync(ContactImportArgs args);
     Task<ListResult<object>> GetUnassignedListAsync(UnassignedFilterOptions filterOptions);

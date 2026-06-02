@@ -20,7 +20,7 @@ using Waffle.Models.Filters;
 
 namespace Waffle.Core.Services.Contacts;
 
-public class ContactService(IContactRepository _contactRepository, ILeadRepository _leadRepository, ApplicationDbContext _context, IWebHostEnvironment _env, ICallStatusRepository _callStatusRepository, IProvinceService _provinceService, ISourceService _sourceService, IDistrictService _districtService, ILogService _logService, UserManager<ApplicationUser> _userManager, IHCAService _hcaService, ILeadService _leadService) : IContactService
+public class ContactService(IContactRepository _contactRepository, ILeadRepository _leadRepository, ApplicationDbContext _context, IWebHostEnvironment _env, ICallStatusRepository _callStatusRepository, IProvinceService _provinceService, ISourceService _sourceService, IDistrictService _districtService, ILogService _logService, UserManager<ApplicationUser> _userManager, IHCAService _hcaService) : IContactService
 {
     public async Task<TResult> BlockAsync(BlockContactArgs args)
     {
@@ -179,73 +179,6 @@ public class ContactService(IContactRepository _contactRepository, ILeadReposito
         catch (Exception ex)
         {
             await _logService.ExceptionAsync(ex);
-            return TResult.Failed(ex.ToString());
-        }
-    }
-
-    public async Task<TResult> BookAsync(ContactBookArgs args)
-    {
-        try
-        {
-            if (args.EventDate.Date < DateTime.Now.Date.AddDays(-1)) return TResult.Failed("Ngày hẹn phải lớn hơn hoặc bằng ngày hiện tại!");
-            var contact = await _contactRepository.FindAsync(args.Id);
-            if (contact is null) return TResult.Failed("Không tìm thấy liên hệ!");
-            if (string.IsNullOrEmpty(contact.PhoneNumber)) return TResult.Failed("Liên hệ chưa có số điện thoại!");
-            if (contact.UserId == null) return TResult.Failed("Liên hệ chưa có người phụ trách!");
-
-            var telesales = await _userManager.FindByIdAsync(contact.UserId.GetValueOrDefault().ToString());
-            if (telesales is null) return TResult.Failed("Người phụ trách không tồn tại!");
-            if (telesales.Status != UserStatus.Working) return TResult.Failed("Người phụ trách không đang làm việc!");
-
-            var lead = await _leadService.FindByPhoneNumberAsync(contact.PhoneNumber);
-            if (lead != null && !lead.Duplicated)
-            {
-                if (lead.Status == LeadStatus.Checkin) return TResult.Failed($"Khách đã check-in vào ngày ${lead.EventDate:dd-MM-yyyy}");
-                if (lead.Status == LeadStatus.CloseDeal) return TResult.Failed($"Khách đã chốt deal vào ngày ${lead.EventDate:dd-MM-yyyy}");
-                var leadDetail = await _context.LeadHistories.FirstOrDefaultAsync(x => x.LeadId == lead.Id);
-                await _context.LeadHistories.AddAsync(new LeadHistory
-                {
-                    LeadId = lead.Id,
-                    EventDate = lead.EventDate,
-                    Note = lead.Note,
-                    CreatedBy = _hcaService.GetUserId(),
-                    AttendanceId = lead.AttendanceId,
-                    CheckinTime = leadDetail?.CheckinTime,
-                    CheckoutTime = leadDetail?.CheckoutTime,
-                    EventId = lead.EventId,
-                    SalesId = lead.SalesId,
-                    TableId = leadDetail?.TableId,
-                    TelesaleId = lead.TelesaleId,
-                    ToById = lead.ToById,
-                    TransportId = leadDetail?.TransportId
-                });
-                lead.Status = LeadStatus.Pending;
-                lead.EventDate = args.EventDate;
-                lead.Note = args.Note;
-                lead.EventId = args.EventId;
-                lead.TelesaleId = telesales.Id;
-                lead.CreatedDate = DateTime.Now;
-                _context.Leads.Update(lead);
-                await _context.SaveChangesAsync();
-                return TResult.Success;
-            }
-
-            await _leadService.AddAsync(new LeadCreateArgs
-            {
-                Name = contact.Name,
-                PhoneNumber = contact.PhoneNumber,
-                Email = contact.Email,
-                EventDate = args.EventDate,
-                EventId = args.EventId,
-                Gender = contact.Gender,
-                Note = args.Note,
-                TelesalesId = contact.UserId,
-                BranchId = telesales.BranchId
-            });
-            return TResult.Success;
-        }
-        catch (Exception ex)
-        {
             return TResult.Failed(ex.ToString());
         }
     }

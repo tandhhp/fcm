@@ -82,7 +82,7 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
                         lead.EventId = args.EventId.GetValueOrDefault();
                         lead.TelesaleId = contact.UserId;
                         lead.CreatedBy = contact.UserId.GetValueOrDefault();
-                        lead.SourceId = SourceConstant.TELE_OPC;
+                        lead.SourceId = contact.SourceId;
                         lead.CreatedDate = DateTime.Now;
                         _context.Leads.Update(lead);
                     }
@@ -102,7 +102,7 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
                             CreatedBy = contact.UserId.GetValueOrDefault(),
                             Status = LeadStatus.Pending,
                             Confirm2 = Confirm2.UNCONFIRM,
-                            SourceId = SourceConstant.TELE_OPC,
+                            SourceId = contact.SourceId,
                             CreatedDate = DateTime.Now
                         });
                     }

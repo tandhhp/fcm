@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
@@ -26,7 +25,8 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         var userId = _hcaService.GetUserId();
         var query = from c in _context.Contacts
                     join u in _context.Users on c.UserId equals u.Id
-                    join s in _context.Sources on c.SourceId equals s.Id
+                    join s in _context.Sources on c.SourceId equals s.Id into cs
+                    from s in cs.DefaultIfEmpty()
                     join t in _context.Teams on u.TeamId equals t.Id into ut
                     from t in ut.DefaultIfEmpty()
                     where c.Status != ContactStatus.Blacklisted
@@ -61,7 +61,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         c.ExtraStatus,
                         IsBooked = _context.Leads.Any(x => x.PhoneNumber == c.PhoneNumber),
                         c.SourceId,
-                        s.TeamId,
+                        TeamId = (int?)t.Id,
                         TeamName = t.Name
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))

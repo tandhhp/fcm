@@ -169,7 +169,7 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
             }
             if (_hcaService.IsUserInRole(RoleName.Dot))
             {
-                query = query.Where(x => x.SourceId == SourceConstant.TELE_OPC);
+                query = query.Where(x => x.SourceId != SourceConstant.PRIVATE);
             }
             query = query.OrderByDescending(x => x.EventDate);
             return await ListResult<object>.Success(query, filterOptions);

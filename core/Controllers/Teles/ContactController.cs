@@ -1203,9 +1203,6 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
     [HttpPost]
     public async Task<IActionResult> CreateAsync([FromBody] ContactCreateArgs args) => Ok(await _contactService.CreateAsync(args));
 
-    [HttpPost("book")]
-    public async Task<IActionResult> BookAsync([FromBody] ContactBookArgs args) => Ok(await _contactService.BookAsync(args));
-
     [HttpPost("import")]
     public async Task<IActionResult> ImportAsync([FromForm] ContactImportArgs args) => Ok(await _contactService.ImportAsync(args));
 
