@@ -109,7 +109,7 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
                             c.DotId,
                             c.DosId,
                             c.TmId,
-                            c.SmId,
+                            c.ManagerId,
                             l.CreatedBy,
                             l.Duplicated,
                             l.AttendanceId,
@@ -161,19 +161,15 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
             }
             if (_hcaService.IsUserInRole(RoleName.SalesManager))
             {
-                query = query.Where(x => x.SmId == userId);
+                query = query.Where(x => x.ManagerId == userId);
             }
             if (_hcaService.IsUserInRole(RoleName.TelesaleManager))
             {
-                query = query.Where(x => x.TmId == userId);
-            }
-            if (_hcaService.IsUserInRole(RoleName.DOS))
-            {
-                query = query.Where(x => x.DosId == userId);
+                query = query.Where(x => x.ManagerId == userId);
             }
             if (_hcaService.IsUserInRole(RoleName.Dot))
             {
-                query = query.Where(x => x.DotId == userId);
+                query = query.Where(x => x.SourceId == SourceConstant.TELE_OPC);
             }
             query = query.OrderByDescending(x => x.EventDate);
             return await ListResult<object>.Success(query, filterOptions);
