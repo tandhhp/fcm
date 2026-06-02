@@ -11,6 +11,7 @@ public class ContactListItem : BaseEntity
     public string? Note { get; set; }
     public Guid? TelesalesId { get; set; }
     public string? TelesalesName { get; set; }
+    public string? TelesalesAvatar { get; set; }
     public int? SourceId { get; set; }
     public bool Confirm1 { get; set; }
     public string? SourceName { get; set; }
@@ -21,4 +22,8 @@ public class ContactListItem : BaseEntity
     public string? PhoneNumber2 { get; set; }
     public Guid? ManagerId { get; set; }
     public LeadStatus? LeadStatus { get; set; }
+    public DateTime? LastCallTime { get; set; }
+    public int? TeamId { get; set; }
+    public string? TeamName { get; set; }
+    public string? ManagerName { get; set; }
 }

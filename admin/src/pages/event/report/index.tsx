@@ -4,8 +4,8 @@ import { apiDotOptions } from "@/services/role";
 import { apiDosOptions } from "@/services/user";
 import { ExportOutlined, ReloadOutlined } from "@ant-design/icons";
 import { PageContainer, ProCard, ProForm, ProFormDatePicker, ProFormSelect } from "@ant-design/pro-components"
-import { useAccess } from "@umijs/max";
-import { Button, Empty, Spin, message } from "antd";
+import { Link, useAccess } from "@umijs/max";
+import { Avatar, Button, Empty, Spin, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
 
@@ -16,6 +16,8 @@ type SUReportResult = {
 }
 
 type SUSalesReport = {
+    id: string;
+    avatar?: string;
     salesName: string;
     attendances: SUAttendance[];
     totalKeyInCount: number;
@@ -93,7 +95,7 @@ const Index: React.FC = () => {
     return (
         <PageContainer extra={(
             <Button type="primary"
-                disabled={!access.em && !access.canAdmin}
+                disabled={!access.em && !access.canAdmin && !access.dot}
                 icon={<ExportOutlined />} onClick={handleExport}>Xuất dữ liệu</Button>
         )}>
             <ProCard title="Báo cáo sự kiện" headerBordered extra={(
@@ -131,19 +133,19 @@ const Index: React.FC = () => {
                 <div className="mb-4 rounded-xl border border-slate-200 bg-gradient-to-r from-cyan-50 via-white to-emerald-50 p-4">
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
                         <div className="rounded-lg bg-white p-3 shadow-sm ring-1 ring-slate-100">
-                            <div className="text-xs uppercase tracking-wide text-slate-500">Sales Manager</div>
+                            <div className="text-xs uppercase tracking-wide text-slate-500">Quản lý</div>
                             <div className="text-2xl font-semibold text-slate-800">{summary.totalSalesManager}</div>
                         </div>
                         <div className="rounded-lg bg-white p-3 shadow-sm ring-1 ring-slate-100">
-                            <div className="text-xs uppercase tracking-wide text-slate-500">Sales</div>
+                            <div className="text-xs uppercase tracking-wide text-slate-500">Nhân viên</div>
                             <div className="text-2xl font-semibold text-slate-800">{summary.totalSales}</div>
                         </div>
                         <div className="rounded-lg bg-white p-3 shadow-sm ring-1 ring-slate-100">
-                            <div className="text-xs uppercase tracking-wide text-slate-500">Tong keyin</div>
+                            <div className="text-xs uppercase tracking-wide text-slate-500">Tổng keyin</div>
                             <div className="text-2xl font-semibold text-slate-800">{summary.totalKeyIn}</div>
                         </div>
                         <div className="rounded-lg bg-white p-3 shadow-sm ring-1 ring-slate-100">
-                            <div className="text-xs uppercase tracking-wide text-slate-500">Tong rate</div>
+                            <div className="text-xs uppercase tracking-wide text-slate-500">Tổng rate</div>
                             <div className="text-2xl font-semibold text-slate-800">{summary.totalRate.toFixed(2)}</div>
                         </div>
                     </div>
@@ -156,8 +158,8 @@ const Index: React.FC = () => {
                     ) : (
                         <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
                             <div className="sticky top-0 z-10 flex min-w-[1366px] border-b bg-slate-100/95 px-3 py-2 text-sm font-semibold backdrop-blur">
-                                <div className="w-36">Sales Manager</div>
-                                <div className="w-48">Sales</div>
+                                <div className="w-36">Quản lý</div>
+                                <div className="w-48">Nhân viên</div>
                                 {
                                     atendanceOptions.map((option: any) => (
                                         <div key={option.value} className="flex-1 text-right">
@@ -179,7 +181,12 @@ const Index: React.FC = () => {
                                                 {
                                                     item.salesReports.map((report: SUSalesReport, idx: number) => (
                                                         <div key={idx} className="flex border-b border-dashed px-3 py-2 text-sm last:border-b-0 odd:bg-white even:bg-slate-50/50 hover:bg-cyan-50/60">
-                                                            <div className="w-48 font-medium text-slate-800">{report.salesName}</div>
+                                                            <div className="w-48 font-medium text-slate-800">
+                                                                <Avatar size="small" className="mr-2" src={report.avatar} />
+                                                                <Link to={`/user/account/${report.id}`}>
+                                                                    {report.salesName}
+                                                                </Link>
+                                                            </div>
                                                             <div className="flex-1 flex">
                                                                 {report.attendances.map((attendance: SUAttendance, idx: number) => (
                                                                     <div key={idx} className="flex-1 text-right tabular-nums text-slate-700">

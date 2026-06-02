@@ -1,8 +1,8 @@
 import { apiDeleteLead } from "@/services/contact";
 import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, ExportOutlined, ManOutlined, MoreOutlined, ReloadOutlined, SettingOutlined, TeamOutlined, UserOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
-import { useAccess } from "@umijs/max";
-import { Button, Dropdown, message, Popconfirm, Tag } from "antd";
+import { Link, useAccess } from "@umijs/max";
+import { Avatar, Button, Dropdown, message, Popconfirm, Tag } from "antd";
 import dayjs from "dayjs";
 import { useRef, useState } from "react";
 import { apiBranchOptions } from "@/services/settings/branch";
@@ -168,8 +168,8 @@ const LeadPage: React.FC = () => {
                         render: (dom, entity) => (
                             <div>
                                 <div>{entity.gender === false && (<ManOutlined className='text-blue-500' />)}{entity.gender === true && (<WomanOutlined className='text-red-500' />)} {dom}</div>
-                                <div className="text-xs text-gray-500">Năm sinh: {dayjs(entity.dateOfBirth).format('YYYY')}</div>                                
-                                </div>
+                                <div className="text-xs text-gray-500">Năm sinh: {dayjs(entity.dateOfBirth).format('YYYY')}</div>
+                            </div>
                         ),
                         minWidth: 200,
                         width: 200
@@ -203,7 +203,12 @@ const LeadPage: React.FC = () => {
                         width: 200,
                         render: (_, entity) => (
                             <div>
-                                <div><UserOutlined /> {entity.creatorName}</div>
+                                <div className="mb-1">
+                                    <Avatar size="small" src={entity.creatorAvatar} className="mr-1" />
+                                    <Link to={`/user/account/${entity.createdBy}`}>
+                                        {entity.creatorName}
+                                    </Link>
+                                </div>
                                 <div className="text-xs text-gray-500"><TeamOutlined /> {entity.teamKeyIn}</div>
                             </div>
                         )
@@ -216,7 +221,12 @@ const LeadPage: React.FC = () => {
                         width: 200,
                         render: (_, entity) => (
                             <div>
-                                <div><UserOutlined /> {entity.salesName}</div>
+                                <div className="mb-1">
+                                    <Avatar size="small" src={entity.salesAvatar} className="mr-1" />
+                                    <Link to={`/user/account/${entity.salesId}`}>
+                                        {entity.salesName}
+                                    </Link>
+                                </div>
                                 <div className="text-xs text-gray-500"><TeamOutlined /> {entity.salesManagerName}</div>
                             </div>
                         )

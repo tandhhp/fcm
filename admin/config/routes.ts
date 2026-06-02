@@ -311,7 +311,8 @@ export default [
       {
         name: 'Đã gọi',
         path: '/contact/dialed',
-        component: './contact/dialed'
+        component: './contact/dialed',
+        hideInMenu: true
       },
       {
         name: 'Lịch hẹn',
@@ -419,7 +420,6 @@ export default [
     icon: 'TeamOutlined',
     name: 'Người dùng',
     path: '/user',
-    access: 'can_read_page_user',
     routes: [
       {
         name: 'Hoạt động',
@@ -468,6 +468,12 @@ export default [
         path: '/user/telesale',
         component: './users/telesale',
         access: 'can_read_page_user_telesales'
+      },
+      {
+        name: 'Tài khoản',
+        path: '/user/account/:id',
+        component: './users/account',
+        hideInMenu: true
       }
     ],
   },

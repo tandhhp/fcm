@@ -8,7 +8,9 @@ public class SUReportResult
 
 public class SUSalesReport
 {
+    public Guid? Id { get; set; }
     public string? SalesName { get; set; }
+    public string? Avatar { get; set; }
     public List<SUAttendance> Attendances { get; set; } = [];
     public int TotalKeyInCount { get; set; }
     public float TotalRate { get; set; }

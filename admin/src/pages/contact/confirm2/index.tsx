@@ -1,6 +1,6 @@
 import { apiContactConfirm2, apiAttendanceSchedules, apiUpdateAttendanceSchedule } from "@/services/contact";
 import { CONFIRM2_OPTIONS } from "@/utils/constants";
-import { EditOutlined, ManOutlined, MoreOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
+import { EditOutlined, FormOutlined, ManOutlined, MoreOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, ModalForm, PageContainer, ProColumnType, ProFormDatePicker, ProFormSelect, ProFormText, ProFormTextArea, ProTable } from "@ant-design/pro-components"
 import { useAccess } from "@umijs/max";
 import { Avatar, Button, Dropdown, message, Tag } from "antd";
@@ -51,7 +51,8 @@ const Index: React.FC = () => {
                             onClick: () => {
                                 setSelectedRecord(record);
                                 setModalVisible(true);
-                            }
+                            },
+                            icon: <FormOutlined />
                         }
                     ]
                 }}

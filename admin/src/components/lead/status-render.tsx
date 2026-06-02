@@ -11,7 +11,7 @@ const LeadStatusRender: React.FC<{ status: LeadStatus }> = ({ status }) => {
         return <div className="px-2 py-[2px] text-xs rounded font-bold w-full text-center bg-blue-100 text-blue-800">Check-in</div>
     }
     if (status === LeadStatus.CloseDeal) {
-        return <div className="px-2 py-[2px] text-xs rounded font-bold w-full text-center bg-purple-100 text-purple-800">Close deal</div>
+        return <div className="px-2 py-[2px] text-xs rounded font-bold w-full text-center bg-purple-100 text-purple-800">Chốt deal</div>
     }
     if (status === LeadStatus.LeadReject) {
         return <div className="px-2 py-[2px] text-xs rounded font-bold w-full text-center bg-red-100 text-red-800">Từ chối</div>

@@ -23,4 +23,5 @@ public class ContactFilterOptions : FilterOptions
     public Guid? TelesalesId { get; set; }
     public Guid? EventId { get; set; }
     public LeadStatus? LeadStatus { get; set; }
+    public bool? IsCalled { get; set; }
 }

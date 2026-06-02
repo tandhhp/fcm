@@ -1,8 +1,8 @@
 import { deleteContact, listContact } from "@/services/contact";
 import { CalendarOutlined, DeleteOutlined, EditOutlined, EyeOutlined, ManOutlined, MoreOutlined, PhoneOutlined, PlusOutlined, StopOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProColumnType, ProTable } from "@ant-design/pro-components"
-import { history, useAccess } from "@umijs/max";
-import { Button, Dropdown, Popconfirm, message } from "antd";
+import { history, Link, useAccess } from "@umijs/max";
+import { Avatar, Button, Dropdown, Popconfirm, message } from "antd";
 import { useRef, useState } from "react";
 import BlockContactModal from "./components/block-modal";
 import ContactForm from "./components/form";
@@ -10,6 +10,7 @@ import CallForm from "./components/call";
 import BookingForm from "./components/booking";
 import { apiSourceOptions } from "@/services/settings/source";
 import AppointmentDrawer from "./components/appointment-drawer";
+import LeadStatusRender from "@/components/lead/status-render";
 
 const ContactPage: React.FC = () => {
 
@@ -45,15 +46,27 @@ const ContactPage: React.FC = () => {
         {
             title: 'Số điện thoại',
             dataIndex: 'phoneNumber',
-            width: 130,
+            width: 100,
             render: (text, record) => {
                 return (
-                    <Button type="primary" size="small" icon={<PhoneOutlined />} onClick={() => {
+                    <Button type="primary" size="small" onClick={() => {
                         setContact(record);
                         setOpenCall(true);
                     }}>{text}</Button>
                 )
             }
+        },
+        {
+            title: 'Trạng thái gọi',
+            dataIndex: 'isCalled',
+            valueType: 'select',
+            valueEnum: {
+                true: { text: 'Đã gọi' },
+                false: { text: 'Chưa gọi' }
+            },
+            width: 100,
+            minWidth: 100,
+            hideInTable: true
         },
         {
             title: 'Nguồn',
@@ -70,15 +83,26 @@ const ContactPage: React.FC = () => {
             dataIndex: 'createdDate',
             valueType: 'date',
             search: false,
-            width: 90,
-            minWidth: 90
+            width: 100,
+            minWidth: 100
         },
         {
             title: 'Nhân viên',
             dataIndex: 'telesalesName',
             search: false,
-            minWidth: 160,
-            width: 160
+            minWidth: 180,
+            width: 180,
+            render: (text, record) => (
+                <div>
+                    <div className="mb-1">
+                        <Avatar size="small" src={record.telesalesAvatar} />
+                        <Link to={`/user/account/${record.telesalesId}`} className="ml-1">
+                            {text}
+                        </Link>
+                    </div>
+                    <div className="text-xs text-gray-500">QL: {record.managerName}</div>
+                </div>
+            )
         },
         {
             title: 'Source',
@@ -92,13 +116,12 @@ const ContactPage: React.FC = () => {
             },
             minWidth: 100,
             width: 100,
-        },
-        {
-            title: 'Source Name',
-            dataIndex: 'sourceName',
-            search: false,
-            width: 120,
-            minWidth: 120
+            render: (text, record) => (
+                <div>
+                    <div className="mb-1">{record.sourceName}</div>
+                    <div className="text-xs text-gray-500">{text}</div>
+                </div>
+            )
         },
         {
             title: 'Type of Data',
@@ -109,26 +132,19 @@ const ContactPage: React.FC = () => {
         },
         {
             title: 'Sự kiện',
-            dataIndex: 'hasAppointment',
-            valueType: 'select',
-            valueEnum: {
-                true: { text: 'Có' },
-                false: { text: 'Không' }
-            },
-            width: 80,
+            dataIndex: 'leadStatus',
+            width: 100,
             search: false,
             minWidth: 80,
-            render: (_, record) => {
-                if (!record.hasAppointment) return <Button type="dashed" block size="small" disabled>Không</Button>;
-                return (
-                    <Button type="dashed" block size="small" onClick={() => {
-                        setAppointmentPhone(record.phoneNumber);
-                        setOpenAppointmentDrawer(true);
-                    }}>
-                        Có
-                    </Button>
-                )
-            }
+            render: (_, record) => <LeadStatusRender status={record.leadStatus} />
+        },
+        {
+            dataIndex: 'lastCallTime',
+            title: 'Lần gọi cuối',
+            valueType: 'dateTime',
+            search: false,
+            width: 150,
+            minWidth: 150
         },
         {
             title: 'Ghi chú',

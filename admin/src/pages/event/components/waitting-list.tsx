@@ -4,7 +4,7 @@ import { CheckOutlined, DeleteOutlined, EditOutlined, FileSearchOutlined, Histor
 import { ActionType, ProTable } from "@ant-design/pro-components";
 import { useRef, useState } from "react";
 import { Avatar, Button, Dropdown, message, Popconfirm, Tag } from "antd";
-import { useAccess } from "@umijs/max";
+import { Link, useAccess } from "@umijs/max";
 import { apiDeleteLead, apiUpdateLeadStatus } from "@/services/contact";
 import { CONFIRM2_OPTIONS, LeadStatus } from "@/utils/constants";
 import LeadForm from "@/components/form/lead-form";
@@ -12,6 +12,7 @@ import LeadStatusRender from "@/components/lead/status-render";
 import { apiBranchOptions } from "@/services/settings/branch";
 import ReinviteHistories from "./reinvite";
 import LeadDetails from "./lead-details";
+import { apiSourceOptions } from "@/services/settings/source";
 
 const WaitingList: React.FC = () => {
 
@@ -119,7 +120,12 @@ const WaitingList: React.FC = () => {
                         dataIndex: 'creatorName',
                         search: false,
                         render: (dom, record) => (
-                            <div className="flex gap-1 items-center"><Avatar size="small" src={record.avatar} />{dom}</div>
+                            <div className="flex gap-1 items-center">
+                                <Avatar size="small" src={record.avatar} />
+                                <Link to={`/user/account/${record.createdBy}`}>
+                                    {dom}
+                                </Link>
+                            </div>
                         ),
                         width: 200,
                         minWidth: 200
@@ -155,9 +161,9 @@ const WaitingList: React.FC = () => {
                         dataIndex: 'sourceId',
                         valueType: 'select',
                         hideInTable: true,
-                        valueEnum: {
-                            1: 'PRIVATE',
-                            2: 'TELE_OPC'
+                        request: apiSourceOptions,
+                        fieldProps: {
+                            showSearch: true
                         }
                     },
                     {

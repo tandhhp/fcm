@@ -97,43 +97,39 @@ public class EventRepository(ApplicationDbContext context, IHCAService _hcaServi
     public async Task<List<SUReportResult>> SuReportAsync(SUFilterOptions filterOptions)
     {
         var currentUserId = _hcaService.GetUserId();
-        var salesManagersQuery = from u in _context.Users
+        var managerQuery = from u in _context.Users
                             join ur in _context.UserRoles on u.Id equals ur.UserId
                             join r in _context.Roles on ur.RoleId equals r.Id
-                            where r.Name == RoleName.SalesManager && u.Status == UserStatus.Working
+                            where (r.Name == RoleName.SalesManager || r.Name == RoleName.TelesaleManager) && u.Status == UserStatus.Working
                             select new
                             {
                                 u.Id,
                                 u.Name,
-                                u.DotId,
                                 u.ManagerId
                             };
         if (filterOptions.SalesManagerId.HasValue)
         {
-            salesManagersQuery = salesManagersQuery.Where(x => x.Id == filterOptions.SalesManagerId);
+            managerQuery = managerQuery.Where(x => x.Id == filterOptions.SalesManagerId);
         }
         if (filterOptions.DosId.HasValue)
         {
-            salesManagersQuery = salesManagersQuery.Where(x => x.ManagerId == filterOptions.DosId);
+            managerQuery = managerQuery.Where(x => x.ManagerId == filterOptions.DosId);
         }
-        if (_hcaService.IsUserInRole(RoleName.Sales))
-        {
-            var currentUser = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == currentUserId);
-            if (currentUser is null) return [];
-            salesManagersQuery = salesManagersQuery.Where(x => x.ManagerId == currentUser.ManagerId);
-        }
-        var salesManagers = await salesManagersQuery.AsNoTracking().ToListAsync();
-        var salesQuery = from u in _context.Users
+        var managers = await managerQuery.AsNoTracking().ToListAsync();
+
+        var staffQuery = from u in _context.Users
                          join ur in _context.UserRoles on u.Id equals ur.UserId
                          join r in _context.Roles on ur.RoleId equals r.Id
-                         where r.Name == RoleName.Sales && u.Status == UserStatus.Working
+                         where (r.Name == RoleName.Sales || r.Name == RoleName.Telesales) && u.Status == UserStatus.Working
                          select new
                          {
                              u.Id,
                              u.Name,
-                             u.SmId
+                             u.ManagerId,
+                             u.Avatar
                          };
-        var sales = await salesQuery.AsNoTracking().ToListAsync();
+
+        var staffs = await staffQuery.AsNoTracking().ToListAsync();
 
         var attendances = await _context.Attendances.AsNoTracking().ToListAsync();
 
@@ -148,20 +144,22 @@ public class EventRepository(ApplicationDbContext context, IHCAService _hcaServi
         var leads = await leadQuery.ToListAsync();
 
         var result = new List<SUReportResult>();
-        foreach (var sm in salesManagers)
+        foreach (var manager in managers)
         {
-            var smSales = sales.Where(x => x.SmId == sm.Id).ToList();
+            var smSales = staffs.Where(x => x.ManagerId == manager.Id).ToList();
             var suReport = new SUReportResult
             {
-                SalesManagerName = sm.Name
+                SalesManagerName = manager.Name
             };
             var salesReports = new List<SUSalesReport>();
-            var salesBySm = sales.Where(x => x.SmId == sm.Id).ToList();
+            var salesBySm = staffs.Where(x => x.ManagerId == manager.Id).ToList();
             foreach (var sale in salesBySm)
             {
                 var suSalesReport = new SUSalesReport
                 {
-                    SalesName = sale.Name
+                    Id = sale.Id,
+                    SalesName = sale.Name,
+                    Avatar = sale.Avatar
                 };
                 var suAttendances = new List<SUAttendance>();
                 var totalCountRate = 0f;

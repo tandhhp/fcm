@@ -32,7 +32,7 @@ const EventPage: React.FC = () => {
                 onItem={(record) => {
                     return {
                         onClick: () => {
-                            if (access.dot) return;
+                            if (access.dot || access.telesaleManager) return;
                             history.push(`/event/time-slot/center/${record.id}`);
                         }
                     }

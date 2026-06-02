@@ -20,7 +20,7 @@ using Waffle.Models.Filters;
 
 namespace Waffle.Core.Services.Contacts;
 
-public class ContactService(IContactRepository _contactRepository, ILeadRepository _leadRepository, ApplicationDbContext _context, IWebHostEnvironment _env, ICallStatusRepository _callStatusRepository, IProvinceService _provinceService, ISourceService _sourceService, IDistrictService _districtService, ILogService _logService, UserManager<ApplicationUser> _userManager, IHCAService _hcaService) : IContactService
+public class ContactService(IContactRepository _contactRepository, ILeadRepository _leadRepository, INotificationService _notificationService, ApplicationDbContext _context, IWebHostEnvironment _env, ICallStatusRepository _callStatusRepository, IProvinceService _provinceService, ISourceService _sourceService, IDistrictService _districtService, ILogService _logService, UserManager<ApplicationUser> _userManager, IHCAService _hcaService) : IContactService
 {
     public async Task<TResult> BlockAsync(BlockContactArgs args)
     {
@@ -402,17 +402,41 @@ public class ContactService(IContactRepository _contactRepository, ILeadReposito
     {
         var lead = await _leadRepository.FindAsync(args.LeadId);
         if (lead is null) return TResult.Failed("Không tìm thấy lịch hẹn!");
-        if (lead.EventDate.Date <= DateTime.Now.Date)
-            return TResult.Failed("Chỉ được chỉnh sửa lịch hẹn với sự kiện chưa diễn ra!");
         var eventExists = await _context.Events.AnyAsync(e => e.Id == args.EventId);
         if (!eventExists) return TResult.Failed("Sự kiện không tồn tại!");
+        await _context.LeadHistories.AddAsync(new LeadHistory
+        {
+            LeadId = lead.Id,
+            AttendanceId = lead.AttendanceId,
+            EventId = lead.EventId,
+            CreatedBy = _hcaService.GetUserId(),
+            EventDate = lead.EventDate,
+            Note = lead.Note,
+            SalesId = lead.SalesId,
+            TelesaleId = lead.TelesaleId,
+            ToById = lead.ToById
+        });
         lead.Name = args.Name;
-        lead.EventDate = args.EventDate;
         lead.EventId = args.EventId;
         lead.Note = args.Note;
         lead.Confirm2 = args.Confirm2;
-        await _leadRepository.UpdateAsync(lead);
+        lead.AppointmentDate = DateTime.Now;
+        if (lead.EventDate.Date != args.EventDate.Date)
+        {
+            lead.Status = LeadStatus.Pending;
+            var ems = await (from u in _context.Users
+                            join ur in _context.UserRoles on u.Id equals ur.UserId
+                            join r in _context.Roles on ur.RoleId equals r.Id
+                            where r.Name == RoleName.EM && u.Status == UserStatus.Working
+                            select u.Id).ToListAsync();
+            foreach (var em in ems)
+            {
+                await _notificationService.CreateAsync("Lịch hẹn bị thay đổi", $"Lịch hẹn của {lead.Name} - {lead.PhoneNumber} đã bị thay đổi từ {lead.EventDate:dd/MM/yyyy} sang ngày {args.EventDate:dd/MM/yyyy}.", em);
+            }
+        }
+        lead.EventDate = args.EventDate;
         await _logService.AddAsync($"Cập nhật lịch hẹn cho {lead.PhoneNumber} - {lead.Name}: ngày {lead.EventDate:dd/MM/yyyy}");
+        await _leadRepository.UpdateAsync(lead);
         return TResult.Success;
     }
 

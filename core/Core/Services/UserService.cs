@@ -179,7 +179,14 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
             user.IdentityNumber,
             user.DistrictId,
             district?.ProvinceId,
-            user.CreatedDate
+            user.CreatedDate,
+            branch = await _context.Branches.Where(x => x.Id == user.BranchId).Select(x => new
+            {
+                x.Id,
+                x.Name
+            }).FirstOrDefaultAsync(),
+            user.Status,
+            roles = await _userManager.GetRolesAsync(user)
         });
     }
 

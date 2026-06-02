@@ -316,7 +316,6 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                     from t in bteam.DefaultIfEmpty()
                     join tod in _context.TypeOfDatas on s.TypeOfDataId equals tod.Id into stype
                     from tod in stype.DefaultIfEmpty()
-                    where a.LastCallTime == null
                     select new ContactListItem
                     {
                         Id = a.Id,
@@ -326,6 +325,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         Note = a.Note,
                         TelesalesId = a.UserId,
                         TelesalesName = b.Name,
+                        TelesalesAvatar = b.Avatar,
                         LeadStatus = _context.Leads.Where(x => x.PhoneNumber == a.PhoneNumber).Select(x => x.Status).FirstOrDefault(),
                         SourceId = a.SourceId,
                         Confirm1 = a.Confirm1,
@@ -335,7 +335,11 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         SourceType = tod.Source,
                         Name2 = a.Name2,
                         PhoneNumber2 = a.PhoneNumber2,
-                        ManagerId = b.ManagerId
+                        ManagerId = b.ManagerId,
+                        LastCallTime = a.LastCallTime,
+                        TeamId = b.TeamId,
+                        TeamName = t.Name,
+                        ManagerName = _context.Users.Where(u => u.Id == b.ManagerId).Select(u => u.Name).FirstOrDefault()
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
         {
@@ -368,6 +372,17 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         if (filterOptions.TelesalesId.HasValue)
         {
             query = query.Where(x => x.TelesalesId == filterOptions.TelesalesId);
+        }
+        if (filterOptions.IsCalled.HasValue)
+        {
+            if (filterOptions.IsCalled == true)
+            {
+                query = query.Where(x => x.LastCallTime != null);
+            }
+            else
+            {
+                query = query.Where(x => x.LastCallTime == null);
+            }
         }
         if (_hcaService.IsUserInRole(RoleName.Telesales))
         {
