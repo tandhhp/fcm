@@ -1011,7 +1011,8 @@ public class ContactController(UserManager<ApplicationUser> _userManager,
                         AttendanceName = f.Name,
                         b.Gender,
                         b.DateOfBirth,
-                        a.TransportId
+                        a.TransportId,
+                        Status = (LeadStatus?)b.Status
                     };
         query = query.OrderByDescending(x => x.EventDate);
         return Ok(await ListResult<object>.Success(query, filterOptions));

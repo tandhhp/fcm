@@ -1,11 +1,12 @@
 import { apiContactConfirm2, apiAttendanceSchedules, apiUpdateAttendanceSchedule } from "@/services/contact";
 import { CONFIRM2_OPTIONS } from "@/utils/constants";
-import { EditOutlined, FormOutlined, ManOutlined, MoreOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
+import { EditOutlined, FormOutlined, HistoryOutlined, ManOutlined, MoreOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, ModalForm, PageContainer, ProColumnType, ProFormDatePicker, ProFormSelect, ProFormText, ProFormTextArea, ProTable } from "@ant-design/pro-components"
 import { useAccess } from "@umijs/max";
 import { Avatar, Button, Dropdown, message, Tag } from "antd";
 import { useRef, useState } from "react";
 import { apiEventOptions } from "@/services/event";
+import ReinviteHistories from "@/pages/event/components/reinvite";
 
 const Index: React.FC = () => {
 
@@ -14,6 +15,7 @@ const Index: React.FC = () => {
     const [selectedRecord, setSelectedRecord] = useState<any>(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [editModalVisible, setEditModalVisible] = useState(false);
+    const [openHistory, setOpenHistory] = useState(false);
 
     const getConfirm2StatusTag = (status: number) => {
         const option = CONFIRM2_OPTIONS.find(o => o.value === status);
@@ -33,38 +35,47 @@ const Index: React.FC = () => {
             valueType: 'option',
             render: (_, record) => [
                 <Dropdown key="more"
-                menu={{
-                    items: [
-                        {
-                            key: 'edit',
-                            label: 'Chỉnh sửa lịch hẹn',
-                            icon: <EditOutlined />,
-                            disabled: record.eventDate && new Date(record.eventDate) <= new Date(),
-                            onClick: () => {
-                                setSelectedRecord(record);
-                                setEditModalVisible(true);
-                            }
-                        },
-                        {
-                            key: 'update',
-                            label: 'Cập nhật trạng thái',
-                            onClick: () => {
-                                setSelectedRecord(record);
-                                setModalVisible(true);
+                    menu={{
+                        items: [
+                            {
+                                key: 'edit',
+                                label: 'Chỉnh sửa lịch hẹn',
+                                icon: <EditOutlined />,
+                                disabled: record.eventDate && new Date(record.eventDate) <= new Date(),
+                                onClick: () => {
+                                    setSelectedRecord(record);
+                                    setEditModalVisible(true);
+                                }
                             },
-                            icon: <FormOutlined />
-                        }
-                    ]
-                }}
+                            {
+                                key: 'update',
+                                label: 'Cập nhật trạng thái',
+                                onClick: () => {
+                                    setSelectedRecord(record);
+                                    setModalVisible(true);
+                                },
+                                icon: <FormOutlined />
+                            },
+                            {
+                                key: 'history',
+                                label: 'Lịch sử mời',
+                                onClick: () => {
+                                    setSelectedRecord(record);
+                                    setOpenHistory(true);
+                                },
+                                icon: <HistoryOutlined />
+                            }
+                        ]
+                    }}
                 >
                     <Button
-                    type="dashed"
-                    size="small"
-                    onClick={(e) => e.preventDefault()}
-                    icon={<MoreOutlined />}
-                >
-                    
-                </Button>
+                        type="dashed"
+                        size="small"
+                        onClick={(e) => e.preventDefault()}
+                        icon={<MoreOutlined />}
+                    >
+
+                    </Button>
                 </Dropdown>
             ],
             width: 40,
@@ -152,6 +163,20 @@ const Index: React.FC = () => {
                 options: CONFIRM2_OPTIONS
             },
             width: 120
+        },
+        {
+            title: 'Lượt',
+            dataIndex: 'inviteCount',
+            search: false,
+            width: 40,
+            minWidth: 40,
+            valueType: 'digit',
+            render: (text, record) => (
+                <Button size="small" type="dashed" block onClick={() => {
+                    setSelectedRecord(record);
+                    setOpenHistory(true);
+                }}>{text}</Button>
+            )
         },
         {
             title: 'Ghi chú',
@@ -268,6 +293,7 @@ const Index: React.FC = () => {
                     fieldProps={{ rows: 3 }}
                 />
             </ModalForm>
+            <ReinviteHistories open={openHistory} onClose={() => setOpenHistory(false)} leadId={selectedRecord?.id || ''} />
         </PageContainer>
     )
 }

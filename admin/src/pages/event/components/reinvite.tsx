@@ -27,6 +27,7 @@ const ReinviteHistories: React.FC<Props> = (props) => {
                 actionRef={actionRef}
                 search={false}
                 rowKey="id"
+                size="small"
                 scroll={{
                     x: true
                 }}
@@ -55,8 +56,8 @@ const ReinviteHistories: React.FC<Props> = (props) => {
                     {
                         title: 'SDT',
                         dataIndex: 'phoneNumber',
-                        width: 120,
-                        minWidth: 120
+                        width: 100,
+                        minWidth: 100
                     },
                     {
                         title: 'Rep',
@@ -78,12 +79,12 @@ const ReinviteHistories: React.FC<Props> = (props) => {
                         minWidth: 100
                     },
                     {
-                        title: 'Khung giờ',
+                        title: 'Giờ',
                         dataIndex: 'eventId',
                         valueType: 'select',
                         request: apiEventOptions,
-                        width: 100,
-                        minWidth: 100
+                        width: 80,
+                        minWidth: 80
                     },
                     {
                         title: 'Check-in',

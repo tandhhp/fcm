@@ -418,9 +418,10 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         c.Confirm2,
                         c.EventDate,
                         EventName = d.Name,
-                        ManagerId = b.ManagerId,
+                        b.ManagerId,
                         c.EventId,
-                        ContactNote = _context.Contacts.Where(x => x.PhoneNumber == c.PhoneNumber).Select(x => x.Note).FirstOrDefault()
+                        ContactNote = _context.Contacts.Where(x => x.PhoneNumber == c.PhoneNumber).Select(x => x.Note).FirstOrDefault(),
+                        InviteCount = _context.LeadHistories.Count(x => x.LeadId == c.Id)
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
         {
