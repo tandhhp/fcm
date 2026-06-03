@@ -72,8 +72,6 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
                         from sales in salesJoin.DefaultIfEmpty()
                         join telesales in _context.Users on l.TelesaleId equals telesales.Id into telesalesJoin
                         from telesales in telesalesJoin.DefaultIfEmpty()
-                        join f in _context.LeadFeedbacks on l.Id equals f.LeadId into feedbackJoin
-                        from f in feedbackJoin.DefaultIfEmpty()
                         join t in _context.Users on l.ToById equals t.Id into toJoin
                         from t in toJoin.DefaultIfEmpty()
                         where l.Status != LeadStatus.Pending && l.Status != LeadStatus.Approved && l.Status != LeadStatus.ReInvite
@@ -103,7 +101,7 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
                             l.Note,
                             InviteCount = _context.LeadHistories.Count(h => h.LeadId == l.Id) + 1,
                             l.BranchId,
-                            f.TableId,
+                            TableId = _context.LeadFeedbacks.OrderByDescending(x => x.CheckinTime).Select(x => x.TableId).FirstOrDefault(),
                             TeamKeyIn = c.ManagerId != null ? _context.Users.First(x => x.Id == c.ManagerId).Name : null,
                             CreatorName = c.Name,
                             CreatorAvatar = c.Avatar,
@@ -166,7 +164,15 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
             }
             if (_hcaService.IsUserInRole(RoleName.TelesaleManager))
             {
-                query = query.Where(x => x.ManagerId == userId);
+                var access = _hcaService.GetUserClaims(CustomClaimType.ACCESS);
+                if (access.Any(x => x.Contains(ClaimAccessValue.CONFIRM2)))
+                {
+                    query = query.Where(x => x.SourceId != SourceConstant.PRIVATE);
+                }
+                else
+                {
+                    query = query.Where(x => x.ManagerId == userId);
+                }
             }
             if (_hcaService.IsUserInRole(RoleName.Dot))
             {
@@ -308,7 +314,7 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
                         l.EventDate,
                         l.Status,
                         l.Gender,
-                        l.CreatedDate,
+                        CreatedDate = l.AppointmentDate ?? l.CreatedDate,
                         l.CreatedBy,
                         c.SmId,
                         c.TmId,

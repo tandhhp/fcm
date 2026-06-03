@@ -50,4 +50,13 @@ public class HCAService(IHttpContextAccessor _httpContextAccessor) : IHCAService
     {
         return _httpContextAccessor.HttpContext?.Request;
     }
+
+    public IEnumerable<string> GetUserClaims(string claimType)
+    {
+        var user = _httpContextAccessor.HttpContext?.User;
+
+        if (user is null || user.Identity is null) return [];
+
+        return user.FindAll(claimType).Select(x => x.Value);
+    }
 }

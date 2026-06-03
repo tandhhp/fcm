@@ -409,7 +409,7 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         c.Id,
                         c.PhoneNumber,
                         c.Email,
-                        c.CreatedDate,
+                        CreatedDate = c.AppointmentDate ?? c.CreatedDate,
                         c.Name,
                         c.Note,
                         StaffId = c.CreatedBy,
@@ -445,7 +445,11 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
         }
         if (_hcaService.IsUserInRole(RoleName.TelesaleManager))
         {
-            query = query.Where(x => x.ManagerId == _hcaService.GetUserId());
+            var access = _hcaService.GetUserClaims(CustomClaimType.ACCESS);
+            if (!access.Contains(ClaimAccessValue.CONFIRM2))
+            {
+                query = query.Where(x => x.ManagerId == _hcaService.GetUserId());
+            }
         }
         if (_hcaService.IsUserInRole(RoleName.Telesales))
         {

@@ -8,4 +8,5 @@ public interface IHCAService
     Guid GetUserId();
     string GetUserName();
     HttpRequest? Request();
+    IEnumerable<string> GetUserClaims(string claimType);
 }

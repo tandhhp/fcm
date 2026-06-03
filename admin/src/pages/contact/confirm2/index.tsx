@@ -2,7 +2,7 @@ import { apiContactConfirm2, apiAttendanceSchedules, apiUpdateAttendanceSchedule
 import { CONFIRM2_OPTIONS } from "@/utils/constants";
 import { EditOutlined, FormOutlined, HistoryOutlined, ManOutlined, MoreOutlined, SettingOutlined, WomanOutlined } from "@ant-design/icons";
 import { ActionType, ModalForm, PageContainer, ProColumnType, ProFormDatePicker, ProFormSelect, ProFormText, ProFormTextArea, ProTable } from "@ant-design/pro-components"
-import { useAccess } from "@umijs/max";
+import { Link, useAccess } from "@umijs/max";
 import { Avatar, Button, Dropdown, message, Tag } from "antd";
 import { useRef, useState } from "react";
 import { apiEventOptions } from "@/services/event";
@@ -104,7 +104,7 @@ const Index: React.FC = () => {
             minWidth: 120
         },
         {
-            title: 'Ngày tạo',
+            title: 'Ngày hẹn',
             dataIndex: 'createdDate',
             valueType: 'date',
             search: false,
@@ -119,7 +119,8 @@ const Index: React.FC = () => {
             minWidth: 200,
             render: (text, record) => (
                 <div className="flex items-center gap-1">
-                    <Avatar size="small" src={record.staffAvatar} />{text}
+                    <Avatar size="small" src={record.staffAvatar} />
+                    <Link to={`/user/account/${record.staffId}`}>{text}</Link>
                 </div>
             )
         },

@@ -1,3 +1,4 @@
+import { apiEventOptions } from "@/services/event";
 import { apiAttendanceOptions } from "@/services/event/attendance";
 import { apiVoucherOptions } from "@/services/event/voucher";
 import { apiSalesManagerOptions } from "@/services/role";
@@ -145,6 +146,14 @@ const LeadFeedbackUpdateForm: React.FC<Props> = (props) => {
                     {
                         name: 'subLeads',
                         value: data.subLeads
+                    },
+                    {
+                        name: 'eventDate',
+                        value: data.eventDate
+                    },
+                    {
+                        name: 'eventId',
+                        value: data.eventId
                     }
                 ]);
                 setDosId(data.dosId);
@@ -219,7 +228,9 @@ const LeadFeedbackUpdateForm: React.FC<Props> = (props) => {
                         'Trung bình (có tích lũy dưới 50M)',
                         'Khá (có tích lũy dưới 200M)',
                         'Tốt (có tích lũy trên 200M)'
-                    ]} name="financialSituation" label="Tình hình tài chính" />
+                    ]} name="financialSituation" label="Tình hình tài chính" fieldProps={{
+                        popupMatchSelectWidth: false
+                    }} />
                 </Col>
                 <Col md={8} xs={24}>
                     <ProFormSelect label="Nghề nghiệp" name="jobKindId" request={apiJobKindOptions} showSearch />
@@ -284,8 +295,18 @@ const LeadFeedbackUpdateForm: React.FC<Props> = (props) => {
                 <Col md={8} xs={24}>
                     <ProFormSelect name="salesId" label="Người Rep" options={salesOptions} showSearch />
                 </Col>
+                <Col span={24}>
+                    <ProFormTextArea name={"note"} label="Ghi chú" />
+                </Col>
+                <Col md={12} xs={12}>
+                    <ProFormDatePicker name="eventDate" label="Ngày sự kiện" width="xl" rules={[{ required: true }]} />
+                </Col>
+                <Col md={12} xs={12}>
+                    <ProFormSelect name="eventId" label="Sự kiện" request={apiEventOptions} allowClear={false}
+                        rules={[{ required: true }]}
+                    />
+                </Col>
             </Row>
-            <ProFormTextArea name={"note"} label="Ghi chú" />
             <ProFormList name="subLeads" label="Khách phụ" copyIconProps={{
                 tooltipText: 'Thêm khách phụ'
             }} deleteIconProps={{

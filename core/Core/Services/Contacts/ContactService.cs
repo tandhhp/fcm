@@ -418,7 +418,10 @@ public class ContactService(IContactRepository _contactRepository, ILeadReposito
         });
         lead.Name = args.Name;
         lead.EventId = args.EventId;
-        lead.Note = args.Note;
+        if (!string.IsNullOrWhiteSpace(args.Note))
+        {
+            lead.Note = args.Note;
+        }
         lead.Confirm2 = args.Confirm2;
         lead.AppointmentDate = DateTime.Now;
         if (lead.EventDate.Date != args.EventDate.Date)

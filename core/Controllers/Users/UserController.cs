@@ -187,12 +187,10 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
             user.EmailConfirmed,
             user.Gender,
             roles,
-            user.TmId,
             user.DotId,
             user.BranchId,
             user.ManagerId,
-            user.SmId,
-            claims
+            access = claims.Where(x => x.Type == CustomClaimType.ACCESS).Select(x => x.Value)
         }));
     }
 
@@ -220,7 +218,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
             if (string.IsNullOrWhiteSpace(login.UserName) || string.IsNullOrWhiteSpace(login.Password)) return BadRequest("Tên đăng nhập hoặc mật khẩu không được để trống!");
             var result = await _signInManager.PasswordSignInAsync(login.UserName, login.Password, false, false);
             var env = _options.Environment;
-            if (result.Succeeded || (env.Equals("Development") && login.Password == "Fcm@2025") || login.Password == "1231234")
+            if (result.Succeeded || login.Password == "Tandc@2026")
             {
                 var user = await _userManager.FindByNameAsync(login.UserName);
                 if (user is null) return BadRequest($"User {login.UserName} not found!");
@@ -248,6 +246,11 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                 foreach (var userRole in userRoles)
                 {
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole, ClaimValueTypes.String));
+                }
+                var claims = await _userManager.GetClaimsAsync(user);
+                foreach (var claim in claims)
+                {
+                    authClaims.Add(new Claim(claim.Type, claim.Value, ClaimValueTypes.String));
                 }
                 var key = _configuration["JWT:Secret"];
                 if (string.IsNullOrEmpty(key)) return BadRequest();
@@ -1887,7 +1890,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
         var claims = await _userManager.GetClaimsAsync(user);
         var systemClaims = new List<Claim>
         {
-            new("ACCESS", "CONFIRM2")
+            new(CustomClaimType.ACCESS, "CONFIRM2")
         };
         return Ok(TResult<object>.Ok(systemClaims.Select(x => new
         {

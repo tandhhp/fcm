@@ -24,6 +24,8 @@ public class LeadUpdateFeedbackArgs : BaseEntity
     public Guid? Voucher1Id { get; set; }
     public Guid? Voucher2Id { get; set; }
     public string? IdentityNumber { get; set; }
+    public Guid EventId { get; set; }
+    public DateTime EventDate { get; set; }
 
     public List<SubLeadUpdateArgs>? SubLeads { get; set; }
 }

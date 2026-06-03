@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using OfficeOpenXml;
 using Waffle.Core.Constants;
+using Waffle.Core.Interfaces.IRepository.Events;
 using Waffle.Core.Interfaces.IRepository.Leads;
 using Waffle.Core.Interfaces.IService;
 using Waffle.Core.Interfaces.IService.Events;
@@ -12,7 +13,7 @@ using Waffle.Models;
 
 namespace Waffle.Core.Services.Leads;
 
-public class LeadService(ILeadRepository _leadRepository, IVoucherService _voucherService, IHCAService _hcaService, ILogService _logService, UserManager<ApplicationUser> _userManager) : ILeadService
+public class LeadService(ILeadRepository _leadRepository, IEventRepository _eventRepository, IVoucherService _voucherService, IHCAService _hcaService, ILogService _logService, UserManager<ApplicationUser> _userManager) : ILeadService
 {
     public async Task<TResult> AddAsync(LeadCreateArgs args)
     {
@@ -303,6 +304,8 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
     {
         var lead = await _leadRepository.FindAsync(args.Id);
         if (lead is null) return TResult.Failed("Không tìm thấy khách hàng!");
+        var evt = await _eventRepository.FindAsync(args.EventId);
+        if (evt is null) return TResult.Failed("Không tìm thấy sự kiện!");
         var feedback = await _leadRepository.GetFeedbackAsync(lead.Id);
         if (feedback is null)
         {
@@ -366,6 +369,8 @@ public class LeadService(ILeadRepository _leadRepository, IVoucherService _vouch
         lead.Voucher1Id = args.Voucher1Id;
         lead.Voucher2Id = args.Voucher2Id;
         lead.CreatedBy = creator.Id;
+        lead.EventDate = args.EventDate;
+        lead.EventId = args.EventId;
         feedback.TransportId = args.TransportId;
         feedback.TableId = args.TableId;
         feedback.InterestLevel = args.InterestLevel;
