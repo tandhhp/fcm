@@ -404,6 +404,8 @@ public class ContactService(IContactRepository _contactRepository, ILeadReposito
         if (lead is null) return TResult.Failed("Không tìm thấy lịch hẹn!");
         var eventExists = await _context.Events.AnyAsync(e => e.Id == args.EventId);
         if (!eventExists) return TResult.Failed("Sự kiện không tồn tại!");
+        if (lead.Status == LeadStatus.CloseDeal) return TResult.Failed($"Không thể thay đổi lịch hẹn của lead đã ở trạng thái {EnumHelper.GetDisplayName(LeadStatus.CloseDeal)}!");
+        if (lead.Status == LeadStatus.Checkin) return TResult.Failed($"Không thể thay đổi lịch hẹn của lead đã ở trạng thái {EnumHelper.GetDisplayName(LeadStatus.Checkin)}!");
         await _context.LeadHistories.AddAsync(new LeadHistory
         {
             LeadId = lead.Id,

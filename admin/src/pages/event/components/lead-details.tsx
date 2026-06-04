@@ -1,6 +1,7 @@
+import { apiCallWebhookLogs } from "@/services/call";
 import { apiContactDetailsByPhone } from "@/services/contact";
 import { DrawerForm, DrawerFormProps, ProCard, ProDescriptions, ProTable } from "@ant-design/pro-components";
-import { Alert, Col, Empty, Row, Spin, Tag } from "antd";
+import { Alert, Button, Col, Empty, Row, Spin, Tag } from "antd";
 import { useEffect, useState } from "react";
 
 type Props = DrawerFormProps & {
@@ -59,7 +60,6 @@ const LeadDetails: React.FC<Props> = ({ lead, ...rest }) => {
 
                 if (response?.succeeded === false) {
                     setContact(null);
-                    setError(response.message || 'Không tìm thấy thông tin liên hệ');
                     return;
                 }
 
@@ -71,7 +71,6 @@ const LeadDetails: React.FC<Props> = ({ lead, ...rest }) => {
             } catch (err: any) {
                 if (cancelled) return;
                 setContact(null);
-                setError(err?.message || 'Không thể tải thông tin liên hệ');
             } finally {
                 if (!cancelled) {
                     setLoading(false);
@@ -90,7 +89,6 @@ const LeadDetails: React.FC<Props> = ({ lead, ...rest }) => {
 
     return (
         <DrawerForm submitter={false} open={open} {...drawerProps} title={`Thông tin chi tiết của ${lead?.name || 'khách hàng'}`} width={1000}>
-            {error && <Alert className="mb-4" type="warning" message={error} showIcon />}
             <Spin spinning={loading}>
                 {contact ? (
                     <Row gutter={[16, 16]}>
@@ -113,6 +111,7 @@ const LeadDetails: React.FC<Props> = ({ lead, ...rest }) => {
                         </Col>
                         <Col xs={24} md={24}>
                             <ProTable<CallHistory>
+                                className="mb-4"
                                 headerTitle="Lịch sử cuộc gọi"
                                 search={false}
                                 ghost
@@ -166,6 +165,51 @@ const LeadDetails: React.FC<Props> = ({ lead, ...rest }) => {
                     </Row>
                 ) : (!loading && !error ? <Empty description="Không có dữ liệu liên hệ" /> : null)}
             </Spin>
+            <ProTable
+                headerTitle="Nhật ký cuộc gọi"
+                request={apiCallWebhookLogs}
+                params={{
+                    fromNumber: lead?.phoneNumber
+                }}
+                search={false}
+                rowKey="id"
+                columns={[
+                    {
+                        title: '#',
+                        valueType: 'indexBorder',
+                        width: 30,
+                    },
+                    {
+                        dataIndex: 'timeStarted',
+                        title: 'Thời gian bắt đầu',
+                        valueType: 'dateTime',
+                    },
+                    {
+                        dataIndex: 'timeEnded',
+                        title: 'Thời gian kết thúc',
+                        valueType: 'dateTime',
+                    },
+                    {
+                        dataIndex: 'timeAnswered',
+                        title: 'Thời gian trả lời',
+                        valueType: 'dateTime',
+                    },
+                    {
+                        dataIndex: 'status',
+                        title: 'Trạng thái',
+                    },
+                    {
+                        dataIndex: 'recordingUrl',
+                        title: 'Bản ghi âm',
+                        render: (text, record) => text ? <Button type="primary" size="small" href={record.recordingUrl} target="_blank"
+                            rel="noopener noreferrer">
+                            Nghe ghi âm
+                        </Button> : '--'
+                    }
+                ]}
+                ghost
+                size="small"
+            />
         </DrawerForm>
     )
 }

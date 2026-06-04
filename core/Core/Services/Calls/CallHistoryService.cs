@@ -55,10 +55,10 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
                     if (telesales is null) return TResult.Failed("Người phụ trách không tồn tại!");
 
                     var lead = await _leadService.FindByPhoneNumberAsync(contact.PhoneNumber);
-                    if (lead != null && !lead.Duplicated)
+                    if (lead != null)
                     {
-                        if (lead.Status == LeadStatus.Checkin) return TResult.Failed($"Khách đã check-in vào ngày ${lead.EventDate:dd-MM-yyyy}");
-                        if (lead.Status == LeadStatus.CloseDeal) return TResult.Failed($"Khách đã chốt deal vào ngày ${lead.EventDate:dd-MM-yyyy}");
+                        if (lead.Status == LeadStatus.Checkin) return TResult.Failed($"Khách đã check-in vào ngày {lead.EventDate:dd-MM-yyyy}");
+                        if (lead.Status == LeadStatus.CloseDeal) return TResult.Failed($"Khách đã chốt deal vào ngày {lead.EventDate:dd-MM-yyyy}");
                         var leadDetail = await _context.LeadHistories.FirstOrDefaultAsync(x => x.LeadId == lead.Id);
                         await _context.LeadHistories.AddAsync(new LeadHistory
                         {
@@ -74,7 +74,7 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
                             TableId = leadDetail?.TableId,
                             TelesaleId = lead.TelesaleId,
                             ToById = lead.ToById,
-                            TransportId = leadDetail?.TransportId,
+                            TransportId = leadDetail?.TransportId
                         });
                         lead.Status = LeadStatus.Pending;
                         lead.EventDate = args.EventDate.GetValueOrDefault();
@@ -84,6 +84,7 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
                         lead.CreatedBy = contact.UserId.GetValueOrDefault();
                         lead.SourceId = contact.SourceId;
                         lead.CreatedDate = DateTime.Now;
+                        lead.AppointmentDate = DateTime.Now;
                         lead.Name = contact.Name;
                         _context.Leads.Update(lead);
                     }
@@ -104,7 +105,8 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
                             Status = LeadStatus.Pending,
                             Confirm2 = Confirm2.UNCONFIRM,
                             SourceId = contact.SourceId,
-                            CreatedDate = DateTime.Now
+                            CreatedDate = DateTime.Now,
+                            AppointmentDate = DateTime.Now
                         });
                     }
                 }

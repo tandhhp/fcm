@@ -68,6 +68,13 @@ const LeadPage: React.FC = () => {
                     setFilterOptions(params);
                     return apiLeadCheckinList(params);
                 }}
+                rowKey="id"
+                rowClassName={(record) => {
+                    if (record.attendanceId === 6) {
+                        return 'bg-red-50';
+                    }
+                    return '';
+                }}
                 columns={[
                     {
                         title: '#',
