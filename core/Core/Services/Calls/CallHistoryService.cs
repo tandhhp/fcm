@@ -84,6 +84,7 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
                         lead.CreatedBy = contact.UserId.GetValueOrDefault();
                         lead.SourceId = contact.SourceId;
                         lead.CreatedDate = DateTime.Now;
+                        lead.Name = contact.Name;
                         _context.Leads.Update(lead);
                     }
                     else
