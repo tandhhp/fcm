@@ -104,6 +104,8 @@ public class EventService(ApplicationDbContext _context, IEventRepository _event
                         a.CreatedDate,
                         a.ModifiedDate,
                         ModifiedBy = _context.Users.Where(x => x.Id == a.ModifiedBy).Select(x => x.Name).FirstOrDefault(),
+                        TodayCount = _context.Leads.Where(x => x.EventId == a.Id && x.CreatedDate.Date == DateTime.Now.Date).Count(),
+                        a.Color
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.Name))
         {

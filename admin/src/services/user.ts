@@ -361,3 +361,9 @@ export async function apiTelesaleDelete(id: string) {
 export async function apiGetManagerOptions(params?: any) {
   return request(`user/manager/options`, { params });
 }
+
+export async function apiDirectorOptions(params?: any) {
+    return request('user/director/options', {
+        params
+    });
+}

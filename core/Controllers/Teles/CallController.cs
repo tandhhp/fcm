@@ -59,7 +59,4 @@ public class CallController(ICallStatusService _callStatusService, ICallService 
 
     [HttpGet("status-details")]
     public async Task<IActionResult> GetStatusDetailsAsync([FromQuery] CallStatusDetailFilterOptions filterOptions) => Ok(await _callService.GetStatusDetailsAsync(filterOptions));
-
-    [HttpGet("trackings")]
-    public async Task<IActionResult> GetTrackingsAsync([FromQuery] CallTrackingFilterOptions filterOptions) => Ok(await _callService.GetTrackingsAsync(filterOptions));
 }

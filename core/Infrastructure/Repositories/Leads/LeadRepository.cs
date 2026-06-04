@@ -325,7 +325,9 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
                         l.BranchId,
                         c.Avatar,
                         l.Confirm2,
-                        InviteCount = _context.LeadHistories.Count(h => h.LeadId == l.Id)
+                        InviteCount = _context.LeadHistories.Count(h => h.LeadId == l.Id),
+                        c.ManagerId,
+                        EventColor = e.Color
                     };
         if (filterOptions.EventId.HasValue)
         {
@@ -353,15 +355,18 @@ public class LeadRepository(ApplicationDbContext context, IHCAService _hcaServic
         }
         if (_hcaService.IsUserInRole(RoleName.SalesManager))
         {
-            query = query.Where(x => x.SmId == userId);
+            query = query.Where(x => x.ManagerId == userId);
         }
         if (_hcaService.IsUserInRole(RoleName.TelesaleManager))
         {
-            query = query.Where(x => x.TmId == userId);
+            query = query.Where(x => x.ManagerId == userId);
         }
         if (_hcaService.IsUserInRole(RoleName.DOS))
         {
-            query = query.Where(x => x.DosId == userId);
+            query = from a in query
+                    join u in _context.Users on a.ManagerId equals u.Id
+                    where u.Id == userId
+                    select a;
         }
         if (_hcaService.IsUserInRole(RoleName.Event))
         {

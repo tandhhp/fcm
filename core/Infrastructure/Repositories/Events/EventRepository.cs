@@ -107,13 +107,13 @@ public class EventRepository(ApplicationDbContext context, IHCAService _hcaServi
                                 u.Name,
                                 u.ManagerId
                             };
-        if (filterOptions.SalesManagerId.HasValue)
+        if (filterOptions.ManagerId.HasValue)
         {
-            managerQuery = managerQuery.Where(x => x.Id == filterOptions.SalesManagerId);
+            managerQuery = managerQuery.Where(x => x.Id == filterOptions.ManagerId);
         }
-        if (filterOptions.DosId.HasValue)
+        if (filterOptions.DirectorId.HasValue)
         {
-            managerQuery = managerQuery.Where(x => x.ManagerId == filterOptions.DosId);
+            managerQuery = managerQuery.Where(x => x.ManagerId == filterOptions.DirectorId);
         }
         var managers = await managerQuery.AsNoTracking().ToListAsync();
 

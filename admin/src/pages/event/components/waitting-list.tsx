@@ -142,7 +142,12 @@ const WaitingList: React.FC = () => {
                         dataIndex: 'eventName',
                         search: false,
                         width: 50,
-                        minWidth: 50
+                        minWidth: 50,
+                        render: (dom, record) => (
+                            <Tag color={record.eventColor} className="w-full text-center">
+                                {dom}
+                            </Tag>
+                        )
                     },
                     {
                         title: 'Nguồn',

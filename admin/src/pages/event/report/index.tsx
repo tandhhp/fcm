@@ -1,7 +1,7 @@
 import { apiEventSuReport, apiExportEventSuReport } from "@/services/event";
 import { apiAttendanceOptions } from "@/services/event/attendance";
-import { apiDotOptions } from "@/services/role";
-import { apiDosOptions } from "@/services/user";
+import { apiDotOptions, apiManagerOptions } from "@/services/role";
+import { apiDirectorOptions, apiDosOptions } from "@/services/user";
 import { ExportOutlined, ReloadOutlined } from "@ant-design/icons";
 import { PageContainer, ProCard, ProForm, ProFormDatePicker, ProFormSelect } from "@ant-design/pro-components"
 import { Link, useAccess } from "@umijs/max";
@@ -38,7 +38,8 @@ const Index: React.FC = () => {
     const [toDate, setToDate] = useState<string>(dayjs().endOf('month').format('YYYY-MM-DD'));
     const [loading, setLoading] = useState<boolean>(false);
     const [atendanceOptions, setAttendanceOptions] = useState<any[]>([]);
-    const [dosId, setDosId] = useState<string>('');
+    const [directorId, setDirectorId] = useState<string>('');
+    const [managerId, setManagerId] = useState<string>('');
 
     const summary = useMemo(() => {
         const totalSalesManager = data.length;
@@ -65,17 +66,17 @@ const Index: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const result = await apiEventSuReport({ fromDate, toDate, dosId });
+            const result = await apiEventSuReport({ fromDate, toDate, directorId, managerId });
             setData(result);
             setLoading(false);
         };
         fetchData();
-    }, [fromDate, toDate, dosId]);
+    }, [fromDate, toDate, directorId, managerId]);
 
     const handleExport = async () => {
         try {
             setLoading(true);
-            const blob = await apiExportEventSuReport({ fromDate, toDate, dosId });
+            const blob = await apiExportEventSuReport({ fromDate, toDate, directorId, managerId });
             const url = window.URL.createObjectURL(new Blob([blob]));
             const link = document.createElement('a');
             link.href = url;
@@ -102,7 +103,8 @@ const Index: React.FC = () => {
                 <Button icon={<ReloadOutlined />} onClick={() => {
                     setFromDate(dayjs().startOf('month').format('YYYY-MM-DD'));
                     setToDate(dayjs().endOf('month').format('YYYY-MM-DD'));
-                    setDosId('');
+                    setDirectorId('');
+                    setManagerId('');
                 }}>
                     Làm mới
                 </Button>
@@ -120,13 +122,21 @@ const Index: React.FC = () => {
                                 setToDate(date ? date.format('YYYY-MM-DD') : '');
                             },
                         }} />
-                        <ProFormSelect name="dosId" label="DOS" placeholder="Chọn DOS" request={apiDosOptions}
+                        <ProFormSelect name="directorId" label="Giám đốc" placeholder="Chọn Giám đốc" request={apiDirectorOptions}
                             fieldProps={{
                                 onChange: (value: string) => {
-                                    setDosId(value);
+                                    setDirectorId(value);
                                 },
                                 popupMatchSelectWidth: false
                             }}
+                        />
+                        <ProFormSelect name="managerId" label="Quản lý" placeholder="Chọn Quản lý" request={apiManagerOptions}
+                            fieldProps={{
+                                onChange: (value: string) => {
+                                    setManagerId(value);
+                                },
+                                popupMatchSelectWidth: false
+                            }} showSearch
                         />
                     </ProForm>
                 </div>
@@ -167,46 +177,75 @@ const Index: React.FC = () => {
                                         </div>
                                     ))
                                 }
-                                <div className="w-28 text-right">Tong keyin</div>
+                                <div className="w-28 text-right">Tổng</div>
                                 <div className="w-28 text-right">Rate</div>
                             </div>
                             {
-                                data.map((item, index) => (
-                                    <div key={index} className="min-w-[1366px] border-b last:border-b-0">
-                                        <div className="flex">
-                                            <div className="w-36 bg-slate-50 px-3 py-2 font-medium text-slate-700">
-                                                {item.salesManagerName}
-                                            </div>
-                                            <div className="flex-1">
-                                                {
-                                                    item.salesReports.map((report: SUSalesReport, idx: number) => (
-                                                        <div key={idx} className="flex border-b border-dashed px-3 py-2 text-sm last:border-b-0 odd:bg-white even:bg-slate-50/50 hover:bg-cyan-50/60">
-                                                            <div className="w-48 font-medium text-slate-800">
-                                                                <Avatar size="small" className="mr-2" src={report.avatar} />
-                                                                <Link to={`/user/account/${report.id}`}>
-                                                                    {report.salesName}
-                                                                </Link>
+                                data.map((item, index) => {
+                                    const managerAttendanceTotals = atendanceOptions.map((option: any) =>
+                                        item.salesReports.reduce((sum, report) => {
+                                            const matchedAttendance = report.attendances.find(
+                                                (attendance) => String(attendance.attendanceId) === String(option.value)
+                                            );
+                                            return sum + (matchedAttendance?.count || 0);
+                                        }, 0)
+                                    );
+                                    const managerTotalKeyIn = item.salesReports.reduce((sum, report) => sum + (report.totalKeyInCount || 0), 0);
+                                    const managerTotalRate = item.salesReports.reduce((sum, report) => sum + (report.totalRate || 0), 0);
+
+                                    return (
+                                        <div key={index} className="min-w-[1366px] border-b last:border-b-0">
+                                            <div className="flex">
+                                                <div className="w-36 bg-slate-50 px-3 py-2 font-medium text-slate-700">
+                                                    {item.salesManagerName}
+                                                </div>
+                                                <div className="flex-1">
+                                                    {
+                                                        item.salesReports.map((report: SUSalesReport, idx: number) => (
+                                                            <div key={idx} className="flex border-b border-dashed px-3 py-2 text-sm last:border-b-0 odd:bg-white even:bg-slate-50/50 hover:bg-cyan-50/60">
+                                                                <div className="w-48 font-medium text-slate-800">
+                                                                    <Avatar size="small" className="mr-2" src={report.avatar} />
+                                                                    <Link to={`/user/account/${report.id}`}>
+                                                                        {report.salesName}
+                                                                    </Link>
+                                                                </div>
+                                                                <div className="flex-1 flex">
+                                                                    {report.attendances.map((attendance: SUAttendance, idx: number) => (
+                                                                        <div key={idx} className="flex-1 text-right tabular-nums text-slate-700">
+                                                                            {attendance.count}
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                                <div className="w-28 text-right font-semibold tabular-nums text-cyan-700">
+                                                                    {report.totalKeyInCount}
+                                                                </div>
+                                                                <div className="w-28 text-right font-medium tabular-nums text-slate-800">
+                                                                    {report.totalRate.toFixed(2)}
+                                                                </div>
                                                             </div>
-                                                            <div className="flex-1 flex">
-                                                                {report.attendances.map((attendance: SUAttendance, idx: number) => (
-                                                                    <div key={idx} className="flex-1 text-right tabular-nums text-slate-700">
-                                                                        {attendance.count}
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                            <div className="w-28 text-right font-semibold tabular-nums text-cyan-700">
-                                                                {report.totalKeyInCount}
-                                                            </div>
-                                                            <div className="w-28 text-right font-medium tabular-nums text-slate-800">
-                                                                {report.totalRate.toFixed(2)}
-                                                            </div>
+                                                        ))
+                                                    }
+                                                    <div className="flex bg-orange-100/80 px-3 py-2 text-sm font-semibold text-slate-800">
+                                                        <div className="w-48">Tổng quản lý</div>
+                                                        <div className="flex-1 flex">
+                                                            {managerAttendanceTotals.map((count: number, idx: number) => (
+                                                                <div key={idx} className="flex-1 text-right tabular-nums text-slate-800">
+                                                                    {count}
+                                                                </div>
+                                                            ))}
                                                         </div>
-                                                    ))
-                                                }
+                                                        <div className="w-28 text-right tabular-nums text-cyan-700">
+                                                            {managerTotalKeyIn}
+                                                        </div>
+                                                        <div className="w-28 text-right tabular-nums text-slate-900">
+                                                            {managerTotalRate.toFixed(2)}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))
+                                    )
+                                })
                             }
                         </div>
                     )}

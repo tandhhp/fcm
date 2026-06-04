@@ -3,6 +3,7 @@ import { ActionType, ModalForm, PageContainer, ProFormInstance, ProFormText, Pro
 import { history, useAccess } from "@umijs/max";
 import { useRef, useState } from "react";
 import WaitingList from "./components/waitting-list";
+import { CalendarOutlined } from "@ant-design/icons";
 
 const EventPage: React.FC = () => {
 
@@ -21,14 +22,15 @@ const EventPage: React.FC = () => {
                 actionRef={actionRef}
                 grid={{ gutter: 16, column: 3, xs: 1, sm: 1, md: 2, lg: 3, xl: 3, xxl: 3 }}
                 request={apiEventList}
-                metas={{
-                    title: {
-                        dataIndex: 'name',
-                        render: (dom) => {
-                            return <div className="text-base font-semibold">{dom}</div>
-                        }
-                    }
-                }}
+                renderItem={(item: any) => (
+                    <div className="p-4 rounded-lg cursor-pointer hover:shadow bg-white m-2 border overflow-hidden relative" key={item.id} style={{
+                        borderColor: `${item.color}`
+                    }}>
+                        <div className="text-base font-semibold pb-2 border-b border-dashed mb-1">{item.name}</div>
+                        <div className="text-gray-500">Showup hôm nay: <span className="font-bold text-green-500">{item.todayCount}</span></div>
+                        <CalendarOutlined className="absolute top-2 right-2 text-gray-300 rotate-45 text-4xl" />
+                    </div>
+                )}
                 onItem={(record) => {
                     return {
                         onClick: () => {

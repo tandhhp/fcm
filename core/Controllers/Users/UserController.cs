@@ -1985,4 +1985,7 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
 
     [HttpGet("manager/options")]
     public async Task<IActionResult> GetManagerOptionsAsync([FromQuery] SelectOptions selectOptions) => Ok(await _userService.GetManagerOptionsAsync(selectOptions));
+
+    [HttpGet("director/options")]
+    public async Task<IActionResult> GetDirectorOptionsAsync([FromQuery] SelectOptions selectOptions) => Ok(await _userService.GetDirectorOptionsAsync(selectOptions));
 }

@@ -669,4 +669,28 @@ public class UserService(UserManager<ApplicationUser> _userManager, RoleManager<
             Value = x.Id
         }).ToListAsync();
     }
+
+    public async Task<object?> GetDirectorOptionsAsync(SelectOptions selectOptions)
+    {
+        var query = from u in _context.Users
+                    join ur in _context.UserRoles on u.Id equals ur.UserId
+                    join r in _context.Roles on ur.RoleId equals r.Id
+                    where (r.Name == RoleName.DOS || r.Name == RoleName.Dot) && u.Status == UserStatus.Working
+                    select new
+                    {
+                        u.Id,
+                        u.Name,
+                        u.BranchId,
+                        RoleName = r.Name
+                    };
+        if (!string.IsNullOrWhiteSpace(selectOptions.KeyWords))
+        {
+            query = query.Where(x => !string.IsNullOrEmpty(x.Name) && x.Name.ToLower().Contains(selectOptions.KeyWords.ToLower()));
+        }
+        return await query.Select(x => new
+        {
+            Label = x.Name,
+            Value = x.Id
+        }).ToListAsync();
+    }
 }
