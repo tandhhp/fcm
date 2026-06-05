@@ -25,7 +25,12 @@ const EventPage: React.FC = () => {
                 renderItem={(item: any) => (
                     <div className="p-4 rounded-lg cursor-pointer hover:shadow bg-white m-2 border overflow-hidden relative" key={item.id} style={{
                         borderColor: `${item.color}`
-                    }}>
+                    }}
+                        onClick={() => {
+                            if (access.dot || access.telesaleManager) return;
+                            history.push(`/event/time-slot/center/${item.id}`);
+                        }}
+                    >
                         <div className="text-base font-semibold pb-2 border-b border-dashed mb-1">{item.name}</div>
                         <div className="text-gray-500">Showup hôm nay: <span className="font-bold text-green-500">{item.todayCount}</span></div>
                         <CalendarOutlined className="absolute top-2 right-2 text-gray-300 rotate-45 text-4xl" />
