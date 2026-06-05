@@ -991,17 +991,17 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
     public async Task<IActionResult> GetOptionsAsync([FromQuery] Guid? telesalesManagerId)
     {
         var query = from a in _context.Users
-                    //where a.Status == UserStatus.Working
+                    where a.Status == UserStatus.Working
                     select new
                     {
-                        a.TmId,
+                        a.ManagerId,
                         a.UserName,
                         a.Name,
                         a.Id
                     };
         if (telesalesManagerId != null)
         {
-            query = query.Where(x => x.TmId == telesalesManagerId);
+            query = query.Where(x => x.ManagerId == telesalesManagerId);
         }
         return Ok(await query.Select(a => new
         {

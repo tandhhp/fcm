@@ -115,9 +115,10 @@ public class ContactService(IContactRepository _contactRepository, ILeadReposito
             ProvinceName = province.Name,
             contact.Gender,
             user.TeamId,
-            user.TmId,
             TelesalesManagerName = telesalesManager.Name,
-            contact.SourceId
+            contact.SourceId,
+            user.ManagerId,
+            contact.BranchId
         });
     }
 

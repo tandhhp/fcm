@@ -92,7 +92,7 @@ const ContactForm: React.FC<Props> = (props) => {
                     },
                     {
                         name: 'telesalesManagerId',
-                        value: response.data.tmId
+                        value: response.data.managerId
                     },
                     {
                         name: 'marriedStatus',
@@ -101,10 +101,14 @@ const ContactForm: React.FC<Props> = (props) => {
                     {
                         name: 'sourceId',
                         value: response.data.sourceId
+                    },
+                    {
+                        name: 'branchId',
+                        value: response.data.branchId
                     }
                 ]);
                 setSelectedProvinceId(response.data.provinceId);
-                setTelesalesManagerId(response.data.tmId);
+                setTelesalesManagerId(response.data.managerId);
             });
         } else {
             formRef.current?.resetFields();
@@ -155,12 +159,12 @@ const ContactForm: React.FC<Props> = (props) => {
                 </Col>
                 <Col xs={24} md={12} hidden={access.telesale}>
                     <ProFormSelect name={`telesalesManagerId`}
-                        label="Team" request={apiUserTelesalesManagerOptions} showSearch
+                        label="Quản lý" request={apiUserTelesalesManagerOptions} showSearch
                         onChange={(value: number) => setTelesalesManagerId(value)}
                     />
                 </Col>
                 <Col xs={24} md={12} hidden={access.telesale}>
-                    <ProFormSelect name={`userId`} label="Agent"
+                    <ProFormSelect name={`userId`} label="Nhân viên"
                         showSearch options={userOptions} disabled={!telesalesManagerId} />
                 </Col>
                 <Col xs={24} md={12}>
