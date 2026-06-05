@@ -11,6 +11,7 @@ import BookingForm from "./components/booking";
 import { apiSourceOptions } from "@/services/settings/source";
 import AppointmentDrawer from "./components/appointment-drawer";
 import LeadStatusRender from "@/components/lead/status-render";
+import { apiBranchOptions } from "@/services/settings/branch";
 
 const ContactPage: React.FC = () => {
 
@@ -28,7 +29,15 @@ const ContactPage: React.FC = () => {
         {
             title: '#',
             valueType: 'indexBorder',
-            width: 30
+            width: 30,
+            align: 'center'
+        },
+        {
+            title: 'Chi nhánh',
+            dataIndex: 'branchId',
+            valueType: 'select',
+            request: apiBranchOptions,
+            width: 100
         },
         {
             title: 'Họ và tên',

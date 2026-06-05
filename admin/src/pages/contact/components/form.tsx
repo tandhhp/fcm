@@ -1,4 +1,5 @@
 import { apiContactCreate, apiContactDetail, apiContactUpdate } from "@/services/contact";
+import { apiBranchOptions } from "@/services/settings/branch";
 import { apiDistrictOptions } from "@/services/settings/district";
 import { apiJobKindOptions } from "@/services/settings/job-kind";
 import { apiProvinceOptions } from "@/services/settings/province";
@@ -186,6 +187,12 @@ const ContactForm: React.FC<Props> = (props) => {
                 </Col>
                 <Col xs={24} md={8}>
                     <ProFormSelect name={`sourceId`} label="Nguồn danh bạ" request={apiSourceOptions} showSearch />
+                </Col>
+                <Col xs={24} md={8}>
+                    <ProFormSelect name="branchId" label="Chi nhánh" request={apiBranchOptions} allowClear={false}
+                        rules={[{ required: true, message: "Vui lòng chọn chi nhánh" }]}
+                        initialValue={1}
+                    />
                 </Col>
             </Row>
             <ProFormTextArea name="note" label="Ghi chú" />

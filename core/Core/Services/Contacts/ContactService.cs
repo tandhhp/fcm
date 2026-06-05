@@ -138,6 +138,7 @@ public class ContactService(IContactRepository _contactRepository, ILeadReposito
         data.TransportId = args.TransportId;
         data.ModifiedDate = DateTime.Now;
         data.ModifiedBy = _hcaService.GetUserId();
+        data.BranchId = args.BranchId;
         await _logService.AddAsync($"Cập nhật liên hệ {data.Name} - {data.PhoneNumber}");
         await _contactRepository.UpdateAsync(data);
         return TResult.Success;
@@ -150,7 +151,7 @@ public class ContactService(IContactRepository _contactRepository, ILeadReposito
             if (!PhoneNumberValidator.IsValidVietnamPhoneNumber(args.PhoneNumber)) return TResult.Failed("Số điện thoại không hợp lệ");
             if (await _contactRepository.IsPhoneExistAsync(args.PhoneNumber)) return TResult.Failed("Số điện thoại đã tồn tại");
             if (args.UserId != null && !await _userManager.Users.AnyAsync(x => x.Id == args.UserId)) return TResult.Failed("Người dùng không tồn tại");
-
+            if (!await _context.Branches.AnyAsync(x => x.Id == args.BranchId)) return TResult.Failed("Chi nhánh không tồn tại");
             var contact = new Contact
             {
                 Name = args.Name,
@@ -166,7 +167,8 @@ public class ContactService(IContactRepository _contactRepository, ILeadReposito
                 Note = args.Note,
                 Gender = args.Gender,
                 TransportId = args.TransportId,
-                SourceId = args.SourceId
+                SourceId = args.SourceId,
+                BranchId = args.BranchId
             };
             if (_hcaService.IsUserInRole(RoleName.Telesales))
             {

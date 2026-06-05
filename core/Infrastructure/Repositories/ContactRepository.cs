@@ -339,7 +339,8 @@ public class ContactRepository(ApplicationDbContext context, IHCAService _hcaSer
                         LastCallTime = a.LastCallTime,
                         TeamId = b.TeamId,
                         TeamName = t.Name,
-                        ManagerName = _context.Users.Where(u => u.Id == b.ManagerId).Select(u => u.Name).FirstOrDefault()
+                        ManagerName = _context.Users.Where(u => u.Id == b.ManagerId).Select(u => u.Name).FirstOrDefault(),
+                        BranchId = a.BranchId
                     };
         if (!string.IsNullOrWhiteSpace(filterOptions.PhoneNumber))
         {

@@ -15,4 +15,5 @@ public class ContactCreateArgs
     public bool? Gender { get; set; }
     public int? TransportId { get; set; }
     public int? SourceId { get; set; }
+    public int BranchId { get; set; }
 }

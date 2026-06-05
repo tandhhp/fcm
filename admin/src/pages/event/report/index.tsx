@@ -1,7 +1,7 @@
 import { apiEventSuReport, apiExportEventSuReport } from "@/services/event";
 import { apiAttendanceOptions } from "@/services/event/attendance";
-import { apiDotOptions, apiManagerOptions } from "@/services/role";
-import { apiDirectorOptions, apiDosOptions } from "@/services/user";
+import { apiManagerOptions } from "@/services/role";
+import { apiDirectorOptions } from "@/services/user";
 import { ExportOutlined, ReloadOutlined } from "@ant-design/icons";
 import { PageContainer, ProCard, ProForm, ProFormDatePicker, ProFormSelect } from "@ant-design/pro-components"
 import { Link, useAccess } from "@umijs/max";
@@ -190,7 +190,16 @@ const Index: React.FC = () => {
                                             return sum + (matchedAttendance?.count || 0);
                                         }, 0)
                                     );
-                                    const managerTotalKeyIn = item.salesReports.reduce((sum, report) => sum + (report.totalKeyInCount || 0), 0);
+                                    const managerTotalKeyIn = item.salesReports.reduce(
+                                        (sum, report) =>
+                                            sum +
+                                            report.attendances.reduce(
+                                                (attendanceSum, attendance) =>
+                                                    attendanceSum + (attendance.attendanceId === 6 ? 0 : (attendance.count || 0)),
+                                                0
+                                            ),
+                                        0
+                                    );
                                     const managerTotalRate = item.salesReports.reduce((sum, report) => sum + (report.totalRate || 0), 0);
 
                                     return (

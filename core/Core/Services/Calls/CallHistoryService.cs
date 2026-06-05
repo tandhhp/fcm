@@ -86,6 +86,7 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
                         lead.CreatedDate = DateTime.Now;
                         lead.AppointmentDate = DateTime.Now;
                         lead.Name = contact.Name;
+                        lead.BranchId = contact.BranchId.GetValueOrDefault();
                         _context.Leads.Update(lead);
                     }
                     else
@@ -100,7 +101,7 @@ public class CallHistoryService(ICallHistoryRepository _callHistoryRepository, I
                             Gender = contact.Gender,
                             Note = args.Note,
                             TelesaleId = contact.UserId,
-                            BranchId = telesales.BranchId,
+                            BranchId = contact.BranchId.GetValueOrDefault(),
                             CreatedBy = contact.UserId.GetValueOrDefault(),
                             Status = LeadStatus.Pending,
                             Confirm2 = Confirm2.UNCONFIRM,

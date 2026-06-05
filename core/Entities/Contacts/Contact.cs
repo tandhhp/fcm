@@ -43,6 +43,7 @@ public class Contact : AuditEntity
     public string? PhoneNumber2 { get; set; }
     [StringLength(450)]
     public string? Name2 { get; set; }
+    public int? BranchId { get; set; }
 
     public virtual Transport? Transport { get; set; }
     public virtual District? District { get; set; }
