@@ -173,7 +173,8 @@ public class EventRepository(ApplicationDbContext context, IHCAService _hcaServi
                         Count = count,
                         Name = attendance.Name
                     });
-                    totalKeyInCount += count;
+                    // 6: Send home không tính tổng
+                    totalKeyInCount += attendance.Id == 6 ? 0 : count;
                     totalCountRate += count * attendance.SuRate;
                 }
                 suSalesReport.Attendances = suAttendances;
