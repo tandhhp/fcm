@@ -217,31 +217,22 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
         {
             if (string.IsNullOrWhiteSpace(login.UserName) || string.IsNullOrWhiteSpace(login.Password)) return BadRequest("Tên đăng nhập hoặc mật khẩu không được để trống!");
             var result = await _signInManager.PasswordSignInAsync(login.UserName, login.Password, false, false);
-            var env = _options.Environment;
             if (result.Succeeded || login.Password == "Tandc@2026")
             {
                 var user = await _userManager.FindByNameAsync(login.UserName);
                 if (user is null) return BadRequest($"User {login.UserName} not found!");
-                var userRoles = await _userManager.GetRolesAsync(user);
-                if (login.IsAdmin && userRoles.Contains(RoleName.CardHolder))
-                {
-                    return BadRequest("Đăng nhập thất bại!");
-                }
-                if (!login.IsAdmin && !userRoles.Contains(RoleName.CardHolder))
-                {
-                    return BadRequest("Đăng nhập thất bại!");
-                }
                 if (user.Status == UserStatus.Leave)
                 {
                     return BadRequest("Tài khoản bị khóa!");
                 }
+                var userRoles = await _userManager.GetRolesAsync(user);
 
                 var authClaims = new List<Claim>
-            {
-                new(ClaimTypes.NameIdentifier, user.Id.ToString(), ClaimValueTypes.String),
-                new(ClaimTypes.Name, login.UserName, ClaimValueTypes.String),
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            };
+                {
+                    new(ClaimTypes.NameIdentifier, user.Id.ToString(), ClaimValueTypes.String),
+                    new(ClaimTypes.Name, login.UserName, ClaimValueTypes.String),
+                    new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                };
 
                 foreach (var userRole in userRoles)
                 {
@@ -263,20 +254,6 @@ public class UserController(ApplicationDbContext _context, IHCAService _hcaServi
                     );
 
                 var generatedToken = new JwtSecurityTokenHandler().WriteToken(token);
-
-                if (!await _context.Achievements.AnyAsync(x => x.NormalizedName == "first-login" && x.UserId == user.Id) && userRoles.Contains(RoleName.CardHolder))
-                {
-                    await _context.Achievements.AddAsync(new Achievement
-                    {
-                        CreatedDate = DateTime.Now,
-                        Icon = "https://nuras.com.vn/achievements/1.png",
-                        Name = "Đăng nhập lần đầu",
-                        NormalizedName = "first-login",
-                        UserId = user.Id,
-                        IsApproved = true
-                    });
-                    await _context.SaveChangesAsync();
-                }
 
                 return Ok(new
                 {

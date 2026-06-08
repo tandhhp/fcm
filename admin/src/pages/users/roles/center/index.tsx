@@ -327,7 +327,7 @@ const RoleCenter: React.FC = () => {
                     <Button icon={<LockOutlined />} size='small' hidden={!access.hr || entity.status === 0} />
                 </Popconfirm>,
                 <Popconfirm title="Khóa tài khoản?" key={23} onConfirm={() => onLock(entity.id)}>
-                    <Button type="primary" icon={<LockOutlined />} size='small' danger hidden={!access.hr || entity.status === 1} />
+                    <Button type="primary" icon={<LockOutlined />} size='small' danger hidden={(!access.hr && !access.canAdmin) || entity.status === 1} />
                 </Popconfirm>,
                 <Popconfirm title="Xác nhận xóa?" key={2} onConfirm={() => onConfirm(entity.id)}>
                     <Button type="primary" icon={<DeleteOutlined />} size='small' danger hidden={!access.canAdmin} />
